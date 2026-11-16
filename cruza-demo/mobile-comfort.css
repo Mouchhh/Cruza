@@ -170,3 +170,9 @@ html body #report-tabs .mc-step-label{display:none}
  html body .reports-heading .report-actions>.report-header-library select{flex:1 1 0;min-width:0}
  html body .reports-heading .report-actions>button{width:100%!important;min-width:0!important;padding:6px 8px!important}
 }
+@media screen and (max-width:700px){
+ html body.reports-mode #report-previous{display:inline-flex!important;align-items:center;justify-content:center;flex:0 0 38%!important;min-height:44px}
+ html body.reports-mode .report-actions-dock{justify-content:space-between!important;gap:8px!important}
+ html body.reports-mode #report-next{flex:1 1 0!important}
+}
+@media screen and (max-width:700px){html body.document-completed-report #report-tabs .mc-step-label{display:none!important}}
