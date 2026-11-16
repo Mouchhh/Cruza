@@ -95,3 +95,7 @@ html body .mc-step-label{display:none}
  html body #training-custom-add,html body #training-personal-exercises{flex:1 1 0!important;min-height:44px}
  html body #bible-results{margin:10px 0 6px!important;font-size:13px!important;font-weight:700}
 }
+@media screen and (max-width:700px){
+ html body .mc-error{margin:6px 0 10px;padding:10px 12px;border-radius:10px;background:#fdeaea;border:1px solid #e24b4a;color:#8a1c1c;font-size:13px;font-weight:600}
+ html body .training-step-footer{bottom:var(--navigation-bottom-space,64px)!important;z-index:50!important;background:#f3f6fb;padding-bottom:8px}
+}
