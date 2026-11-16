@@ -18,3 +18,12 @@ html body #workspace-navigation>button.mc-plus{display:none!important}
  body.home-mode .home-hero p,body.home-mode .home-hero .eyebrow,body.home-mode .home-hero #home-date{color:#fff!important;opacity:1!important}
 }
 
+/* Accueil téléphone : « Bonjour coach » en simple bannière */
+@media screen and (max-width:700px){
+ html body.home-mode .home-hero{padding:12px 14px!important;gap:10px!important;margin-bottom:10px!important;min-height:0!important;align-items:center!important}
+ html body.home-mode .home-hero>div>p:not(#home-date),html body.home-mode .home-hero .home-welcome-intro,html body.home-mode .home-hero .home-stats{display:none!important}
+ html body.home-mode .home-hero .eyebrow{margin:0!important;font-size:10px!important}
+ html body.home-mode .home-hero #home-date{margin:2px 0 0!important;font-size:11px!important}
+ html body.home-mode .home-hero h1{font-size:22px!important;line-height:1.15!important;margin:4px 0 0!important;padding-left:10px}
+ html body.home-mode .home-hero .home-crest{width:44px!important;height:44px!important}
+}
