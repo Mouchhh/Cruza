@@ -27,3 +27,7 @@ html body #workspace-navigation>button.mc-plus{display:none!important}
  html body #home-live-widgets .home-live-card>:is(p,h3,.home-live-caption){display:none!important}
  html body #home-live-widgets .home-live-card .home-live-open{margin-top:auto!important;min-height:36px;font-size:12px!important;padding:6px 8px!important}
 }
+@media screen and (max-width:700px){
+ html body #home-live-widgets .home-live-card.home-live-training{grid-column:1/-1;aspect-ratio:auto;flex-direction:row!important;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:6px 12px!important}
+ html body #home-live-widgets .home-live-card.home-live-training .home-live-open{margin-top:0!important}
+}
