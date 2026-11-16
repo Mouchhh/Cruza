@@ -21,4 +21,6 @@ Le SMFC garde ses données et son historique. Aucun nouveau service payant n’e
 
 ## Publication de ce rangement
 
-Le push direct vers main a été refusé par le contrôle automatique car il déclencherait potentiellement un déploiement du SMFC. La livraison est préparée dans la branche `chore/cruza-organisation`, sans fusion ni déploiement. La fusion doit être approuvée explicitement après revue. Les modèles et contrôles ne sont pas actifs sur main avant cette fusion.
+La fusion vers main et le déploiement automatique associé ont été expressément autorisés par Enzo le 16 novembre 2026. Le centre de pilotage, les modèles et les outils font partie de la livraison autorisée. Le déploiement public reste à vérifier après publication.
+
+Cette autorisation ne signifie pas que les trois nouveaux dépôts privés, le Project ou les projets Supabase ont été créés : ces opérations restent dépendantes de connexions administrateur disponibles.
