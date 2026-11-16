@@ -130,3 +130,16 @@ html body .mc-search-row{display:contents}
  html body #exercise-studio-board .studio-stage canvas{width:auto!important;height:calc(100dvh - 398px)!important;max-width:100%!important;aspect-ratio:1500/2400}
  html body #exercise-studio-board .studio-stage canvas[data-portrait="false"]{width:100%!important;height:auto!important;aspect-ratio:2400/1500}
 }
+/* Téléphone : liste « Mes séances » plus claire — recherche + créer, filtres sur une ligne, cartes avec Ouvrir / Supprimer */
+@media screen and (max-width:700px){
+ html body #training-library-page .report-library,html body #training-library-page>p.hint{display:none!important}
+ html body #training-library-page>*{margin-top:0!important;margin-bottom:10px!important}
+ html body #training-library-page .training-session-filters{display:grid!important;grid-template-columns:1fr 1fr!important;gap:8px!important}
+ html body #training-library-page .training-session-filters label{font-size:11px!important;gap:3px!important;margin:0!important;min-width:0}
+ html body #training-library-page .training-session-filters select{min-height:44px;font-size:13px!important;padding:6px 8px!important;width:100%}
+ html body #training-library-page .training-session-results{font-size:12px!important;color:#5d7391;margin-bottom:6px!important}
+ html body #training-library-page .training-saved-card{display:flex!important;flex-wrap:wrap!important;gap:8px!important;padding:12px!important}
+ html body #training-library-page .training-saved-card>div{flex:1 1 100%!important}
+ html body #training-library-page .training-saved-card>button{flex:1 1 0!important;min-height:44px}
+ html body .training-workspace-tabs,html body #training-space>.task-section-tabs{margin-bottom:8px!important}
+}
