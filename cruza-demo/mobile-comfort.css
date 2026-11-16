@@ -186,3 +186,15 @@ html body #report-tabs .mc-step-label{display:none}
  html.club-private-request:not(.club-authenticated) body.task-navigation.responsive-navigation #workspace-navigation,
  html.club-private-request:not(.club-authenticated) body .mc-extra{display:none!important}
 }
+/* Téléphone : en-tête sans chevauchement, même avec un long nom de club (équipe | logo + nom | profil) */
+@media screen and (max-width:700px){
+ html body>header{position:static!important}
+ html body>header .header-actions{display:contents!important}
+ html body>header .team-space-picker{order:1!important;flex:0 1 36%!important;max-width:36%!important;margin:0!important}
+ html body>header .brand{order:2!important;position:static!important;transform:none!important;flex:1 1 0!important;min-width:0!important;justify-content:center!important;overflow:hidden}
+ html body>header .brand>span:not(.club-monogram){min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:13px!important;margin-left:6px!important}
+ html body>header #save{order:3!important}
+ html body>header .coach-profile-menu{order:4!important;margin-left:0!important}
+}
+@media screen and (max-width:700px){html body>header .brand>span:not(.club-monogram){font-size:12px!important;letter-spacing:0!important}}
+@media screen and (max-width:700px){html body>header .club-save-indicator,html body>header #club-save-indicator{display:none!important}}
