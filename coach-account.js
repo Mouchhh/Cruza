@@ -758,7 +758,7 @@ function coachAccountOpen(initialTab = "profile") {
     const url = new URL(
       "https://github.com/Mouchhh/FOOT-U16-2026-2027/issues/new",
     );
-    url.searchParams.set("title", "Problème sur Le Vestiaire");
+    url.searchParams.set("title", "Problème sur Cruza");
     url.searchParams.set(
       "body",
       (description.value.trim() ||
