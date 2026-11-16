@@ -31,3 +31,13 @@ html body #workspace-navigation>button.mc-plus{display:none!important}
  html body #home-live-widgets .home-live-card.home-live-training{grid-column:1/-1;aspect-ratio:auto;flex-direction:row!important;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:6px 12px!important}
  html body #home-live-widgets .home-live-card.home-live-training .home-live-open{margin-top:0!important}
 }
+/* Disposition finale : Groupe + Agenda en carrés, Forme en bandeau avec les 5 pastilles */
+@media screen and (max-width:700px){
+ html body #home-live-widgets .home-live-card.home-live-training{grid-column:auto;aspect-ratio:1/1;flex-direction:column!important;flex-wrap:nowrap;align-items:stretch;justify-content:flex-start;order:2}
+ html body #home-live-widgets .home-live-card.home-live-training .home-live-open{margin-top:auto!important}
+ html body #home-live-widgets .home-live-card.home-live-group{order:1}
+ html body #home-live-widgets .home-live-card.home-live-form{order:3;grid-column:1/-1;aspect-ratio:auto;flex-direction:row;flex-wrap:wrap;align-items:center;justify-content:space-between}
+ html body #home-live-widgets .home-live-card.home-live-form .home-live-value{display:none!important}
+ html body #home-live-widgets .home-live-card.home-live-form:has(.home-live-results:empty) .home-live-value{display:block!important;font-size:14px!important}
+ html body #home-live-widgets .home-live-card.home-live-form .home-live-results{display:flex!important;gap:8px}
+}
