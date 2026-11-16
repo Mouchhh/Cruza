@@ -134,7 +134,13 @@
         status,
         grid,
       );
-      options.panel.append(section);
+      // Juste sous « Logo du club » ; Entrée dans un nom de photo ne doit pas enregistrer la fiche du club.
+      section.addEventListener("keydown", (e) => {
+        if (e.key === "Enter" && e.target.tagName === "INPUT") e.preventDefault();
+      });
+      const identityBox = options.panel.querySelector(".account-club-identity");
+      if (identityBox) identityBox.after(section);
+      else options.panel.append(section);
       function paint() {
         grid.replaceChildren();
         const rows = window.clubPhotoLibrary.cached();
