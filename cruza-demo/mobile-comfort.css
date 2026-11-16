@@ -105,7 +105,7 @@ html body .mc-search-row{display:contents}
  html body #training-library-page .training-step-heading{margin:0!important;min-height:0!important}
  html body .mc-search-row{display:flex!important;gap:8px;align-items:center;margin:0 0 10px}
  html body .mc-search-row .training-library-search{flex:1 1 0;min-width:0;font-size:0!important;margin:0!important}
- html body .mc-search-row .training-library-search input{font-size:15px!important;width:100%;min-height:44px}
+ html body .mc-search-row .training-library-search input{font-size:16px!important;width:100%;min-height:44px}
  html body .mc-search-row #training-create-session{flex:0 0 auto;min-height:44px;padding:8px 12px!important;white-space:nowrap}
 }
 /* Téléphone : « Créer mon exercice » — terrain pleine largeur, palette en bandeau qui défile dessous */
@@ -136,7 +136,7 @@ html body .mc-search-row{display:contents}
  html body #training-library-page>*{margin-top:0!important;margin-bottom:10px!important}
  html body #training-library-page .training-session-filters{display:grid!important;grid-template-columns:1fr 1fr!important;gap:8px!important}
  html body #training-library-page .training-session-filters label{font-size:11px!important;gap:3px!important;margin:0!important;min-width:0}
- html body #training-library-page .training-session-filters select{min-height:44px;font-size:13px!important;padding:6px 8px!important;width:100%}
+ html body #training-library-page .training-session-filters select{min-height:44px;font-size:16px!important;padding:6px 8px!important;width:100%}
  html body #training-library-page .training-session-results{font-size:12px!important;color:#5d7391;margin-bottom:6px!important}
  html body #training-library-page .training-saved-card{display:flex!important;flex-wrap:wrap!important;gap:8px!important;padding:12px!important}
  html body #training-library-page .training-saved-card>div{flex:1 1 100%!important}
@@ -198,3 +198,7 @@ html body #report-tabs .mc-step-label{display:none}
 }
 @media screen and (max-width:700px){html body>header .brand>span:not(.club-monogram){font-size:12px!important;letter-spacing:0!important}}
 @media screen and (max-width:700px){html body>header .club-save-indicator,html body>header #club-save-indicator{display:none!important}}
+/* Téléphone : champs de saisie à 16 px, sinon l'iPhone zoome dans la page dès qu'on touche un champ */
+@media screen and (max-width:700px){
+ html body input:not([type=checkbox]):not([type=radio]):not([type=range]):not([type=color]):not([type=file]),html body select,html body textarea{font-size:16px!important}
+}

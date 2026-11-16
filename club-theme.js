@@ -86,6 +86,15 @@
         bgMap.set(parse(h).join(","), delta > 0 ? mix(base, [255, 255, 255], Math.min(0.12, delta * 2)) : mix(base, [0, 0, 0], Math.min(0.08, -delta * 2)));
       }
     }
+    // Any other dark navy (photo filters, gradients, overlays) follows the club colour too.
+    const navy = (rgb) => {
+      const [h, s, l] = toHsl(rgb);
+      if (!(h >= 195 && h <= 240 && s > 0.3 && l < 0.3)) return null;
+      if (bright) { const [ph] = toHsl(p); return fromHsl(ph, 0.2, Math.max(0.07, l * 0.55)); }
+      return mix(p, [0, 0, 0], Math.min(0.85, Math.max(0.1, 0.45 + (0.2 - l) * 1.3)));
+    };
+    map.fallback = navy;
+    if (bgMap) bgMap.fallback = navy;
     return { custom, map, bgMap, primaryKeys, pastel: bgMap ? toHex(bgMap.get(parse(DEFAULTS.primary).join(","))) : null, primary: toHex(p), secondary: toHex(readable(secondary)) };
   }
   const COLOR = /#([0-9a-f]{8}|[0-9a-f]{6}|[0-9a-f]{3})\b|rgba?\(\s*(\d{1,3})\s*,\s*(\d{1,3})\s*,\s*(\d{1,3})\s*(?:,\s*([\d.]+%?)\s*)?\)/gi;
@@ -100,7 +109,7 @@
         rgb = [r, g, b].map(Number);
         alpha = a === undefined ? null : a.endsWith("%") ? parseFloat(a) / 100 : parseFloat(a);
       }
-      const target = map.get(rgb.join(","));
+      const target = map.get(rgb.join(",")) || (map.fallback && map.fallback(rgb));
       if (!target) return match;
       const [tr, tg, tb] = target.map((v) => Math.round(v));
       return alpha === null ? toHex(target) : "rgba(" + tr + ", " + tg + ", " + tb + ", " + +alpha.toFixed(3) + ")";
@@ -128,9 +137,27 @@
     for (const [style, props] of originals) for (const [prop, [value, priority]] of props) style.setProperty(prop, value, priority);
     originals.clear();
   }
+  // Composition tokens ("pions") follow the club colour unless the coach picked another shirt colour.
+  let shirtColor = DEFAULTS.primary;
+  function syncShirt() {
+    try {
+      if (typeof state === "undefined" || state === null) return;
+      const auto = state.colorAuto === true || (state.colorAuto === undefined && String(state.color).toLowerCase() === DEFAULTS.primary);
+      if (!auto || state.color === shirtColor) return;
+      state.color = shirtColor;
+      state.colorAuto = true;
+      document.documentElement.style.setProperty("--shirt", shirtColor);
+      const input = document.getElementById("color");
+      if (input) input.value = shirtColor;
+      if (typeof persist === "function") persist();
+    } catch {
+      /* Composition state not ready yet: it syncs again when the page renders. */
+    }
+  }
   function applyColors(details) {
     restore();
     const { custom, map, bgMap, primaryKeys, pastel, primary, secondary } = palette(details);
+    shirtColor = custom ? primary : DEFAULTS.primary;
     document.documentElement.style.setProperty("--club-theme-primary", primary);
     document.documentElement.style.setProperty("--club-theme-secondary", secondary);
     if (!custom) return;
@@ -220,12 +247,13 @@
   function apply(details = typeof coachClubDetailsRead === "function" ? coachClubDetailsRead() : null) {
     try {
       applyColors(details);
+      syncShirt();
       applyLogo(details);
     } catch {
       /* The default theme stays usable. */
     }
   }
-  window.clubTheme = { apply, palette, readable: (hex) => toHex(readable(hex)), defaults: DEFAULTS };
+  window.clubTheme = { apply, syncShirt, palette, readable: (hex) => toHex(readable(hex)), defaults: DEFAULTS };
   if (document.readyState === "complete") apply();
   else window.addEventListener("load", () => apply());
 })();
