@@ -47,7 +47,7 @@
     const [r, g, b] = h < 60 ? [c, x, 0] : h < 120 ? [x, c, 0] : h < 180 ? [0, c, x] : h < 240 ? [0, x, c] : h < 300 ? [x, 0, c] : [c, 0, x];
     return [r + m, g + m, b + m].map((v) => v * 255);
   };
-  const isBright = (rgb) => { const h = toHsl(rgb)[0]; return contrastWithWhite(rgb) < 3 && h >= 40 && h <= 110; };
+  const isBright = (rgb) => contrastWithWhite(rgb) < 3.2;
   function deepen(hex) {
     let [h, s, l] = toHsl(parse(hex));
     if (h >= 45 && h <= 100) h = 42 + (h - 42) * 0.25;
@@ -75,7 +75,18 @@
     }
     for (const [h, t] of Object.entries(SOURCES.light)) map.set(parse(h).join(","), mix(p, [255, 255, 255], t));
     for (const h of SOURCES.secondary) map.set(parse(h).join(","), readable(secondary));
-    return { custom, map, primary: toHex(p), secondary: toHex(readable(secondary)) };
+    // Vivid/bright club colour: backgrounds become a soft pastel (with dark text), text and borders keep the deeper tone.
+    let bgMap = null;
+    const primaryKeys = new Set(SOURCES.primary.map((h) => parse(h).join(",")));
+    if (bright) {
+      const [ph, ps, pl] = toHsl(parse(primary)), base = fromHsl(ph, Math.min(ps, 0.78), Math.min(Math.max(pl, 0.68), 0.78));
+      bgMap = new Map(map);
+      for (const h of SOURCES.primary) {
+        const delta = luminance(parse(h)) - luminance(parse(DEFAULTS.primary));
+        bgMap.set(parse(h).join(","), delta > 0 ? mix(base, [255, 255, 255], Math.min(0.12, delta * 2)) : mix(base, [0, 0, 0], Math.min(0.08, -delta * 2)));
+      }
+    }
+    return { custom, map, bgMap, primaryKeys, pastel: bgMap ? toHex(bgMap.get(parse(DEFAULTS.primary).join(","))) : null, primary: toHex(p), secondary: toHex(readable(secondary)) };
   }
   const COLOR = /#([0-9a-f]{8}|[0-9a-f]{6}|[0-9a-f]{3})\b|rgba?\(\s*(\d{1,3})\s*,\s*(\d{1,3})\s*,\s*(\d{1,3})\s*(?:,\s*([\d.]+%?)\s*)?\)/gi;
   function replaceColors(value, map) {
@@ -95,6 +106,18 @@
       return alpha === null ? toHex(target) : "rgba(" + tr + ", " + tg + ", " + tb + ", " + +alpha.toFixed(3) + ")";
     });
   }
+  const PRIMARY_VARS = /var\(--(?:smfc-blue|club-blue|club-accent|club-theme-primary)\s*(?:,[^)]*)?\)/gi;
+  const PRIMARY_VARS_T = new RegExp(PRIMARY_VARS.source, "i");
+  function usesPrimary(value, keys) {
+    for (const m of value.matchAll(COLOR)) {
+      const [, hex, r, g, b] = m;
+      let rgb;
+      if (hex) { const full = hex.length === 3 ? hex.split("").map((c) => c + c).join("") : hex; rgb = [0, 2, 4].map((i) => parseInt(full.slice(i, i + 2), 16)); }
+      else rgb = [r, g, b].map(Number);
+      if (keys.has(rgb.join(","))) return true;
+    }
+    return false;
+  }
   function eachStyle(rules, fn) {
     for (const rule of rules) {
       if (rule.style) fn(rule.style);
@@ -107,7 +130,7 @@
   }
   function applyColors(details) {
     restore();
-    const { custom, map, primary, secondary } = palette(details);
+    const { custom, map, bgMap, primaryKeys, pastel, primary, secondary } = palette(details);
     document.documentElement.style.setProperty("--club-theme-primary", primary);
     document.documentElement.style.setProperty("--club-theme-secondary", secondary);
     if (!custom) return;
@@ -119,15 +142,42 @@
         continue; // Cross-origin font sheets cannot be read and carry no brand colour.
       }
       eachStyle(rules, (style) => {
+        let pastelBackground = false;
+        if (bgMap) {
+          // `background: var(--smfc-blue)` hides its longhands from the loop below: read the shorthand.
+          const sh = style.getPropertyValue("background");
+          if (sh && PRIMARY_VARS_T.test(sh)) {
+            PRIMARY_VARS.lastIndex = 0;
+            if (!originals.has(style)) originals.set(style, new Map());
+            if (!originals.get(style).has("background")) originals.get(style).set("background", [sh, style.getPropertyPriority("background")]);
+            style.setProperty("background", sh.replace(PRIMARY_VARS, pastel), style.getPropertyPriority("background"));
+            pastelBackground = true;
+          }
+          PRIMARY_VARS.lastIndex = 0;
+        }
         for (let i = 0; i < style.length; i++) {
           const prop = style[i],
             value = style.getPropertyValue(prop);
-          if (!value || !/#|rgb/i.test(value)) continue;
-          const next = replaceColors(value, map);
+          const viaVar = bgMap && /^background/.test(prop) && /var\(--(?:smfc-blue|club-blue|club-accent|club-theme-primary)/i.test(value);
+          if (!value || !(viaVar || /#|rgb/i.test(value))) continue;
+          const isBackground = bgMap && /^background/.test(prop);
+          let next = replaceColors(value, isBackground ? bgMap : map);
+          // Backgrounds that read the club colour through a variable (var(--smfc-blue)…) get the pastel too.
+          if (isBackground && PRIMARY_VARS_T.test(next)) { next = next.replace(PRIMARY_VARS, pastel); pastelBackground = true; }
           if (next === value) continue;
+          if (isBackground && usesPrimary(value, primaryKeys)) pastelBackground = true;
           if (!originals.has(style)) originals.set(style, new Map());
           if (!originals.get(style).has(prop)) originals.get(style).set(prop, [value, style.getPropertyPriority(prop)]);
           style.setProperty(prop, next, style.getPropertyPriority(prop));
+        }
+        // White text on a pastel background would vanish: switch it to a dark ink.
+        if (pastelBackground) {
+          const color = style.getPropertyValue("color");
+          if (/^(#fff(fff)?|white|rgb\(\s*255\s*,\s*255\s*,\s*255\s*\))$/i.test(color.trim())) {
+            if (!originals.has(style)) originals.set(style, new Map());
+            if (!originals.get(style).has("color")) originals.get(style).set("color", [color, style.getPropertyPriority("color")]);
+            style.setProperty("color", "#1d2230", style.getPropertyPriority("color"));
+          }
         }
       });
     }
