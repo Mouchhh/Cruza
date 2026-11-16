@@ -13,7 +13,4 @@
  if(location.pathname.endsWith('/index.html')||location.pathname.endsWith('/')){
   const u=new URL(location.href);if(u.searchParams.get('mode')!=='local'){u.searchParams.set('mode','local');location.replace(u.href);}
  }
- document.addEventListener('DOMContentLoaded',()=>{
-  const note=document.createElement('div');note.textContent='CRUZA · Démonstration vierge · Vos essais restent dans ce navigateur';note.style.cssText='position:fixed;bottom:6px;left:50%;transform:translateX(-50%);max-width:90vw;padding:6px 12px;border-radius:8px;background:#071c55;color:#fff;font:10px system-ui;z-index:9999;pointer-events:none;text-align:center';document.body.append(note);
- });
 })();
