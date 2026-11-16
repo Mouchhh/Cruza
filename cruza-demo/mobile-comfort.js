@@ -101,7 +101,7 @@
    const create = document.getElementById('training-create-session'), label = document.querySelector('.training-library-search');
    if (!create || !label || done) return; done = true;
    const row = document.createElement('div'); row.className = 'mc-search-row';
-   const input = label.querySelector('input'); if (input && !input.placeholder) input.placeholder = 'Rechercher une séance';
+   const input = label.querySelector('input'); if (input && matchMedia('(max-width:700px)').matches) input.placeholder = 'Rechercher une séance';
    label.before(row); row.append(label, create);
   }
   new MutationObserver(init).observe(document.body, { childList: true, subtree: true }); init();
