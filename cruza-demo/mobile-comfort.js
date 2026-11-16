@@ -41,4 +41,11 @@
   const mark = () => document.querySelectorAll('summary:not(.mc-hide-reglages)').forEach(s => { if (/^\s*Réglages du match/.test(s.textContent)) s.classList.add('mc-hide-reglages'); });
   new MutationObserver(mark).observe(document.body, { childList: true, subtree: true }); mark();
  });
+ // Téléphone : bouton d'enregistrement du haut sans flèche ni mots en trop (« Enregistrer »).
+ document.addEventListener('DOMContentLoaded', () => {
+  const phone = matchMedia('(max-width:700px)');
+  const clean = () => { const b = document.getElementById('save'); if (!b || !phone.matches) return; const t = b.textContent, n = t.replace(/\s*↗/, '').replace(/^(Enregistrer)\s+(la|le|l’)\s*\S+/, '$1').trim(); if (n && n !== t) b.textContent = n; };
+  const b = document.getElementById('save'); if (!b) return;
+  new MutationObserver(clean).observe(b, { childList: true, characterData: true, subtree: true }); clean();
+ });
 })();
