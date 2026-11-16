@@ -36,3 +36,14 @@ html body .mc-extra{display:none!important}
 @media screen and (max-width:700px){html body #landscape-toggle,html body .tactic-fs-open-button{display:none!important}}
 /* Téléphone et ordinateur : on masque le bloc repliable « Réglages du match » */
 html body details:has(>summary.mc-hide-reglages){display:none!important}
+/* Téléphone : en-tête sur une seule ligne (logo, équipe, connexion, profil) */
+@media screen and (max-width:700px){
+ html body>header{display:flex!important;flex-wrap:nowrap!important;align-items:center!important;gap:8px!important;padding:6px 10px!important;height:auto!important;min-height:0!important}
+ html body>header .brand{flex:0 0 auto!important;gap:0!important}
+ html body>header .brand>span,html body>header .brand small,html body>header .season{display:none!important}
+ html body>header .brand .club-logo{width:34px!important;height:34px!important}
+ html body>header .header-actions{flex:1 1 0!important;min-width:0!important;display:flex!important;flex-wrap:nowrap!important;align-items:center!important;gap:6px!important;margin:0!important;padding:0!important}
+ html body>header .team-space-picker{flex:1 1 0!important;min-width:0!important}
+ html body>header #club-network-shortcut{flex:0 0 auto!important;font-size:11px!important;padding:6px 8px!important;line-height:1.15;max-width:84px}
+ html body>header .coach-profile-menu{flex:0 0 auto!important}
+}
