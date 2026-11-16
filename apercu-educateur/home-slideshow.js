@@ -22,7 +22,7 @@ new MutationObserver(updateHomeSlideTimer).observe(document.body,{attributes:tru
 async function initializeHomeSlides(){
  const configured=Array.isArray(window.CLUB_HOME_SLIDES)?window.CLUB_HOME_SLIDES:[],seen=new Set();
  const candidates=configured.filter(photo=>{if(!photo||typeof photo.src!=='string'||!/^assets\/(?:[a-zA-Z0-9_-]+\/)*[a-zA-Z0-9_-]+\.(?:jpe?g|png|webp)$/i.test(photo.src)||seen.has(photo.src))return false;seen.add(photo.src);return true;}).slice(0,12);
- const loaded=await Promise.all(candidates.map(async photo=>{const img=new Image();img.alt='';img.decoding='async';img.src=photo.src;try{await img.decode();return img;}catch{return null;}}));
+ const loaded=await Promise.all(candidates.map(async photo=>{const img=new Image();img.alt='';img.decoding='async';img.src=new URL("../"+photo.src,location.href).href;try{await img.decode();return img;}catch{return null;}}));
  homeSlideImages=loaded.filter(Boolean);if(!homeSlideImages.length)return;
  $('home-backdrop').replaceChildren(...homeSlideImages);$('home-backdrop').hidden=false;$('home-slideshow-controls').hidden=false;document.body.classList.add('home-has-slides');
  // Le fond remplace le bloc d'attente des photos de l'accueil.

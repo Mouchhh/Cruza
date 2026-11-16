@@ -216,12 +216,13 @@
  html{--smfc-blue:#0B2E8A;--smfc-navy:#071C55;--smfc-ink:#071C55;--smfc-red:#E4312B;--smfc-cream:#F3E9D2}
 }
 
-/* Keep photography inside the welcome card: no fixed/fading layer behind the dashboard. */
+/* Full-page home photography, behind the dashboard rather than inside its welcome card. */
 @media screen{
- html body.home-mode .home-hero{isolation:isolate;overflow:hidden;background:var(--smfc-navy)!important;border-color:var(--smfc-line);min-height:240px}
- html body.home-mode .home-hero #home-backdrop:not([hidden]){position:absolute!important;inset:0!important;width:100%;height:100%!important;max-height:none!important;mask-image:none!important;opacity:1;z-index:-1;pointer-events:none;border-radius:inherit}
- html body.home-mode .home-hero #home-backdrop::after{background:linear-gradient(90deg,rgba(7,28,55,.92),rgba(7,28,55,.68) 58%,rgba(7,28,55,.25))!important}
- html body.home-mode .home-hero .home-welcome-copy{position:relative;z-index:1}
+ html body.home-mode.home-has-slides{background:var(--smfc-navy)}
+ html body.home-mode>#home-backdrop:not([hidden]){display:block!important;position:fixed!important;inset:0!important;width:100%;height:100dvh!important;max-height:none!important;mask-image:none!important;opacity:1;z-index:0;pointer-events:none;border-radius:0}
+ html body.home-mode>#home-backdrop::after{background:linear-gradient(105deg,rgba(7,28,55,.8),rgba(7,28,55,.55))!important}
+ html body.home-mode.home-has-slides>main{position:relative;z-index:1;background:transparent!important}
+ html body.home-mode.home-has-slides .home-hero{background:transparent!important;border-color:transparent;box-shadow:none;min-height:240px}
  html body.home-mode .home-hero #home-last-saved{color:#e1eafa}
 }
-@media screen and (max-width:700px){html body.home-mode .home-hero{min-height:210px}}
+@media screen and (max-width:700px){html body.home-mode.home-has-slides .home-hero{min-height:210px}}
