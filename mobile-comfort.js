@@ -4,7 +4,7 @@
  const PLUS = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true" focusable="false" class="navigation-icon"><circle cx="5" cy="12" r="1.5"/><circle cx="12" cy="12" r="1.5"/><circle cx="19" cy="12" r="1.5"/></svg>';
  const MAIN = {
   coach: ['view-home', 'view-pitch', 'view-training', 'view-coach-agenda'],
-  manager: ['view-home', 'view-management', 'workspace-squad-entry', 'view-reports']
+  manager: ['view-home', 'view-management', 'view-reports']
  };
  document.addEventListener('DOMContentLoaded', () => {
   const nav = document.getElementById('workspace-navigation'); if (!nav) return;
