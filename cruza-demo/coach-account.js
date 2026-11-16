@@ -756,7 +756,7 @@ function coachAccountOpen(initialTab = "profile") {
   bug.rel = "noopener";
   function bugURL() {
     const url = new URL(
-      "https://github.com/Mouchhh/FOOT-U16-2026-2027/issues/new",
+      "https://github.com/Mouchhh/cruza-stade-mayennais/issues/new",
     );
     url.searchParams.set("title", "Problème sur Cruza");
     url.searchParams.set(

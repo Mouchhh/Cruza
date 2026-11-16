@@ -18,12 +18,15 @@ function homeWidgetsSnapshot(){
 function renderHomeWidgets(){
  const root=$('home-live-widgets');if(!root)return;const s=homeWidgetsSnapshot();root.replaceChildren();
  const card=(title,kind)=>{const node=el('article','home-live-card '+kind);node.append(el('h2','',title));root.append(node);return node;};
- const group=card('Dynamique du Groupe','home-live-group');
- group.append(el('strong','home-live-value',s.rate===null?'Présence à confirmer':s.rate+'% de présence'));
- const gauge=el('progress');gauge.max=100;gauge.value=s.rate??0;gauge.setAttribute('aria-label','Présence connue sur les trois dernières séances');group.append(gauge);
- group.append(el('p','',s.sessions?s.active+' joueur'+(s.active===1?'':'s')+' présent'+(s.active===1?'':'s')+' sur les '+s.sessions+' dernières séances':'Aucune séance passée dans l’agenda'));
- group.append(el('p','home-live-caption',s.delta===null?'Évolution mensuelle : données insuffisantes':(s.delta>0?'+':'')+s.delta+' points ce mois'));
- if(s.unknown)group.append(el('small','home-live-caption',s.unknown+' présence(s) à confirmer · taux sur les pointages connus'));
+ const ranking=card('Classement · Sportcorico','home-live-ranking');
+ const isU17=/^U17$/i.test(String(activeCoachTeam.category||'').trim());
+ const sportcoricoURL=isU17?'':'';
+ ranking.append(el('strong','home-live-value',sportcoricoURL?'Championnat U17':'Classement de l’équipe'));
+ if(sportcoricoURL){
+  ranking.append(el('p','','Consultez le classement et les résultats publiés sur Sportcorico.'));
+  const link=el('a','home-live-open','Voir le classement sur Sportcorico ↗');link.href=sportcoricoURL;link.target='_blank';link.rel='noopener noreferrer';link.style.display='inline-block';link.style.textDecoration='none';ranking.append(link);
+  ranking.append(el('p','home-live-caption','Le classement s’ouvre sur Sportcorico. L’affichage automatique dans cette carte n’est pas encore activé.'));
+ }else ranking.append(el('p','','Le lien Sportcorico de cette catégorie reste à configurer.'));
  const form=card('Forme · 5 derniers matchs','home-live-form');form.append(el('strong','home-live-value',s.form.length?s.points+' pts / '+s.form.length*3:'Aucun résultat validé'));
  const circles=el('div','home-live-results');s.form.slice().reverse().forEach(v=>{const circle=el('span','home-live-result result-'+v,v);circle.title={V:'Victoire',N:'Match nul',D:'Défaite'}[v];circles.append(circle);});form.append(circles);
  const last=s.scored[0];form.append(el('p','',last?'Dernier match : '+last.info.goalsFor+' – '+last.info.goalsAgainst+' · '+last.info.opponent:'Les résultats apparaîtront après validation des bilans.'));

@@ -1,0 +1,1 @@
+window.CLUB_CANVA_GATEWAY='';

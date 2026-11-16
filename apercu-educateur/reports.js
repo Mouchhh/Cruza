@@ -1,0 +1,133 @@
+// Rapport local : modèle inspiré des rubriques du document fourni par le coach.
+const reportInfo={team:'Équipe',opponent:'Adversaire',category:'Catégorie',competition:'Compétition',round:'Journée / tour',date:'Date',time:'Heure',venue:'Lieu de rencontre',stadium:'Terrain / stade',coach:'Éducateur / staff',formation:'Organisation utilisée',duration:'Durée du match (minutes)',goalsFor:'Buts marqués',goalsAgainst:'Buts encaissés',halfFor:'Buts marqués à la pause',halfAgainst:'Buts encaissés à la pause',scorers:'Buteurs / passeurs',conditions:'Conditions et contexte'};
+const reportSport={project:'Respect du projet de jeu',defence:'Animation défensive',attack:'Animation offensive',physical:'État physique global'};
+const reportHuman={cohesion:'État d’esprit / cohésion',attitude:'Investissement & attitude',emotions:'Gestion émotionnelle'};
+const reportAnalysis={topAttack:'Top Offensivement (Avec le ballon)',topDefence:'Top Défensif (Sans le ballon)',improveAttack:'Axe de progrès · offensivement',improveDefence:'Axe de progrès · défensivement',firstHalf:'Analyse de la première période',secondHalf:'Analyse de la seconde période',withBall:'Avec le ballon',withoutBall:'Sans le ballon',transitions:'Transitions à la récupération et à la perte',setPieces:'Phases arrêtées · pour et contre',individualFocus:'Focus individuel / joueurs à relayer',staff:'Remarques du staff / récit du match'};
+const reportPlan={priority:'Priorité de la semaine',session1:'Séance 1 · objectif et exercice prévu',session2:'Séance 2 · objectif et exercice prévu',session3:'Séance 3 · objectif et exercice prévu',success:'Critères observables de réussite',owner:'Responsable(s) du suivi',reviewDate:'Date du prochain point',summary:'Message à transmettre au groupe'};
+const reportTabNames={general:'1 · Le match',sport:'2 · Suivi sportif',human:'3 · Suivi humain',players:'4 · Joueurs & faits',plan:'5 · Plan d’action',preview:'6 · Synthèse'};
+const emptyObject=keys=>Object.fromEntries(Object.keys(keys).map(k=>[k,'']));
+function reportPreparationSnapshot(source){return {formation:source.formation||'',roster:source.players.map(p=>({name:p.name,number:p.number,role:p.role||'starter',...(p.squadPlayerId?{squadPlayerId:p.squadPlayerId}:{})})),plan:structuredClone(source.matchPreparation||newMatchPreparation()),objectives:(source.matchPreparation?.objectives||[]).filter(t=>t.trim()).map(text=>({text,status:'Non évalué',observation:''}))};}
+function reportPreparationValid(p){return !!p&&reportText(p.formation,100)&&(p.roster===undefined||Array.isArray(p.roster)&&p.roster.length<=30&&p.roster.every(r=>r&&reportText(r.name,25)&&Number.isInteger(r.number)&&r.number>=1&&r.number<=99&&['starter','sub'].includes(r.role)&&(r.squadPlayerId===undefined||typeof r.squadPlayerId==='string'&&r.squadPlayerId.length>0&&r.squadPlayerId.length<=100)))&&!!p.plan&&validMatchPreparation(p.plan)&&Array.isArray(p.objectives)&&p.objectives.length<=4&&p.objectives.every(o=>o&&reportText(o.text,300)&&['Non évalué','À renforcer','En progrès','Atteint'].includes(o.status)&&reportText(o.observation,3000));}
+function newReport(){const source=typeof getCompositionBoard==='function'?getCompositionBoard():state;return {teamContext:{...activeCoachTeam},eventType:'match',version:1,id:crypto.randomUUID(),updatedAt:'',preparation:reportPreparationSnapshot(source),info:{...emptyObject(reportInfo),team:activeCoachTeam.team||source.team,coach:activeCoach.name,category:activeCoachTeam.category||source.category||'',duration:source.matchDuration||'',date:source.matchPreparation?.date||'',opponent:source.matchPreparation?.opponent||'',conditions:source.matchPreparation?.context||'',venue:'Domicile',formation:source.formation},ratings:Object.fromEntries(Object.keys({...reportSport,...reportHuman}).map(k=>[k,{score:'',note:''}])),analysis:emptyObject(reportAnalysis),plan:{...emptyObject(reportPlan),sessionObjective:'',sessionExercise:''},players:[],events:[]};}
+const reportText=(v,max=12000)=>typeof v==='string'&&v.length<=max;
+const reportScore=v=>v===''||(typeof v==='string'&&Number(v)>=.5&&Number(v)<=5&&Number(v)*2%1===0);
+function reportValid(r){
+ if(!r||(r.preparation!==undefined&&!reportPreparationValid(r.preparation))||(r.title!==undefined&&!reportText(r.title,100))||r.version!==1||!reportText(r.id,100)||!r.id||!reportText(r.updatedAt,100))return false;
+ for(const [section,labels] of [['info',reportInfo],['analysis',reportAnalysis],['plan',reportPlan]])if(!r[section]||!Object.keys(labels).every(k=>reportText(r[section][k])))return false;
+ if(['sessionObjective','sessionExercise'].some(k=>r.plan[k]!==undefined&&!reportText(r.plan[k])))return false;
+ if(r.statsEventId!==undefined&&(!reportText(r.statsEventId,100)||!r.statsEventId))return false;
+ if(r.eventType!==undefined&&!['match','training'].includes(r.eventType))return false;
+ if(Array.isArray(r.players)){const linked=r.players.map(p=>p?.squadPlayerId).filter(Boolean);if(new Set(linked).size!==linked.length)return false;}
+ if(!r.ratings||!Object.keys({...reportSport,...reportHuman}).every(k=>r.ratings[k]&&reportScore(r.ratings[k].score)&&reportText(r.ratings[k].note)))return false;
+ for(const key of ['goalsFor','goalsAgainst','halfFor','halfAgainst'])if(r.info[key]!==''&&!/^\d{1,2}$/.test(r.info[key]))return false;
+ if(r.info.duration!==''&&(!/^\d{1,3}$/.test(r.info.duration)||Number(r.info.duration)>180))return false;
+ if(!['Domicile','Extérieur','Terrain neutre'].includes(r.info.venue))return false;
+ if(!Array.isArray(r.players)||r.players.length>40||new Set(r.players.map(p=>p?.id)).size!==r.players.length||!r.players.every(p=>p&&playerStatsRowValid(p)&&reportText(p.id,100)&&reportText(p.name,100)&&['Titulaire','Impacteur / Finisseur','Non entré'].includes(p.role)&&reportText(p.number,3)&&(/^\d{1,2}$/.test(p.number)||p.number==='')&&reportText(p.minutes,3)&&(p.minutes===''||(/^\d{1,3}$/.test(p.minutes)&&Number(p.minutes)<=180))&&reportScore(p.score)&&reportText(p.note)&&reportText(p.objective)))return false;
+ return Array.isArray(r.events)&&r.events.length<=100&&r.events.every(e=>e&&reportText(e.minute,3)&&(e.minute===''||(/^\d{1,3}$/.test(e.minute)&&Number(e.minute)<=180))&&['But pour','But contre','Changement','Carton','Carton adverse','Occasion','Autre'].includes(e.type)&&reportText(e.detail)&&reportEventLinksValid(e));
+}
+let currentReport=newReport(),reportLibrary=[],reportTab='general',reportAutosaveTimer;
+try{const saved=JSON.parse(coachStorageGet('vestiaire-report-draft')||'null');if(reportValid(saved))currentReport=saved;const list=JSON.parse(coachStorageGet('vestiaire-reports')||'[]');if(Array.isArray(list))reportLibrary=list.filter(reportValid);}catch{}
+function reportAutosave(){clearTimeout(reportAutosaveTimer);$('report-save-status').textContent='';reportAutosaveTimer=setTimeout(flushReportDraft,250);}
+function flushReportDraft(){clearTimeout(reportAutosaveTimer);reportEventsApply(currentReport,squadPlayers());if(!reportValid(currentReport)){$('report-save-status').textContent=playerStatsValidationMessage(currentReport)||'Brouillon non enregistré : vérifiez les scores, les minutes et les champs numériques.';return;}currentReport.updatedAt=new Date().toISOString();try{coachStorageSet('vestiaire-report-draft',JSON.stringify(currentReport));$('report-save-status').textContent='';}catch{$('report-save-status').textContent='Stockage indisponible ou plein : le brouillon reste ouvert. Libérez de l’espace puis réessayez.';}}
+window.addEventListener('pagehide',flushReportDraft);
+function reportField(label,value,setter,options={}){
+ const wrap=el('label','report-field');wrap.append(el('span','',label));let input;
+ if(options.choices){input=el('select');options.choices.forEach(choice=>{const o=el('option','',choice);o.value=choice;input.append(o);});}
+ else input=el(options.area?'textarea':'input');
+ if(!options.area&&!options.choices)input.type=options.type||'text';input.value=value;input.maxLength=options.maxLength||12000;
+ if(options.type==='number'){input.min=0;input.max=options.max||99;input.step=1;}
+ if(options.area){input.rows=options.rows||3;input.placeholder=options.placeholder||'Faits observés, exemples concrets, éléments à retenir…';}
+ input.addEventListener('input',()=>{setter(input.value);reportAutosave();if(['Buts marqués','Buts encaissés'].includes(label))updateReportResult();});wrap.append(input);return wrap;
+}
+function reportSection(title,hint){const s=el('section','report-panel');s.append(el('h2','',title));if(hint)s.append(el('p','hint',hint));return s;}
+function reportResult(){if(currentReport.eventType==='training')return 'Bilan de séance';const i=currentReport.info;if(i.goalsFor===''||i.goalsAgainst==='')return 'Score à renseigner';if(!/^\d{1,2}$/.test(i.goalsFor)||!/^\d{1,2}$/.test(i.goalsAgainst))return 'Score à vérifier';const d=Number(i.goalsFor)-Number(i.goalsAgainst);return i.goalsFor+' — '+i.goalsAgainst+' · '+(d>0?'Victoire':d<0?'Défaite':'Match nul');}
+function updateReportResult(){for(const id of ['report-result','report-quick-result']){const box=$(id);if(box)box.textContent=reportResult();}}
+function reportRatings(parent,labels){
+ Object.entries(labels).forEach(([key,label])=>{const row=el('div','report-rating');const rating=currentReport.ratings[key];const wrap=el('label','report-field');wrap.append(el('span','',label));const select=el('select');const empty=el('option','','Non évalué');empty.value='';select.append(empty);for(let n=.5;n<=5;n+=.5){const o=el('option','',String(n).replace('.',',')+' / 5');o.value=String(n);select.append(o);}select.value=rating.score;select.onchange=()=>{rating.score=select.value;reportAutosave();};wrap.append(select);row.append(wrap,reportField('Observations',rating.note,v=>rating.note=v,{area:true,rows:2}));parent.append(row);});
+}
+function renderReportTabs(){
+ if(reportTab==='plan')reportTab='sport';
+ $('report-tabs').replaceChildren();Object.entries({general:'1 · Le match',sport:'2 · Analyse',players:'3 · Moments marquants',preview:'4 · Synthèse'}).forEach(([id,label])=>{const selected=reportTab===id||id==='sport'&&reportTab==='human',b=el('button',selected?'active':'',label);b.type='button';b.dataset.reportTab=id;b.setAttribute('aria-pressed',String(selected));b.onclick=()=>{reportTab=id;renderReportTabs();renderReportContent();};$('report-tabs').append(b);});
+}
+function renderReportContent(){
+ if(reportTab==='plan')reportTab='sport';
+ $('report-title').value=currentReport.title||'';const root=$('report-content');root.replaceChildren();
+ if(reportTab==='general'){
+ const panel=reportSection('Informations générales','Préparez le contexte, le résultat et les principaux repères du match.');const result=el('div','report-result',reportResult());result.id='report-result';panel.append(result);const grid=el('div','report-grid');
+ Object.entries(reportInfo).forEach(([key,label])=>{let options={};if(key==='date')options.type='date';if(key==='time')options.type='time';if(key==='venue')options.choices=['Domicile','Extérieur','Terrain neutre'];if(['duration','goalsFor','goalsAgainst','halfFor','halfAgainst'].includes(key)){options.type='number';options.max=key==='duration'?180:99;}if(['scorers','conditions'].includes(key))options.area=true;grid.append(reportField(label,currentReport.info[key],v=>currentReport.info[key]=v,options));});panel.append(grid);root.append(panel);
+ }else if(reportTab==='sport'){
+ reportRenderAnalysis(root);
+ }else if(reportTab==='human'){
+ const panel=reportSection('Suivi humain & comportemental','Appuyez les appréciations sur des comportements observables.');reportRatings(panel,reportHuman);panel.append(reportField(reportAnalysis.individualFocus,currentReport.analysis.individualFocus,v=>currentReport.analysis.individualFocus=v,{area:true}),reportField(reportAnalysis.staff,currentReport.analysis.staff,v=>currentReport.analysis.staff=v,{area:true,rows:7}));root.append(panel);
+ }else if(reportTab==='players')renderReportPlayers(root);
+ else if(reportTab==='plan'){
+ reportRenderPlan(root);
+ }else{const tools=el('div','report-preview-tools');tools.append(el('p','hint','Aperçu du rapport complet. Les rubriques vides restent identifiées pour préparer votre bilan.'));root.append(tools,buildReportDocument());}
+}
+function importReportRoster(){
+ let added=0;(typeof getCompositionBoard==='function'?getCompositionBoard():state).players.forEach(p=>{const linked=playerStatsResolve(p);if(currentReport.players.length>=40||currentReport.players.some(q=>q.id===p.id||linked&&playerStatsResolve(q)?.id===linked.id))return;currentReport.players.push({id:p.id,...(linked?{squadPlayerId:linked.id}:{}),name:p.name,number:String(p.number),role:p.role==='sub'?'Impacteur / Finisseur':'Titulaire',minutes:'',score:'',note:'',objective:''});added++;});reportAutosave();renderReportContent();notify(added+' joueur(s) ajouté(s) au rapport.');
+}
+function renderReportPlayers(root,includeEvents=true){
+ reportEventsApply(currentReport,squadPlayers());
+ const panel=reportSection('Suivi individuel','Minutes, performances, discipline et présences de vos joueurs.');panel.id='report-players-panel';const tools=el('div','report-actions');const roster=el('button','export','Importer les joueurs de ma compo');roster.onclick=importReportRoster;const add=el('button','primary','+ Ajouter un joueur');add.onclick=()=>{if(currentReport.players.length>=40)return notify('40 joueurs maximum.');currentReport.players.push({id:crypto.randomUUID(),name:'',number:'',role:'Impacteur / Finisseur',minutes:'',score:'',note:'',objective:''});reportAutosave();renderReportContent();};tools.append(roster,add);panel.append(tools);playerStatsReportContext(panel);
+ if(!currentReport.players.length)panel.append(el('p','hint','Importez votre effectif ou ajoutez les joueurs manuellement.'));
+ currentReport.players.forEach((p,index)=>{const card=el('div','report-player');const head=el('div','section-heading');head.append(el('h3','',p.name||'Joueur '+(index+1)));const del=el('button','report-player-remove','Retirer du suivi');del.type='button';del.setAttribute('aria-label','Retirer '+(p.name||'ce joueur')+' du suivi individuel');del.onclick=()=>{const linked=playerStatsResolve(p),related=linked&&currentReport.events.some(e=>reportEventPlayerKeys.some(k=>e[k]===linked.id));if(!confirm('Retirer '+(p.name||'ce joueur')+' du suivi de ce bilan ? Sa fiche dans votre effectif est conservée.'+(related?' Ses liens avec les faits marquants seront retirés.':'')))return;if(linked)reportEventsUnlinkPlayer(linked.id);currentReport.players=currentReport.players.filter(player=>player.id!==p.id);reportEventsApply(currentReport,squadPlayers());reportAutosave();renderReportContent();};head.append(del);card.append(head);const grid=el('div','report-grid');grid.append(reportField('Prénom / nom',p.name,v=>p.name=v,{maxLength:100}),reportField('Numéro',p.number,v=>p.number=v,{type:'number'}),reportField('Statut',p.role,v=>p.role=v,{choices:['Titulaire','Impacteur / Finisseur','Non entré']}),reportField('Minutes jouées',p.minutes,v=>p.minutes=v,{type:'number',max:180}));
+ card.append(grid);playerStatsReportFields(card,p);panel.append(card);});root.append(panel);
+ if(includeEvents)renderReportEvents(root);
+}
+function reportValue(v){return v.trim()||'Non renseigné';}
+function reportPrintText(parent,label,value){const row=el('div','report-text-block');row.append(el('h3','',label),el('p','',reportValue(value)));parent.append(row);}
+function reportRatingTable(labels){const table=el('table','report-table');const head=el('tr');for(const title of ['Critère','Note / 5','Observations'])head.append(el('th','',title));table.append(head);Object.entries(labels).forEach(([k,label])=>{const row=el('tr');row.append(el('td','',label),el('td','',currentReport.ratings[k].score?currentReport.ratings[k].score.replace('.',',')+' / 5':'Non évalué'),el('td','',reportValue(currentReport.ratings[k].note)));table.append(row);});return table;}
+function buildReportDocument(){
+ reportEventsApply(currentReport,squadPlayers());
+ const report=el('article','report-document');const head=el('div','report-doc-heading');head.append(el('div','eyebrow','STADE MAYENNAIS · SUIVI SPORTIF & HUMAIN'),el('h1','',currentReport.title||(currentReport.eventType==='training'?'Bilan de séance':'Rapport de match')),el('p','',currentReport.info.team+(currentReport.eventType==='training'?'':' / '+(currentReport.info.opponent||'Adversaire'))+' · '+currentReport.info.category));report.append(head);
+ const general=el('section');general.append(el('h2','','1. Informations générales'),el('p','report-doc-score',reportResult()));const details=el('div','report-doc-details');Object.entries(reportInfo).filter(([k])=>!['goalsFor','goalsAgainst'].includes(k)&&currentReport.info[k].trim()).forEach(([k,label])=>{const row=el('p');row.append(el('strong','',label+' : '),document.createTextNode(reportValue(currentReport.info[k])));details.append(row);});general.append(details);report.append(general);
+ report.append(reportSportDocument());
+ const human=el('section');human.append(el('h2','','3. Suivi humain & comportemental'),reportRatingTable(reportHuman));for(const k of ['individualFocus','staff'])reportPrintText(human,reportAnalysis[k],currentReport.analysis[k]);report.append(human);
+ const players=el('section');players.append(el('h2','',currentReport.eventType==='training'?'4. Suivi individuel de séance':'4. Suivi individuel & faits marquants'));if(!currentReport.players.length)players.append(el('p','','Aucun joueur renseigné.'));
+ currentReport.players.forEach(p=>{const card=el('div','report-doc-player');card.append(el('h3','',(p.number?'N° '+p.number+' · ':'')+(p.name||'Joueur sans nom')),el('p','',p.role+' · '+(p.minutes?p.minutes+' min':'Temps non renseigné')+' · '+(p.score?p.score.replace('.',',')+' / 5':'Non évalué')));reportPrintText(card,'Observation',p.note);reportPrintText(card,'Objectif',p.objective);playerStatsPrintRow(card,p);players.append(card);});
+ if(currentReport.events.length){const table=el('table','report-table');const tr=el('tr');['Minute','Fait','Détail'].forEach(t=>tr.append(el('th','',t)));table.append(tr);[...currentReport.events].sort((a,b)=>(a.minute===''?Infinity:Number(a.minute))-(b.minute===''?Infinity:Number(b.minute))).forEach(e=>{const row=el('tr');[e.minute?e.minute+'′':'—',e.type,reportValue(reportEventDescription(e))].forEach(v=>row.append(el('td','',v)));table.append(row);});players.append(table);}report.append(players);
+ report.append(reportPlanDocument());return report;
+}
+function reportIsRecoveryCopy(report){return /^Copie locale avant ouverture\s*·/i.test(report?.title||'');}
+function renderReportLibrary(){
+ const select=$('report-library-select');select.replaceChildren();const empty=el('option','','Ouvrir un rapport enregistré…');empty.value='';select.append(empty);reportLibrary.filter(r=>!reportIsRecoveryCopy(r)).forEach(r=>{const label=(r.title?r.title+' · ':'')+(r.info.date||'Sans date')+' · '+(r.info.team||'Équipe')+' / '+(r.info.opponent||'Adversaire')+' · '+(r.info.round||'');const o=el('option','',label);o.value=r.id;select.append(o);});select.value=reportLibrary.some(r=>r.id===currentReport.id)?currentReport.id:'';
+}
+function reportStatsPrepareForSave(){
+ const goalError=reportGoalValidationMessage(currentReport);
+ if(goalError){$('report-save-status').textContent=goalError;reportGoalValidationDisplay(true);notify(goalError);return false;}
+ reportEventsApply(currentReport,squadPlayers());
+ for(const row of currentReport.players){const player=playerStatsResolve(row);if(player)row.squadPlayerId=player.id;}
+ const hasStats=currentReport.players.some(r=>['minutes','goals','assists','yellowCards','redCards','attendanceRate'].some(k=>r[k]!==undefined&&r[k]!==''));
+ if(hasStats&&!trainingDateValid(currentReport.info.date)){
+  const message='Renseignez la date du bilan pour rattacher les statistiques à la bonne saison.';
+  $('report-save-status').textContent=message;notify(message);return false;
+ }
+ return true;
+}
+function reportStatsUnlinked(){return currentReport.players.filter(r=>!playerStatsResolve(r)&&['minutes','goals','assists','yellowCards','redCards'].some(k=>r[k]!==undefined&&r[k]!==''));}
+function reportStatsSaveNotice(message){
+ const missing=reportStatsUnlinked().length;
+ if(missing)message+=' '+missing+' joueur(s) non associé(s) à une fiche Effectif : leurs statistiques restent uniquement dans ce bilan.';
+ if(currentReport.info.date>playerStatsNow().day)message+=' Les statistiques de ce bilan futur seront comptées à la date du match.';
+ return message;
+}
+function saveReport(){
+ if(!reportStatsPrepareForSave())return false;
+ if(!reportValid(currentReport)){notify(playerStatsValidationMessage(currentReport)||'Vérifiez les scores, les minutes et les champs numériques avant d’enregistrer.');return false;}flushReportDraft();const next=[structuredClone(currentReport),...reportLibrary.filter(r=>r.id!==currentReport.id)];try{coachStorageSet('vestiaire-reports',JSON.stringify(next));reportLibrary=next;renderReportLibrary();$('report-save-status').textContent='Rapport enregistré dans « Mes rapports » sur cet appareil.';$('report-save-status').textContent=reportStatsSaveNotice($('report-save-status').textContent);document.dispatchEvent(new CustomEvent('report-saved',{detail:{id:currentReport.id,team:activeCoachTeam.id,season:playerStatsSeason(currentReport.info.date)}}));notify(reportStatsSaveNotice('Rapport enregistré.'));return true;}catch(error){notify(error.code==='local_library_conflict'?clubNetworkMessage(error):'Stockage plein : le rapport reste ouvert. Libérez de l’espace puis réessayez.');return false;}
+}
+$('report-save').onclick=saveReport;
+$('report-new').onclick=()=>{if(!confirm('Créer un nouveau rapport ? Enregistrez le rapport courant dans « Mes rapports » si vous souhaitez le retrouver.'))return;if(typeof workspaceReplaceDraft==='function'){if(!workspaceReplaceDraft('report',newReport()))return;reportTab='general';renderReportTabs();renderReportContent();return;}currentReport=newReport();reportTab='general';flushReportDraft();renderReportTabs();renderReportContent();renderReportLibrary();};
+$('report-library-select').onchange=e=>{const saved=reportLibrary.find(r=>r.id===e.target.value);if(!saved)return;if(!confirm('Ouvrir ce rapport ? Le brouillon courant sera remplacé.')){renderReportLibrary();return;}if(typeof workspaceReplaceDraft==='function'){workspaceReplaceDraft('report',saved);return;}currentReport=structuredClone(saved);flushReportDraft();renderReportContent();};
+$('report-delete').onclick=()=>{if(!reportLibrary.some(r=>r.id===currentReport.id))return notify('Ce rapport est uniquement un brouillon.');if(!confirm('Supprimer ce rapport de vos rapports enregistrés ? Le brouillon restera accessible.'))return;const next=reportLibrary.filter(r=>r.id!==currentReport.id);try{coachStorageSet('vestiaire-reports',JSON.stringify(next));reportLibrary=next;renderReportLibrary();notify('Rapport retiré de la bibliothèque.');}catch{notify('Impossible de modifier le stockage.');}};
+const reportPrintRoot=el('div');reportPrintRoot.id='report-print';document.body.append(reportPrintRoot);
+function prepareReportPrint(){if(!document.body.classList.contains('reports-mode'))return;reportPrintRoot.replaceChildren(buildReportDocument());document.body.classList.add('report-printing');document.title=(currentReport.title||(currentReport.eventType==='training'?'Bilan de séance':'Rapport de match'))+' — '+(currentReport.info.team||'Équipe')+' — '+(currentReport.info.date||'Brouillon');}
+window.addEventListener('beforeprint',prepareReportPrint);window.addEventListener('afterprint',()=>document.body.classList.remove('report-printing'));
+$('report-pdf').onclick=()=>{if(!reportValid(currentReport))return notify('Vérifiez les champs numériques avant l’export PDF.');flushReportDraft();prepareReportPrint();window.print();};
+function setReportView(on){const source=typeof getCompositionBoard==='function'?getCompositionBoard():state;if(on&&!currentReport.updatedAt&&!currentReport.info.opponent&&!currentReport.info.date&&!currentReport.players.length){currentReport.info.team=source.team;currentReport.info.category=source.category||'';currentReport.info.duration=source.matchDuration||'';currentReport.info.formation=source.formation;}if(on&&typeof stopAnimation==='function')stopAnimation();document.body.classList.toggle('reports-mode',on);$('after-match').hidden=!on;$('view-reports').classList.toggle('active',on);$('view-pitch').classList.toggle('active',!on);$('view-reports').setAttribute('aria-pressed',String(on));$('view-pitch').setAttribute('aria-pressed',String(!on));if(on){renderReportTabs();renderReportContent();renderReportLibrary();}}
+$('view-reports').onclick=()=>setReportView(true);$('view-pitch').onclick=()=>setReportView(false);
+renderReportTabs();renderReportContent();renderReportLibrary();
+
+$('report-title').oninput=e=>{currentReport.title=e.target.value;reportAutosave();};
+$('report-rename').onclick=()=>openDocumentName('Renommer le rapport',currentReport.title||(currentReport.eventType==='training'?'Bilan de séance':'Rapport de match'),name=>{currentReport.title=name;$('report-title').value=name;saveReport();});
+$('report-copy').onclick=()=>{if(!reportValid(currentReport))return notify('Corrigez les champs du rapport avant la copie.');currentReport=structuredClone(currentReport);currentReport.statsEventId=currentReport.statsEventId||currentReport.id;currentReport.id=crypto.randomUUID();currentReport.title=(currentReport.title||(currentReport.eventType==='training'?'Bilan de séance':'Rapport de match')).slice(0,92)+' (copie)';saveReport();renderReportContent();};

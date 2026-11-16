@@ -1,0 +1,21 @@
+{
+  "owner": "Mouchhh",
+  "repositories": [
+    {
+      "name": "cruza-app",
+      "private": true,
+      "description": "Application CRUZA, configurations et tests"
+    },
+    {
+      "name": "cruza-vitrine",
+      "private": true,
+      "description": "Présentation publique de CRUZA"
+    },
+    {
+      "name": "cruza-organisation",
+      "private": true,
+      "description": "Pilotage et procédures CRUZA"
+    }
+  ],
+  "apply": false
+}

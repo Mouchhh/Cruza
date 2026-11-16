@@ -14,3 +14,11 @@ canva-gateway/data/
 *.dump
 *.backup
 club-backups/
+
+# Préparations administrateur et livrables privés : ne jamais servir via Pages
+local-admin/
+livrables-prives/
+*.pgpass
+pg_service.conf
+__pycache__/
+*.pyc
