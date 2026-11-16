@@ -106,4 +106,15 @@
   }
   new MutationObserver(init).observe(document.body, { childList: true, subtree: true }); init();
  });
+ // Téléphone : l'éditeur d'exercice dessine le terrain en portrait (le plus grand possible).
+ document.addEventListener('DOMContentLoaded', () => {
+  const phone = matchMedia('(max-width:700px)');
+  const apply = () => {
+   const c = document.getElementById('exercise-board-canvas'); if (!c) return;
+   const want = phone.matches ? 'true' : 'false';
+   if (c.dataset.portrait !== want) { c.dataset.portrait = want; try { if (typeof exerciseEditorRefresh === 'function') exerciseEditorRefresh(); } catch {} }
+  };
+  new MutationObserver(apply).observe(document.body, { childList: true, subtree: true, attributes: true, attributeFilter: ['open', 'hidden'] });
+  phone.addEventListener('change', apply); apply();
+ });
 })();
