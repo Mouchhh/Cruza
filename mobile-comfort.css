@@ -127,6 +127,6 @@ html body .mc-search-row{display:contents}
 }
 @media screen and (max-width:700px){
  html body #exercise-studio-board .studio-stage{justify-content:center!important;align-items:flex-start!important}
- html body #exercise-studio-board .studio-stage canvas{width:auto!important;height:calc(100dvh - 410px)!important;max-width:100%!important;aspect-ratio:1500/2400}
+ html body #exercise-studio-board .studio-stage canvas{width:auto!important;height:calc(100dvh - 398px)!important;max-width:100%!important;aspect-ratio:1500/2400}
  html body #exercise-studio-board .studio-stage canvas[data-portrait="false"]{width:100%!important;height:auto!important;aspect-ratio:2400/1500}
 }
