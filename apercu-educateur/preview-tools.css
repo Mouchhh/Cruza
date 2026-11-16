@@ -1,0 +1,16 @@
+@media screen{
+ #visual-preview-banner{position:fixed;left:16px;bottom:85px;width:186px;border:1px solid #476185;border-radius:11px;background:#233e62;color:white;padding:13px;z-index:111;font:11px SMFCArchivo,Arial,sans-serif;box-sizing:border-box}
+ #visual-preview-banner strong{font-size:11px;display:block;line-height:1.4}
+ #visual-preview-banner small{font-size:10px;display:block;color:#d2e0f4;margin-top:6px;line-height:1.5}
+ #visual-preview-banner button{font:600 10px SMFCArchivo,Arial,sans-serif;background:white;border:0;border-radius:7px;color:#173151;padding:9px 10px;min-height:34px;margin-top:12px;cursor:pointer;width:100%}
+ #visual-preview-banner button:focus-visible{outline:3px solid #bfd1ef;outline-offset:3px}
+}
+@media screen and (max-width:1099px),screen and (hover:none),screen and (pointer:coarse){
+ body{padding-top:36px!important}
+ html body.task-navigation.responsive-navigation>header{top:36px}
+ #visual-preview-banner{left:0;right:0;top:0;bottom:auto;width:100%;height:36px;padding:5px 10px;border-radius:0;border:0;display:flex;align-items:center;justify-content:space-between;gap:10px;z-index:201}
+ #visual-preview-banner strong{font-size:10px}
+ #visual-preview-banner small{display:none}
+ #visual-preview-banner button{width:auto;min-height:26px;margin:0;font-size:9px;padding:5px 9px}
+}
+@media print{#visual-preview-banner{display:none!important}}
