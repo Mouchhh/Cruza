@@ -54,3 +54,19 @@ html body #workspace-navigation>button.mc-plus{display:none!important}
  html body.home-mode #home-page-0 #home-live-widgets{flex:1 1 auto;grid-template-rows:minmax(150px,1fr) auto!important}
  html body #home-live-widgets .home-live-card.home-live-group,html body #home-live-widgets .home-live-card.home-live-training{height:auto!important}
 }
+/* Disposition v3 : trois bandes pleine largeur, une par widget, qui se partagent l'écran */
+@media screen and (max-width:700px){
+ html body.home-mode #home-page-0 #home-live-widgets{grid-template-columns:1fr!important;grid-template-rows:none!important;grid-auto-rows:1fr;gap:10px!important}
+ html body #home-live-widgets .home-live-card{grid-column:1/-1!important;aspect-ratio:auto!important;height:auto!important;min-height:84px!important;flex-direction:row!important;flex-wrap:wrap;align-items:center!important;justify-content:space-between!important;padding:14px 16px!important;gap:4px 12px!important}
+ html body #home-live-widgets .home-live-card h2{flex:1 1 100%;font-size:12px!important;opacity:.85}
+ html body #home-live-widgets .home-live-card .home-live-value{margin:0!important;font-size:20px!important}
+ html body #home-live-widgets .home-live-card progress{flex:1 1 100%;margin:0!important}
+ html body #home-live-widgets .home-live-card .home-live-open{margin:0!important;width:auto;flex:0 0 auto}
+ html body #home-live-widgets .home-live-card.home-live-group{order:1}
+ html body #home-live-widgets .home-live-card.home-live-training{order:2}
+ html body #home-live-widgets .home-live-card.home-live-form{order:3}
+}
+@media screen and (max-width:700px){
+ html body #home-live-widgets .home-live-card{text-align:left!important;align-content:center}
+ html body #home-live-widgets .home-live-card.home-live-training .home-live-open{margin-left:auto!important}
+}
