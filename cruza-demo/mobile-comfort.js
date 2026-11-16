@@ -117,4 +117,27 @@
   new MutationObserver(apply).observe(document.body, { childList: true, subtree: true, attributes: true, attributeFilter: ['open', 'hidden'] });
   phone.addEventListener('change', apply); apply();
  });
+ // Téléphone : Bilans — « Étape 2 sur 4 », flèches Précédent / Suivant, dernier écran « Enregistrer mon bilan ».
+ document.addEventListener('DOMContentLoaded', () => {
+  const phone = matchMedia('(max-width:700px)');
+  const tabs = () => document.getElementById('report-tabs');
+  const steps = () => [...(tabs()?.querySelectorAll(':scope>button') || [])];
+  const index = () => steps().findIndex(b => b.classList.contains('active') || b.getAttribute('aria-current') === 'step');
+  function sync() {
+   const bar = tabs(); if (!bar) return;
+   let label = bar.querySelector('.mc-step-label');
+   if (!label) { label = document.createElement('div'); label.className = 'mc-step-label'; bar.prepend(label); }
+   const list = steps(), i = index(); if (i < 0) return;
+   const name = list[i].textContent.replace(/^\s*\d+\s*·?\s*/, '').trim();
+   const t = 'Étape ' + (i + 1) + ' sur ' + list.length + ' · ' + name; if (label.textContent !== t) label.textContent = t;
+   const next = document.getElementById('report-next');
+   if (next && phone.matches) { const want = i >= list.length - 1 ? 'Enregistrer mon bilan' : 'Suivant →'; if (next.textContent !== want) next.textContent = want; }
+  }
+  window.addEventListener('click', e => {
+   if (!phone.matches || !e.target.closest || !e.target.closest('#report-next')) return;
+   const list = steps(), i = index(); if (i < 0 || i >= list.length - 1) return;
+   e.preventDefault(); e.stopImmediatePropagation(); list[i + 1].click();
+  }, true);
+  new MutationObserver(sync).observe(document.body, { childList: true, subtree: true, attributes: true, attributeFilter: ['class', 'aria-current'] }); sync();
+ });
 })();

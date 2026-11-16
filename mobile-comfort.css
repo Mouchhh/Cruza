@@ -154,3 +154,19 @@ html body .mc-search-row{display:contents}
  html body .reports-heading .report-actions>button{flex:1 1 0!important;min-width:0!important;font-size:13px!important;min-height:44px;padding:6px 8px!important}
  html body .agenda-day-details p.hint,html body .agenda-overview-note,html body .agenda-overview-card small,html body #training-themes-help,html body #training-library-page .training-step-heading p{display:none!important}
 }
+/* Téléphone : Bilans — étape par étape */
+html body #report-tabs .mc-step-label{display:none}
+@media screen and (max-width:700px){
+ html body #report-tabs>button{display:none!important}
+ html body #report-tabs{display:block!important;margin:0 0 6px!important;padding:0!important;background:none!important;border:0!important;min-height:0!important}
+ html body #report-tabs .mc-step-label{display:block}
+ html body .report-actions-dock{bottom:var(--navigation-bottom-space,64px)!important;z-index:50!important;background:#f3f6fb}
+ html body #after-match .report-causerie-import p,html body #after-match .report-panel>p.hint:not([role]),html body #after-match .hint:not([role]){display:none!important}
+ html body #report-new,html body #report-delete{min-height:44px;font-size:13px!important}
+}
+@media screen and (max-width:700px){
+ html body .reports-heading .report-actions{display:grid!important;grid-template-columns:1fr 1fr!important;gap:8px!important;width:100%!important}
+ html body .reports-heading .report-actions>.report-header-library{grid-column:1/-1!important;width:100%!important;display:flex!important;align-items:center;gap:8px}
+ html body .reports-heading .report-actions>.report-header-library select{flex:1 1 0;min-width:0}
+ html body .reports-heading .report-actions>button{width:100%!important;min-width:0!important;padding:6px 8px!important}
+}
