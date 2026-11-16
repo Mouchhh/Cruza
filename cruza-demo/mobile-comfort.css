@@ -1,0 +1,17 @@
+/* Confort téléphone uniquement (≤ 700 px). L'ordinateur et la tablette large ne changent pas. */
+@media screen and (max-width:700px){
+ html body.task-navigation.responsive-navigation #workspace-navigation{display:flex!important;flex-wrap:nowrap!important;gap:0!important;padding:4px 4px calc(4px + env(safe-area-inset-bottom,0px))!important}
+ html body.task-navigation.responsive-navigation #workspace-navigation>button{flex:1 1 0!important;min-height:56px!important;font-size:11px!important;padding:6px 2px!important;gap:3px!important;white-space:nowrap!important}
+ html body.task-navigation.responsive-navigation #workspace-navigation>button[data-mc="more"]{display:none!important}
+ html body.task-navigation.responsive-navigation #workspace-navigation>button.mc-plus{display:flex!important;flex-direction:column;align-items:center;justify-content:center;background:transparent;border:0;color:#dce7f7}
+ html body.task-navigation.responsive-navigation #workspace-navigation>button.mc-plus[aria-expanded=true],html body.task-navigation.responsive-navigation #workspace-navigation>button.mc-plus.mc-current{background:#2855a2!important;color:#fff!important}
+ .mc-sheet{position:fixed;left:8px;right:8px;bottom:calc(var(--navigation-bottom-space,64px) + 8px);z-index:101;background:#142d50;border:1px solid #345278;border-radius:14px;padding:8px;display:grid;grid-template-columns:1fr 1fr;gap:6px;box-shadow:0 8px 28px #0006}
+ .mc-sheet[hidden]{display:none}
+ .mc-sheet button{display:flex;align-items:center;gap:10px;min-height:48px;padding:8px 12px;border:0;border-radius:10px;background:#1d3d68;color:#fff;font:600 14px system-ui;text-align:left}
+ .mc-sheet button[aria-current=page]{background:#2855a2}
+ .mc-sheet svg{width:22px;height:22px;flex:0 0 22px}
+ .mc-sheet button:focus-visible,.mc-plus:focus-visible{outline:3px solid #fff;outline-offset:-3px}
+ /* Contraste des cartes bleues de l'accueil */
+ body.home-mode .home-hero{background:#1b3f86!important;color:#fff!important}
+ body.home-mode .home-hero p,body.home-mode .home-hero .eyebrow,body.home-mode .home-hero #home-date{color:#fff!important;opacity:1!important}
+}
