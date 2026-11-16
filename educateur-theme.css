@@ -1,0 +1,212 @@
+/* Approved visual language of the Responsable workspace, with SMFC identity.
+   Screen-only presentation; no data, navigation, permission or export changes. */
+@font-face{font-family:SMFCArchivo;src:url('assets/fonts/Archivo.ttf') format('truetype');font-display:swap}
+@font-face{font-family:SMFCUnbounded;src:url('assets/fonts/Unbounded.ttf') format('truetype');font-display:swap}
+@media screen{
+ html{--smfc-blue:#2855a2;--smfc-navy:#142d50;--smfc-ink:#173151;--smfc-muted:#53617b;--smfc-line:#e2e6ee;--smfc-canvas:#f7f8fb;--smfc-cream:#f3e9d2;--smfc-red:#e41f28}
+ html body{font-family:SMFCArchivo,Arial,sans-serif;color:var(--smfc-ink);background:var(--smfc-canvas);--workspace-ink:var(--smfc-ink);--workspace-muted:var(--smfc-muted);--workspace-line:var(--smfc-line);--workspace-soft:var(--smfc-canvas)}
+ html body :is(button,input,select,textarea){font-family:SMFCArchivo,Arial,sans-serif}
+ html body :is(.eyebrow,.field-label){letter-spacing:1.6px}
+ html body :is(button,a,input,select,textarea,summary):focus-visible{outline:3px solid #8faedb;outline-offset:3px}
+ html body :is(.hint,.report-causerie-status,.home-live-caption,.training-library-meta){color:var(--smfc-muted)}
+ /* The existing rail still reserves its own column and the mobile dock stays intact. */
+ html body.task-navigation.responsive-navigation #workspace-navigation{background:var(--smfc-navy)!important;border-color:#294462!important}
+ html body.task-navigation.responsive-navigation #workspace-navigation>button{background:transparent!important;border-color:transparent!important;box-shadow:none!important;color:#b9c9e0!important;font-weight:550!important;text-shadow:none!important;transition:background .15s ease,color .15s ease}
+ html body.task-navigation.responsive-navigation #workspace-navigation>button:hover{background:#243f65!important;color:white!important;transform:none}
+ html body.task-navigation.responsive-navigation #workspace-navigation>button[aria-current=page]{background:#29466f!important;color:white!important;border-color:transparent!important;box-shadow:inset 3px 0 #96b5e2!important}
+ html body.responsive-navigation .navigation-icon{width:20px;height:20px;flex-basis:20px;opacity:.95;stroke-width:1.5}
+ html body.task-navigation.responsive-navigation>header{background:#fff!important;border:0!important;border-bottom:1px solid var(--smfc-line)!important;box-shadow:none;height:auto;min-height:74px;padding-block:12px;gap:18px}
+ html body.task-navigation.responsive-navigation>header .brand{font-family:SMFCArchivo,Arial,sans-serif;color:var(--smfc-navy)!important;text-shadow:none!important;font-size:14px!important;letter-spacing:.8px;font-weight:750}
+ html body.task-navigation.responsive-navigation>header .brand small{color:var(--smfc-muted)!important;text-shadow:none!important;font-size:8px!important;letter-spacing:1.5px;line-height:1.5}
+ html body.task-navigation.responsive-navigation>header .brand .club-logo{height:38px;width:38px;object-fit:contain}
+ html body .team-space-trigger{border:1px solid #dbe1eb!important;border-left:3px solid var(--smfc-blue)!important;border-radius:9px;min-height:46px;background:white!important;box-shadow:none;padding:8px 12px}
+ html body .team-space-trigger strong{font-size:12px}
+ html body .team-space-trigger small{font-size:8px;letter-spacing:1.1px;color:var(--smfc-muted)}
+ html body .coach-profile-trigger{border:1px solid var(--smfc-line);border-radius:24px;background:white;padding:4px 10px 4px 5px}
+ html body .coach-profile-avatar{background:var(--smfc-cream);color:var(--smfc-navy);width:31px;height:31px}
+ html body .coach-profile-name{font-size:12px}
+ html body .workspace-save-trigger{font-size:11px;border-radius:8px;min-height:34px}
+ /* Short, quiet tabs match the Responsable workspace instead of competing with the page. */
+ html body.task-navigation #task-section-navigation{background:transparent!important;padding:8px 0!important;border:0!important;border-bottom:1px solid var(--smfc-line)!important;border-radius:0!important;margin-bottom:18px;gap:12px}
+ html body.task-navigation .task-section-tabs{background:#e9edf5!important;padding:4px!important;border-radius:9px;gap:3px;flex:none;max-width:100%}
+ html body.task-navigation .task-section-tab{font-size:12px!important;min-height:36px;padding:8px 18px!important;font-weight:550;color:#53617b!important;border:0!important;border-radius:6px;box-shadow:none!important;flex:0 1 auto}
+ html body.task-navigation .task-section-tab[aria-pressed=true]{background:#fff!important;color:var(--smfc-blue)!important;box-shadow:0 2px 5px #142d5008!important;font-weight:700}
+ html body.task-navigation #club-assistant-open{margin-left:auto;min-height:36px;border:1px solid #dbe1eb!important;background:white!important;font-size:11px;padding:8px 14px;border-radius:8px}
+ /* Respect the dense pitch's measured dimensions, while restyling ordinary section titles. */
+ html body:not(.home-mode) :is(#training-space,#after-match,#coach-agenda,#club-network-dialog,#coach-squad-dialog,#coach-resources)>.reports-heading :is(h1,h2),
+ html body .squad-page>.section-heading h2{font-family:SMFCUnbounded,Arial,sans-serif!important;font-size:clamp(21px,2.1vw,30px)!important;font-weight:550;line-height:1.3;letter-spacing:-1px;color:var(--smfc-navy)!important}
+ html body :is(.reports-heading,.training-step-heading){margin-block:17px 20px;gap:14px}
+ html body :is(.reports-heading,.training-step-heading)>div>p{font-size:12px;color:var(--smfc-muted);line-height:1.6}
+ html body :is(.report-panel,.club-network-card,.coach-agenda-card,.squad-page,.bible-card,.home-live-card,.resource-card){border-color:var(--smfc-line)!important;border-radius:13px;box-shadow:none!important}
+ html body :is(.report-panel,.club-network-card,.coach-agenda-card,.squad-page,.home-live-card,.resource-card){background:#fff}
+ html body :is(.report-panel,.card-heading,.section-heading) h2{font-family:SMFCArchivo,Arial,sans-serif;font-weight:700;letter-spacing:-.3px}
+ html body :is(.report-panel,.bible-card,.resource-card) h3{color:var(--smfc-ink);font-weight:700}
+ html body :is(.report-panel,.reports-heading,.training-step-footer,.flow-footer) button{border-radius:8px;box-shadow:none!important}
+ /* Keep ordinary actions blue and the existing destructive/error/discipline signals red. */
+ html body :is(#training-new,#training-create-session,#report-new,.squad-tools button,.report-actions .export){border-radius:8px;border-color:#d6deea;background:white}
+ html body :is(#training-save,#report-save){background:var(--smfc-blue);color:#fff;border:1px solid var(--smfc-blue);border-radius:8px}
+ html body :is(.training-progress,#report-tabs,.squad-followup-tabs){background:#e9edf5;border-radius:9px;padding:4px;gap:3px;border:0}
+ html body :is(.training-progress,#report-tabs,.squad-followup-tabs)>button{border:0!important;border-radius:6px;font-size:12px;color:var(--smfc-muted);font-weight:550;background:transparent;box-shadow:none!important}
+ html body :is(.training-progress,#report-tabs)>button.active{background:#fff!important;color:var(--smfc-blue)!important;box-shadow:0 2px 5px #142d5008!important;font-weight:700}
+ html body :is(.training-step,#report-content,.task-causerie,.squad-page) :is(input,select,textarea):not([type=checkbox]):not([type=radio]):not([type=range]):not([type=color]):not([type=file]){border-color:#dbe1eb!important;border-radius:8px!important;background:#fff!important;color:var(--smfc-ink)!important;box-shadow:none;font-weight:400}
+ html body :is(.report-field,.field-label){color:#445675}
+ html body :is(.training-title,.document-title-field){font-size:11px;letter-spacing:.15px;color:var(--smfc-muted)}
+ html body :is(.report-field,.training-step label,.task-causerie label){font-size:12px!important;font-weight:600!important;color:#445675!important}
+ html body :is(.training-step,.report-panel) :is(input,textarea)::placeholder{color:#66738a}
+ html body .match-continuity-cue{background:#eef3fb;border:1px solid #dce5f1;border-left:3px solid var(--smfc-blue);border-radius:10px;padding:12px 16px}
+ html body .match-continuity-text>strong{font-size:12px}
+ html body .match-continuity-text>p{font-size:11px;color:var(--smfc-muted)}
+ html body .causerie-clean-editor .causerie-clean-body{border-color:var(--smfc-line);border-radius:13px;box-shadow:none}
+ html body .causerie-clean-editor .causerie-clean-body>.section-heading,
+ html body #match-plan-form>.section-heading{background:#eef3fb;border-color:#dce5f1;border-left-color:var(--smfc-blue);border-radius:10px}
+ html body #match-plan-dialog-title{font-family:SMFCUnbounded,Arial,sans-serif;font-size:23px;letter-spacing:-.8px;font-weight:550}
+ html body .causerie-clean-grid .causerie-clean-card{border-top:1px solid var(--smfc-line);padding-top:17px}
+ html body .causerie-clean-card h3{font-family:SMFCArchivo,Arial,sans-serif;font-size:15px;letter-spacing:-.2px}
+ /* Tables and directories: thin dividers and restrained secondary information. */
+ html body :is(.squad-row,.educator-card,.agenda-overview-event){border-color:var(--smfc-line);box-shadow:none}
+ html body :is(.squad-player-info small,.squad-player-details,.educator-status){color:var(--smfc-muted)}
+ html body :is(.report-score-card,.report-quick-score){border-radius:12px}
+ html body .agenda-calendar{background:white;border:1px solid var(--smfc-line);border-radius:13px;padding:18px}
+ html body .agenda-calendar-day{border-color:#e7ebf2;background:white}
+ html body .agenda-calendar-day.is-today{background:#f2f6fc}
+ html body .agenda-calendar-event{border-radius:5px;box-shadow:none;font-size:11px}
+ html body :is(.resource-card,.bible-card){overflow:hidden}
+ html body .bible-card-picture{background:#edf2f9;border-radius:9px}
+ html body .bible-card .eyebrow{font-size:9px;color:var(--smfc-blue);letter-spacing:1.2px}
+ html body .bible-card-goal{font-size:12px;color:var(--smfc-muted)}
+ html body .squad-page{padding:24px;border-color:var(--smfc-line);border-radius:13px}
+ html body .squad-row{padding-block:15px}
+ html body .squad-player-info strong{font-size:14px;font-weight:700}
+ html body :is(dialog,.header-dropdown){border-color:var(--smfc-line);border-radius:14px;box-shadow:0 20px 60px #142d5020;color:var(--smfc-ink)}
+ html body dialog::backdrop{background:#142d5066;backdrop-filter:blur(3px)}
+ /* Preserve the club photography; the surrounding dashboard follows Responsable cards. */
+ html body.home-mode{background:var(--smfc-canvas)}
+ html body.home-mode #home-backdrop:not([hidden]){inset:74px 0 auto var(--navigation-rail-width,0px);height:275px;max-height:32vh;opacity:1;mask-image:linear-gradient(#000 75%,transparent)}
+ html body.home-mode #home-backdrop::after{background:linear-gradient(90deg,#142d50db,#142d5099)}
+ html body.home-mode #club-home{padding-top:0}
+ html body.home-mode .home-hero{border:1px solid #ffffff20;border-radius:13px;background:linear-gradient(105deg,#163a70ed,#2855a2c9);box-shadow:none;padding:25px 28px!important;margin-top:5px;margin-bottom:22px;position:relative}
+ html body.home-mode .home-hero :is(h1,p,.eyebrow){text-shadow:none}
+ html body.home-mode .home-hero .eyebrow{color:#d6e4fa;font-size:9px;letter-spacing:1.6px}
+ html body.home-mode #home-greeting{font-family:SMFCUnbounded,Arial,sans-serif;font-size:clamp(23px,2.5vw,34px)!important;line-height:1.3;letter-spacing:-1.1px;color:white;margin:12px 0!important;font-weight:550}
+ html body.home-mode :is(#home-date,.home-last-saved){color:#d6e3f7;font-size:11px}
+ html body.home-mode .home-crest{width:70px;height:70px;object-fit:contain}
+ html body.home-mode :is(.home-stats span,.home-stats strong){color:white}
+ html body.home-mode #home-live-widgets .home-live-card{background:#fff!important;border:1px solid var(--smfc-line)!important;border-radius:13px!important;color:var(--smfc-ink);padding:22px;box-shadow:none}
+ html body.home-mode #home-live-widgets .home-live-card h2{font:700 13px SMFCArchivo,Arial,sans-serif;color:var(--smfc-ink);letter-spacing:-.2px;margin-bottom:20px}
+ html body.home-mode #home-live-widgets .home-live-value{font:550 24px/1.3 SMFCUnbounded,Arial,sans-serif;color:var(--smfc-blue);letter-spacing:-.8px;display:block;margin-bottom:15px}
+ html body.home-mode #home-live-widgets .home-live-card p{color:var(--smfc-muted);font-size:12px;line-height:1.6}
+ html body.home-mode #home-live-widgets .home-live-card h3{font-size:12px;color:var(--smfc-ink)}
+ html body.home-mode #home-live-widgets .home-live-card .home-live-open{background:var(--smfc-blue);color:white;border:0;border-radius:8px;font-size:12px;padding:11px 15px}
+ html body.home-mode #home-live-widgets .home-live-training{background:#eef3fb!important}
+ html body.home-mode #home-live-widgets{gap:16px}
+ html body.home-mode :is(.home-profile-card,.home-fff-card){background:white!important;border:1px solid var(--smfc-line)!important;box-shadow:none;border-radius:13px;color:var(--smfc-ink)}
+ html body .flow-footer{background:white;border-color:var(--smfc-line);box-shadow:none}
+ /* Welcome and sign-in retain the crest, club photographs and existing authentication forms. */
+ html body:has(.welcome){background:var(--smfc-canvas);font-family:SMFCArchivo,Arial,sans-serif}
+ html body .welcome-intro{background:var(--smfc-navy)}
+ html body .welcome-copy h1{font-family:SMFCUnbounded,Arial,sans-serif;font-size:clamp(30px,3.7vw,48px);font-weight:550;line-height:1.25;letter-spacing:-1.7px}
+ html body .welcome-copy h1 span{color:#bfd2f2}
+ html body .welcome-card{border:1px solid var(--smfc-line);border-radius:14px;box-shadow:none;padding:32px}
+ html body .welcome-card h2{font-family:SMFCUnbounded,Arial,sans-serif;font-size:24px;font-weight:550;line-height:1.3;letter-spacing:-.8px}
+ html body :is(.welcome-local,.welcome-card>p.welcome-note,.welcome-private){color:var(--smfc-muted)}
+ html body #club-auth-gate{font-family:SMFCArchivo,Arial,sans-serif}
+ html body #club-auth-gate h1{font-family:SMFCUnbounded,Arial,sans-serif;font-weight:550;line-height:1.25;letter-spacing:-1.3px}
+ html body #club-auth-gate>p,html body #club-auth-gate .hint{color:var(--smfc-muted)}
+}
+@media screen and (min-width:1100px) and (hover:hover) and (pointer:fine){
+ html body.responsive-navigation{--navigation-rail-width:218px;--workspace-gutter:clamp(22px,2.5vw,36px)}
+ html body.task-navigation.responsive-navigation #workspace-navigation{padding:27px 19px;gap:8px}
+ html body.task-navigation.responsive-navigation #workspace-navigation>button{min-height:49px;padding:11px 12px!important;border-radius:9px;font-size:12px!important;gap:11px}
+ html body.task-navigation.responsive-navigation #workspace-navigation>button:first-of-type{margin-bottom:10px}
+ html body.task-navigation.responsive-navigation>main{padding-top:18px}
+}
+@media screen and (min-width:1000px) and (min-height:650px){
+ /* Compact tactical workspaces keep their original height budget. */
+ html body.task-navigation.terrain-workflow-active #task-section-navigation{margin-bottom:10px;padding-block:5px!important}
+ html body.task-navigation .task-tactical-modes button{min-height:34px;font-size:11px}
+ html body.task-navigation #terrain-flow :is(.board-toolbar,.tactic-tool-panel,.board-footer){font-family:SMFCArchivo,Arial,sans-serif}
+}
+@media screen and (max-width:1099px),screen and (hover:none),screen and (pointer:coarse){
+ html body.home-mode #home-backdrop:not([hidden]){left:0}
+ html body.task-navigation.responsive-navigation #workspace-navigation{border:0!important;border-top:1px solid #2c476a!important}
+ html body.task-navigation.responsive-navigation #workspace-navigation>button[aria-current=page]{box-shadow:inset 0 3px #96b5e2!important}
+}
+@media screen and (max-width:700px){
+ html body.task-navigation.responsive-navigation>header{min-height:64px;padding-block:9px;gap:8px}
+ html body.task-navigation.responsive-navigation>header .brand{font-size:10px!important;gap:7px;letter-spacing:.4px}
+ html body.task-navigation.responsive-navigation>header .brand small{font-size:6px!important;letter-spacing:.8px}
+ html body.task-navigation.responsive-navigation>header .brand .club-logo{width:30px;height:30px}
+ html body .team-space-trigger{padding:6px 8px;min-height:42px}
+ html body .team-space-trigger strong{font-size:10px}
+ html body .coach-profile-name{font-size:11px}
+ html body .coach-profile-avatar{width:29px;height:29px}
+ html body.task-navigation #task-section-navigation{gap:6px;padding-block:6px!important;margin-bottom:13px}
+ html body.task-navigation .task-section-tabs{flex:1;min-width:0}
+ html body.task-navigation .task-section-tab{font-size:11px!important;padding:8px 10px!important;min-height:38px;flex:1}
+ html body.task-navigation #club-assistant-open{padding:8px 10px;font-size:10px}
+ html body:not(.home-mode) :is(#training-space,#after-match,#coach-agenda,#club-network-dialog,#coach-squad-dialog,#coach-resources)>.reports-heading :is(h1,h2){font-size:22px!important;letter-spacing:-.7px}
+ html body.home-mode .home-hero{padding:20px!important;margin-bottom:16px}
+ html body.home-mode #home-greeting{font-size:23px!important;letter-spacing:-.8px}
+ html body.home-mode .home-crest{width:55px;height:55px}
+ html body.home-mode #home-live-widgets .home-live-card{padding:19px}
+ html body.home-mode #home-live-widgets .home-live-value{font-size:22px}
+ html body :is(.squad-page,.agenda-calendar){padding:15px}
+ html body .welcome-copy h1{font-size:32px;letter-spacing:-1px}
+ html body .welcome-card h2{font-size:23px}
+}
+@media(prefers-reduced-motion:reduce){html body.task-navigation.responsive-navigation #workspace-navigation>button{transition:none}}
+@media screen{
+ html body .training-library-page{background:white;border:1px solid var(--smfc-line);border-radius:13px;padding:20px 22px}
+ html body #training-library-page>.training-step-heading{margin-top:0;margin-bottom:15px}
+ html body #training-library-page>.training-step-heading>h2{font-size:14px!important;letter-spacing:-.2px;font-family:SMFCArchivo,Arial,sans-serif!important}
+ html body .training-library-search{font-size:11px;color:var(--smfc-muted)}
+ html body #training-library-search{border-color:#dbe1eb;border-radius:8px;font-size:13px;min-height:42px}
+ html body .training-session-filters{gap:12px}
+ html body .training-session-filters label{font-size:11px;color:var(--smfc-muted)}
+ html body .training-session-filters select{border-color:#dbe1eb;border-radius:8px;background:white;min-height:40px;font-size:12px}
+ html body .training-session-sector>h3{font:700 11px SMFCArchivo,Arial,sans-serif;letter-spacing:1px;text-transform:uppercase;color:var(--smfc-muted);display:flex;gap:8px;align-items:center;margin:22px 0 12px}
+ html body .training-session-sector>h3>span{font-size:10px;border-radius:5px;background:var(--smfc-cream);color:var(--smfc-navy);padding:4px 7px}
+ html body .training-saved-card{position:relative;display:grid;grid-template-columns:minmax(0,1fr) auto auto;align-items:center;gap:11px;background:white;border:1px solid var(--smfc-line);border-radius:10px;padding:17px 17px 17px 66px;margin-bottom:10px;box-shadow:none}
+ html body .training-saved-card::before{content:'';position:absolute;left:17px;top:20px;width:32px;height:36px;border:1px solid #e1e8f4;border-radius:7px;background:#eef2fb url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='%232855a2' stroke-width='1.4'%3E%3Cpath d='m12 4 7 15H5L12 4Zm-3 7h6m-8 5h10'/%3E%3C/svg%3E") no-repeat center/22px}
+ html body .training-saved-card>div:first-child{min-width:0}
+ html body .training-saved-card>div>strong{font-size:14px;color:var(--smfc-ink);font-weight:700}
+ html body .training-saved-card>div>p{font-size:11px;color:var(--smfc-muted);margin:7px 0;line-height:1.5}
+ html body .training-session-tags{gap:5px;margin:8px 0}
+ html body .training-session-tags>span{font-size:9px;font-weight:550;border:0;border-radius:5px;color:var(--smfc-blue);background:#eef2fa;padding:5px 7px}
+ html body .training-saved-card>button{border:1px solid #d6deea;border-radius:8px;font-size:11px;padding:9px 12px;min-height:36px;white-space:nowrap}
+ html body .training-saved-card>button.training-session-delete{color:var(--smfc-red);border-color:#f1dadd;background:white}
+ html body .training-library-page .training-library{background:#f4f6fa;border-radius:10px;padding:12px;border:0}
+ html body.home-mode #home-live-widgets progress{background:#e8edf5;accent-color:var(--smfc-blue)}
+ html body.home-mode #home-live-widgets progress::-webkit-progress-bar{background:#e8edf5}
+ html body.home-mode #home-live-widgets progress::-webkit-progress-value{background:var(--smfc-blue)}
+ html body.home-mode #home-live-widgets progress::-moz-progress-bar{background:var(--smfc-blue)}
+}
+@media screen and (max-width:700px){
+ html body .training-library-page{padding:16px 13px}
+ html body .training-saved-card{grid-template-columns:1fr auto;padding:16px 13px 16px 58px;gap:9px}
+ html body .training-saved-card::before{left:12px;top:16px}
+ html body .training-saved-card>div:first-child{grid-column:1/-1}
+ html body .training-saved-card>button{font-size:11px;min-height:40px}
+}
+@media screen and (min-width:1100px){
+ html body #training-library-page:not([hidden]){display:grid;grid-template-columns:minmax(220px,1fr) minmax(330px,1.4fr);align-content:start;gap:13px 18px}
+ html body #training-library-page>.training-step-heading{grid-column:1/-1;margin:0}
+ html body #training-library-page>.training-library-search{grid-column:1;margin:0;align-self:start}
+ html body #training-library-page>.training-session-filters{grid-column:2;margin:0;align-self:start}
+ html body #training-library-page>.training-session-filters label{margin:0}
+ html body #training-library-page>:is(.training-session-results,.training-library,.hint,#training-saved-cards){grid-column:1/-1;margin-block:0}
+ html body #training-library-page #training-library-search{margin-top:7px}
+ html body #training-library-page .training-session-filters select{margin-top:7px}
+ html body #training-library-page .training-session-sector>h3{margin:12px 0}
+}
+
+@media screen{html body.task-navigation.responsive-navigation>header{position:sticky;top:0;z-index:101}}
+@media screen{html body #training-create-session{background:var(--smfc-blue)!important;border-color:var(--smfc-blue)!important;color:white!important}}
+/* Let ordinary long pages use the document scroller so the header can stay pinned.
+   Dedicated editors and open modal workspaces retain their existing scroll locks. */
+@media screen{
+ html body:is(.home-mode,.squad-mode,.resources-mode):not(.workspace-panel-open):not(:has(dialog[open])){overflow:visible!important}
+}
+@media screen and (max-width:999px),screen and (max-height:649px){
+ html body.task-navigation:not(.workspace-panel-open):not(:has(dialog[open])){overflow:visible!important}
+}
