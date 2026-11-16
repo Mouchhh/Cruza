@@ -55,8 +55,8 @@
   function init() {
   const first = document.getElementById('training-step-link-0'); if (!first || done) return; done = true;
   const bar = first.parentElement; bar.classList.add('mc-step-stepper');
-  const label = document.createElement('div'); label.className = 'mc-step-label'; bar.before(label);
-  const steps = [...bar.querySelectorAll('button')];
+  const label = document.createElement('div'); label.className = 'mc-step-label'; bar.prepend(label);
+  const steps = [...bar.querySelectorAll(':scope>button')];
   const upd = () => { const i = steps.findIndex(b => b.classList.contains('active')); if (i < 0) return; const name = steps[i].textContent.replace(/^\s*\d+\s*/, '').trim(); label.textContent = 'Étape ' + (i + 1) + ' sur ' + steps.length + ' · ' + name; };
   new MutationObserver(upd).observe(bar, { attributes: true, subtree: true, attributeFilter: ['class'] }); upd();
   const field = document.getElementById('training-field-open'), next = document.getElementById('training-next');
@@ -67,5 +67,18 @@
   }
   }
   new MutationObserver(init).observe(document.body, { childList: true, subtree: true }); init();
+ });
+ // Téléphone : page Exercices allégée (Affiner masqué, nombre de résultats sous les filtres).
+ document.addEventListener('DOMContentLoaded', () => {
+  const phone = matchMedia('(max-width:700px)');
+  let home = null;
+  const run = () => {
+   document.querySelectorAll('summary').forEach(s => { if (/^\s*Affiner la recherche/.test(s.textContent)) s.parentElement.classList.add('mc-hide'); });
+   const r = document.getElementById('bible-results'), cat = document.getElementById('training-catalogue');
+   if (!r || !cat) return;
+   if (phone.matches) { if (!home) home = { parent: r.parentElement, before: r.nextSibling }; if (r.nextElementSibling !== cat) cat.before(r); }
+   else if (home) { home.parent.insertBefore(r, home.before); home = null; }
+  };
+  new MutationObserver(run).observe(document.body, { childList: true, subtree: true }); phone.addEventListener('change', run); run();
  });
 })();

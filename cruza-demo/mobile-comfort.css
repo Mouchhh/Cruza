@@ -83,7 +83,15 @@ html body .mc-step-label{display:none}
 @media screen and (max-width:700px){
  html body #workspace-save-open{display:none!important}
  html body #training-new,html body #training-save,html body #training-pdf{flex:1 1 0!important;min-width:0!important;padding:8px 4px!important;font-size:12px!important;line-height:1.2}
- html body.task-navigation nav.training-progress.mc-step-stepper:not([hidden]),html body .mc-step-stepper{display:none!important}
+ html body nav.mc-step-stepper>button{display:none!important}
+ html body nav.mc-step-stepper{margin:0 0 6px!important;padding:0!important;background:none!important;border:0!important;min-height:0!important}
+ html body nav.mc-step-stepper .mc-step-label{grid-column:1/-1}
  html body .mc-step-label{display:block;margin:8px 0 4px;font-size:13px;font-weight:700;color:#304f75}
  html body .mc-field-link{display:block;width:100%;margin:12px 0 4px}
+}
+@media screen and (max-width:700px){
+ html body #training-field-open,html body #training-exercises-resume,html body #bible-group-context,html body details.mc-hide{display:none!important}
+ html body .training-catalogue-action{display:flex!important;gap:8px!important}
+ html body #training-custom-add,html body #training-personal-exercises{flex:1 1 0!important;min-height:44px}
+ html body #bible-results{margin:10px 0 6px!important;font-size:13px!important;font-weight:700}
 }
