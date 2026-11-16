@@ -1,0 +1,24 @@
+name: Bug sur le site
+description: Décrire un problème reproductible sans données personnelles.
+title: '[Bug] '
+body:
+  - type: input
+    id: environnement
+    attributes:
+      label: Environnement concerné
+      placeholder: SMFC / Démo / Préproduction / Club pilote
+    validations:
+      required: true
+  - type: textarea
+    id: reproduction
+    attributes:
+      label: Étapes et résultat observé
+      description: Ne pas publier de mot de passe, token, nom de joueur ou document privé.
+    validations:
+      required: true
+  - type: textarea
+    id: attendu
+    attributes:
+      label: Résultat attendu
+    validations:
+      required: true

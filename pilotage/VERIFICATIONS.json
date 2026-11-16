@@ -1,0 +1,17 @@
+{
+  "date": "2026-11-16",
+  "checks": [
+    "Registre des environnements, plan de dépôts privés, empreintes des migrations et liens documentaires : PASS",
+    "Installation neuve PostgreSQL embarqué : sept tables, aucun rôle nominatif, réinstallation refusée et lecture anonyme refusée : PASS",
+    "Droits Responsable director/pole/educator/inactive/anon et idempotence PostgreSQL embarqué : PASS",
+    "Statistiques métier : PASS",
+    "Orchestration sauvegarde/restauration à 5 et 6 tables avec clients simulés : PASS",
+    "Fichiers applicatifs, configuration SMFC et PWA de Hugo inchangés octet par octet : PASS"
+  ],
+  "limits": [
+    "Pas de connexion administrateur GitHub ou Supabase utilisable ici",
+    "Aucune création de projet Supabase ni de dépôt privé vérifiée",
+    "Pas de restauration du projet réel",
+    "Pas de vérification du déploiement public"
+  ]
+}

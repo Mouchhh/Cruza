@@ -1,3 +1,11 @@
+# CRUZA — application et installations de clubs
+
+**[Centre de pilotage](pilotage/README.md)** · **[Sites et environnements](pilotage/environnements.json)** · **[Tableau de travail](pilotage/TABLEAU-DE-TRAVAIL.md)** · **[Supabase / nouveau club](pilotage/04-donnees-supabase/INSTALLER-UN-CLUB.md)**
+
+Le site SMFC reste à la racine ; la démonstration neutre est dans `cruza-demo/`. Les nouvelles organisations et projets externes sont distingués des contenus simplement préparés dans [l’état réel](pilotage/ETAT-REEL.md).
+
+---
+
 # Le Vestiaire
 
 Espace de travail du Stade Mayennais, en français, sur ordinateur, tablette et mobile : terrain tactique, séances, bibliothèque d’exercices, agenda et rapports. L’espace du club nécessite un compte autorisé. Les brouillons restent sur l’appareil ; les documents enregistrés, y compris leurs photos, sont partagés entre éducateurs autorisés via Supabase. Le mode local reste accessible avec `?mode=local`.

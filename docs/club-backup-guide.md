@@ -9,7 +9,9 @@ Ne pas effacer les données du navigateur avant de les enregistrer ou de les con
 
 Les scripts `scripts/club-backup.sh` et `scripts/club-restore.sh` conservent les
 membres, invitations, documents (photos intégrées comprises), responsables de pôles
-et validations. Le dump PostgreSQL prend une vue cohérente de ces cinq tables.
+et validations, ainsi que les accès Responsable quand leur migration est installée.
+Le dump PostgreSQL prend une vue cohérente de cinq tables historiques et de la
+sixième table de droits lorsqu’elle existe.
 La présence temporaire en ligne n'est pas restaurée.
 
 **Ce n'est pas une sauvegarde complète du projet Supabase.** Authentication
@@ -48,7 +50,7 @@ qu'un compte gratuit dispose d'une restauration automatique.
    les mêmes UUID** : recréer seulement les adresses mail génère d'autres identifiants
    et ne suffit pas. Une reprise complète peut demander l'aide de l'administrateur
    Supabase. Ne pas désactiver les clés étrangères pour contourner cet obstacle.
-3. Les cinq tables applicatives doivent être vides. Le script ne les efface jamais.
+3. Les tables applicatives et les droits Responsable présents doivent être vides. Le script ne les efface jamais.
    Une installation avec des comptes déjà présents peut avoir créé des membres ou
    invitations : préparer une cible réellement vide avec l'administrateur.
 4. Configurer un **autre** service PostgreSQL `club_test`, puis :
@@ -70,3 +72,5 @@ qu'un compte gratuit dispose d'une restauration automatique.
 Les scripts ne restaurent pas le projet en production automatiquement et ne
 remplacent pas la sauvegarde Supabase complète. Aucun exercice de reprise du
 projet réel n'a été effectué depuis cet environnement, qui n'a pas ses accès.
+
+Une archive qui contient `club_management_access` exige la migration Responsable sur la cible. Les archives anciennes restent lisibles mais ne contiennent pas ces droits. Leur inclusion n’est pas une preuve de restauration du projet réel : effectuer la recette dédiée.

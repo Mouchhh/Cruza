@@ -1,0 +1,29 @@
+{
+  "scope": "projet neuf seulement",
+  "migrations": [
+    {
+      "file": "club.sql",
+      "sha256": "c467fe8615204352b19e3c7a11f1b1b35a57e96e2bf3a9805f3fc4b8fb80c4b9"
+    },
+    {
+      "file": "club-accounts.sql",
+      "sha256": "96e8e9606473ce2ea8ba3f9a57580df0b7e19e7eef4db79008bcf612dd784625"
+    },
+    {
+      "file": "club-presence.sql",
+      "sha256": "03edc9bd3d3e3a215dd040ff85510c2993a4f48b0afa8bcb7aff0b4375f4bf4e"
+    },
+    {
+      "file": "club-references.sql",
+      "sha256": "29386d9cd87d695dc9f57e897f99cb209f51ff5aa4bc82a753a016541e8c387d"
+    },
+    {
+      "file": "club-management.sql",
+      "sha256": "b2bb995799a118f5898bf33dff20c621364d06b93a2df0d3508df9fda2bd190d"
+    },
+    {
+      "file": "club-management-statistics.sql",
+      "sha256": "3b769c286a188900b274caed7a605073c0f87a553054f93de7194f899df7670a"
+    }
+  ]
+}

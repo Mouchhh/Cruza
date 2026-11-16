@@ -1,0 +1,16 @@
+name: Amélioration du produit
+description: Relier une amélioration à un besoin de l’éducateur.
+title: '[Produit] '
+body:
+  - type: textarea
+    id: besoin
+    attributes:
+      label: Besoin et parcours concerné
+    validations:
+      required: true
+  - type: textarea
+    id: validation
+    attributes:
+      label: Comment vérifier que c’est terminé ?
+    validations:
+      required: true

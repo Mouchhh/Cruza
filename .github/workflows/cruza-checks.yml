@@ -1,0 +1,35 @@
+name: Contrôles CRUZA
+on:
+  pull_request:
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: cruza-checks-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  controle:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Vérifier les scripts et modèles
+        run: |
+          for file in *.js; do node --check "$file"; done
+          bash -n scripts/club-backup.sh scripts/club-restore.sh
+          node tests/manager-statistics-model.mjs
+          python3 scripts/check-organisation.py
+          python3 tests/club-backup-tools.py
+      - name: Installer PostgreSQL embarqué de test
+        run: npm install --prefix /tmp/cruza-checks --no-audit --no-fund @electric-sql/pglite@0.3.14
+      - name: Tester les accès Responsable et l’installation neuve
+        env:
+          PGLITE_MODULE: /tmp/cruza-checks/node_modules/@electric-sql/pglite/dist/index.js
+        run: |
+          node tests/club-management-access.mjs
+          node tests/club-installation.mjs
