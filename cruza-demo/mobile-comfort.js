@@ -94,4 +94,16 @@
    set.scrollIntoView({ block: 'center', behavior: 'smooth' });
   }, true);
  })();
+ // Téléphone : liste « Mes séances » — « Créer ma séance » à côté de la recherche, sans doublon de titre ni brouillon.
+ document.addEventListener('DOMContentLoaded', () => {
+  let done = false;
+  function init() {
+   const create = document.getElementById('training-create-session'), label = document.querySelector('.training-library-search');
+   if (!create || !label || done) return; done = true;
+   const row = document.createElement('div'); row.className = 'mc-search-row';
+   const input = label.querySelector('input'); if (input && !input.placeholder) input.placeholder = 'Rechercher une séance';
+   label.before(row); row.append(label, create);
+  }
+  new MutationObserver(init).observe(document.body, { childList: true, subtree: true }); init();
+ });
 })();

@@ -99,3 +99,12 @@ html body .mc-step-label{display:none}
  html body .mc-error{margin:6px 0 10px;padding:10px 12px;border-radius:10px;background:#fdeaea;border:1px solid #e24b4a;color:#8a1c1c;font-size:13px;font-weight:600}
  html body .training-step-footer{bottom:var(--navigation-bottom-space,64px)!important;z-index:50!important;background:#f3f6fb;padding-bottom:8px}
 }
+html body .mc-search-row{display:contents}
+@media screen and (max-width:700px){
+ html body #training-library-page .training-step-heading h2,html body #training-resume-session{display:none!important}
+ html body #training-library-page .training-step-heading{margin:0!important;min-height:0!important}
+ html body .mc-search-row{display:flex!important;gap:8px;align-items:center;margin:0 0 10px}
+ html body .mc-search-row .training-library-search{flex:1 1 0;min-width:0;font-size:0!important;margin:0!important}
+ html body .mc-search-row .training-library-search input{font-size:15px!important;width:100%;min-height:44px}
+ html body .mc-search-row #training-create-session{flex:0 0 auto;min-height:44px;padding:8px 12px!important;white-space:nowrap}
+}
