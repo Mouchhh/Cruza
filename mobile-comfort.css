@@ -181,3 +181,8 @@ html body #report-tabs .mc-step-label{display:none}
  html body>header .coach-profile-avatar{margin:0!important}
  html body>header .coach-profile-name{display:none!important}
 }
+/* Écran de connexion du club : pas de menu du bas tant qu'on n'est pas connecté */
+@media screen and (max-width:700px){
+ html.club-private-request:not(.club-authenticated) body.task-navigation.responsive-navigation #workspace-navigation,
+ html.club-private-request:not(.club-authenticated) body .mc-extra{display:none!important}
+}
