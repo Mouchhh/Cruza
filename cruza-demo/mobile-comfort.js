@@ -20,7 +20,7 @@
     if (!more || b.hidden || !menu) continue;
     const c = document.createElement('button'); c.type = 'button'; c.className = 'mc-extra';
     c.textContent = b.textContent.trim();
-    c.onclick = () => { menu.hidden = true; document.getElementById('coach-profile-trigger')?.setAttribute('aria-expanded', 'false'); b.click(); };
+    c.onclick = e => { e.stopPropagation(); menu.hidden = true; document.getElementById('coach-profile-trigger')?.setAttribute('aria-expanded', 'false'); setTimeout(() => { if (window.workspaceNavigation && b.id !== 'workspace-squad-entry' && b.id !== 'view-management') window.workspaceNavigation.run(b.id); else b.click(); }, 60); };
     menu.append(c);
    }
   }

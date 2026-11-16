@@ -4,7 +4,7 @@ html body .mc-extra{display:none!important}
  html body .mc-extra{display:block!important;width:100%;text-align:left;min-height:44px}
  html body.task-navigation.responsive-navigation #workspace-navigation{display:flex!important;flex-wrap:nowrap!important;gap:0!important;padding:4px 4px calc(4px + env(safe-area-inset-bottom,0px))!important}
  html body.task-navigation.responsive-navigation #workspace-navigation>button{flex:1 1 0!important;order:var(--mc-order,0);min-height:56px!important;font-size:11px!important;padding:6px 2px!important;gap:3px!important;white-space:nowrap!important}
- html body.task-navigation.responsive-navigation #workspace-navigation>button[data-mc="more"]{display:none!important}
+ html body.task-navigation.responsive-navigation #workspace-navigation>button[data-mc="more"]{display:flex!important;position:absolute!important;left:-9999px!important;width:1px!important;height:1px!important;min-height:0!important;padding:0!important;opacity:0!important;pointer-events:none!important;overflow:hidden!important}
  /* Contraste des cartes bleues de l'accueil */
  body.home-mode .home-hero{background:#1b3f86!important;color:#fff!important}
  body.home-mode .home-hero p,body.home-mode .home-hero .eyebrow,body.home-mode .home-hero #home-date{color:#fff!important;opacity:1!important}
