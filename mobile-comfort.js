@@ -27,4 +27,19 @@
   new MutationObserver(build).observe(nav, { attributes: true, subtree: true, attributeFilter: ['hidden'] });
   build();
  });
+
+ // Bouton « Paysage » dans la barre d'actions de la Tactique (même réglage que « Terrain paysage »).
+ document.addEventListener('DOMContentLoaded', () => {
+  const toggle = document.getElementById('landscape-toggle'); if (!toggle) return;
+  const label = () => document.body.classList.contains('landscape-mode') ? '▯ Portrait' : '▭ Paysage';
+  function sync() {
+   document.querySelectorAll('.tactic-compact-actions').forEach(bar => {
+    let b = bar.querySelector('.mc-landscape');
+    if (!b) { b = document.createElement('button'); b.type = 'button'; b.className = 'mc-landscape export'; b.onclick = () => toggle.click(); bar.append(b); }
+    if (b.textContent !== label()) b.textContent = label();
+   });
+  }
+  new MutationObserver(sync).observe(document.body, { childList: true, subtree: true, attributes: true, attributeFilter: ['class'] });
+  sync();
+ });
 })();
