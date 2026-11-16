@@ -23,7 +23,7 @@ Render, sans supposer une disponibilité permanente ou un montant futur.
 
 | Réglage | Valeur |
 |---|---|
-| Dépôt | `Mouchhh/FOOT-U16-2026-2027` |
+| Dépôt | `Mouchhh/cruza-stade-mayennais` |
 | Branche | Celle qui contient effectivement les nouveaux fichiers publiés |
 | Nom | `vestiaire-canva` |
 | Language / Runtime | **Node**, sans Docker local |

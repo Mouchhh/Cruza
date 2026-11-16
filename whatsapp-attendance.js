@@ -35,7 +35,7 @@
  function render(){
   const wasConfirmed=$('whatsapp-confirm')?.checked||false;content.replaceChildren(status);status.textContent='';
   if(!clubNetworkBound()){summary.textContent='Présences WhatsApp · espace privé';content.append(el('p','hint','Connectez-vous à votre compte éducateur pour associer votre groupe.'));return;}
-  if(!base()){summary.textContent='Présences WhatsApp · à activer';content.append(el('p','','La passerelle du club doit être hébergée avant de pouvoir associer un compte.'),el('p','hint','Lecture des réactions 👍 / 👎 sous le message de la séance. Le coach valide la liste avant l’adaptation.'));const a=el('a','','Installation du serveur');a.href='https://github.com/Mouchhh/FOOT-U16-2026-2027/blob/main/whatsapp-gateway/README.md';a.target='_blank';a.rel='noopener';content.append(a);return;}
+  if(!base()){summary.textContent='Présences WhatsApp · à activer';content.append(el('p','','La passerelle du club doit être hébergée avant de pouvoir associer un compte.'),el('p','hint','Lecture des réactions 👍 / 👎 sous le message de la séance. Le coach valide la liste avant l’adaptation.'));const a=el('a','','Installation du serveur');a.href='https://github.com/Mouchhh/cruza-stade-mayennais/blob/main/whatsapp-gateway/README.md';a.target='_blank';a.rel='noopener';content.append(a);return;}
   const state=data?.state||'disconnected';summary.textContent='Présences WhatsApp · '+({ready:'connecté',qr:'QR à scanner',connecting:'connexion en cours',error:'connexion à reprendre',disconnected:'non connecté'}[state]||state);
   const actions=el('div','whatsapp-actions');actions.append(button('Actualiser',refresh));
   if(state!=='ready'){
