@@ -34,3 +34,5 @@ html body .mc-extra{display:none!important}
  html body #home-live-widgets .home-live-form{order:3}
 }
 @media screen and (max-width:700px){html body #landscape-toggle,html body .tactic-fs-open-button{display:none!important}}
+/* Téléphone : on masque le bloc repliable « Réglages du match » */
+@media screen and (max-width:700px){html body details:has(>summary.mc-hide-reglages){display:none!important}}

@@ -36,4 +36,9 @@
   new MutationObserver(force).observe(document.body, { attributes: true, attributeFilter: ['class'] });
   force();
  });
+ // Marque le bloc « Réglages du match » pour pouvoir le masquer sur téléphone.
+ document.addEventListener('DOMContentLoaded', () => {
+  const mark = () => document.querySelectorAll('summary:not(.mc-hide-reglages)').forEach(s => { if (/^\s*Réglages du match/.test(s.textContent)) s.classList.add('mc-hide-reglages'); });
+  new MutationObserver(mark).observe(document.body, { childList: true, subtree: true }); mark();
+ });
 })();
