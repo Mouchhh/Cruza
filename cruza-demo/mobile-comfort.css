@@ -77,3 +77,4 @@ html body details:has(>summary.mc-hide-reglages){display:none!important}
  html body>header .brand>span:not(.club-monogram){font-size:13px!important;margin-left:6px!important}
  html body>header .brand .club-logo{width:30px!important;height:30px!important}
 }
+@media screen and (max-width:700px){html body>header #save{display:none!important}}
