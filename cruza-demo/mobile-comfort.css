@@ -47,3 +47,15 @@ html body details:has(>summary.mc-hide-reglages){display:none!important}
  html body>header #club-network-shortcut{flex:0 0 auto!important;font-size:11px!important;padding:6px 8px!important;line-height:1.15;max-width:84px}
  html body>header .coach-profile-menu{flex:0 0 auto!important}
 }
+/* Téléphone : logo + nom CRUZA à gauche, équipe en petite pastille, boutons d'action, profil */
+@media screen and (max-width:700px){
+ html body>header .brand>span:not(.club-monogram){display:inline!important;font-size:15px!important;font-weight:800;letter-spacing:.04em;margin-left:8px}
+ html body>header .brand>span small{display:none!important}
+ html body>header .header-actions{justify-content:flex-end!important}
+ html body>header .team-space-picker{flex:0 1 auto!important;max-width:42%!important;width:auto!important}
+ html body>header .team-space-trigger{height:34px!important;min-height:34px!important;padding:4px 8px!important;display:flex!important;align-items:center!important;gap:4px!important}
+ html body>header .team-space-trigger small{display:none!important}
+ html body>header .team-space-trigger strong{font-size:12px!important;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0}
+ html body>header .header-actions .primary{font-size:12px!important;padding:6px 10px!important;min-height:34px!important;white-space:nowrap}
+}
+@media screen and (max-width:700px){html body>header #save{white-space:nowrap!important;flex:0 0 auto!important;font-size:11px!important;padding:6px 8px!important}}
