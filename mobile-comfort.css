@@ -27,3 +27,17 @@ html body #workspace-navigation>button.mc-plus{display:none!important}
  html body.home-mode .home-hero h1{font-size:22px!important;line-height:1.15!important;margin:4px 0 0!important;padding-left:10px}
  html body.home-mode .home-hero .home-crest{width:44px!important;height:44px!important}
 }
+/* Accueil téléphone : tout tient sur un écran, sans défilement */
+@media screen and (max-width:700px){
+ html body.home-mode #home-page-0{display:flex!important;flex-direction:column;height:calc(100dvh - 150px - var(--navigation-bottom-space,64px) - 10px);min-height:0!important}
+ html body.home-mode #home-page-0 #home-live-widgets{flex:1 1 0;min-height:0;display:grid!important;grid-template-columns:1fr!important;grid-template-rows:repeat(3,minmax(0,1fr))!important;gap:8px!important;margin:0!important}
+ html body #home-live-widgets .home-live-card{aspect-ratio:auto!important;height:auto!important;min-height:0!important;overflow:hidden;display:flex!important;flex-direction:row!important;flex-wrap:wrap;align-content:center;align-items:center!important;justify-content:space-between!important;gap:2px 12px!important;padding:10px 16px!important;text-align:left!important}
+ html body #home-live-widgets .home-live-card>:is(p,h3,.home-live-caption){display:none!important}
+ html body #home-live-widgets .home-live-card h2{flex:1 1 100%;font-size:12px!important;margin:0!important;opacity:.85}
+ html body #home-live-widgets .home-live-card .home-live-value{margin:0!important;font-size:20px!important;line-height:1.15}
+ html body #home-live-widgets .home-live-card progress{flex:1 1 100%;margin:2px 0 0!important}
+ html body #home-live-widgets .home-live-card .home-live-open{margin:0 0 0 auto!important;min-height:36px;padding:6px 12px!important;font-size:12px!important}
+ html body #home-live-widgets .home-live-group{order:1}
+ html body #home-live-widgets .home-live-training{order:2}
+ html body #home-live-widgets .home-live-form{order:3}
+}
