@@ -10,7 +10,8 @@
   function build() {
    const buttons = [...nav.querySelectorAll(':scope>button')];
    const mgr = document.getElementById('view-management');
-   const keep = MAIN[mgr && !mgr.hidden ? 'manager' : 'coach'];
+   const demo = new URLSearchParams(location.search).get('mode') === 'local';
+   const keep = MAIN[mgr && !mgr.hidden && !demo ? 'manager' : 'coach'];
    const menu = document.getElementById('coach-profile-options');
    menu?.querySelectorAll('.mc-extra').forEach(e => e.remove());
    for (const b of buttons) {
