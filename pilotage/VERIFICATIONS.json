@@ -13,5 +13,6 @@
     "Aucune création de projet Supabase ni de dépôt privé vérifiée",
     "Pas de restauration du projet réel",
     "Pas de vérification du déploiement public"
-  ]
+  ],
+  "delivery_status": "Branche de revue ; fusion main non autorisée par le contrôle automatique"
 }

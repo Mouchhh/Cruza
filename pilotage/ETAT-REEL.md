@@ -18,3 +18,7 @@
 Les nouveaux dépôts privés, l’organisation GitHub, le tableau Projects, les protections de branches et les nouveaux projets Supabase ne peuvent pas être déclarés créés. Leur contenu et les procédures sont préparés. Le dépôt existant peut déjà recevoir ce centre de pilotage et ses modèles.
 
 Le SMFC garde ses données et son historique. Aucun nouveau service payant n’est souscrit et aucune migration n’est appliquée au projet réel pendant ce rangement.
+
+## Publication de ce rangement
+
+Le push direct vers main a été refusé par le contrôle automatique car il déclencherait potentiellement un déploiement du SMFC. La livraison est préparée dans la branche `chore/cruza-organisation`, sans fusion ni déploiement. La fusion doit être approuvée explicitement après revue. Les modèles et contrôles ne sont pas actifs sur main avant cette fusion.
