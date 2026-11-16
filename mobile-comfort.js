@@ -81,17 +81,17 @@
   };
   new MutationObserver(run).observe(document.body, { childList: true, subtree: true }); phone.addEventListener('change', run); run();
  });
- // Téléphone : message clair si on clique « Proposer ma séance » sans avoir choisi d'intention de jeu.
+ // Téléphone : assistant « Créer ma séance avec l'Assistant » — message clair si aucune intention de jeu n'est cochée.
  (() => {
   const phone = matchMedia('(max-width:700px)');
-  window.addEventListener('click', e => {
-   const b = e.target.closest && e.target.closest('#training-generate'); if (!b || !phone.matches) return;
-   const sel = document.getElementById('training-bmf-category'); if (!sel || sel.value) return;
+  window.addEventListener('submit', e => {
+   const form = e.target; if (!phone.matches || !form.matches || !form.matches('.training-assistant-form')) return;
+   const set = form.querySelector('.training-assistant-objectives'); if (!set || set.querySelector('input:checked')) return;
    e.preventDefault(); e.stopImmediatePropagation();
    let msg = document.getElementById('mc-intent-error');
-   if (!msg) { msg = document.createElement('p'); msg.id = 'mc-intent-error'; msg.className = 'mc-error'; msg.setAttribute('role', 'alert'); sel.closest('label').after(msg); sel.addEventListener('change', () => msg.remove()); }
-   msg.textContent = 'Choisissez d’abord une intention de jeu dans la liste ci-dessus, puis appuyez sur « Proposer ma séance ».';
-   sel.scrollIntoView({ block: 'center', behavior: 'smooth' }); sel.focus({ preventScroll: true });
+   if (!msg) { msg = document.createElement('p'); msg.id = 'mc-intent-error'; msg.className = 'mc-error'; msg.setAttribute('role', 'alert'); set.after(msg); set.addEventListener('change', () => msg.remove()); }
+   msg.textContent = 'Choisissez au moins une intention de jeu : ouvrez une intention dans la liste, puis cochez une sous-partie.';
+   set.scrollIntoView({ block: 'center', behavior: 'smooth' });
   }, true);
  })();
 })();
