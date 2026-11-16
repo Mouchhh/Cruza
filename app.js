@@ -10,7 +10,7 @@ for(const name of formationNames){
 }
 $('formation').replaceChildren(...Object.keys(layouts).map(name=>{const o=document.createElement('option');o.value=o.textContent=name;return o;}));
 const names=Array.from({length:11},(_,i)=>'Joueur '+(i+1));
-let state={teamContext:{...activeCoachTeam},team:activeCoachTeam.team||'Stade Mayennais',category:activeCoachTeam.category,section:'Masculine',squad:'',matchDuration:'',formation:'4-3-3',color:'#2855a2',lanes:true,benchVisible:true,clubLogo:'',notes:'',arrows:[],players:names.map((name,i)=>({id:crypto.randomUUID(),name,number:[7,9,11,8,6,10,3,4,5,2,1][i],photo:'',x:layouts['4-3-3'][i][0],y:layouts['4-3-3'][i][1]}))};
+let state={teamContext:{...activeCoachTeam},team:activeCoachTeam.team||clubDisplayName(),category:activeCoachTeam.category,section:'Masculine',squad:'',matchDuration:'',formation:'4-3-3',color:'#2855a2',lanes:true,benchVisible:true,clubLogo:'',notes:'',arrows:[],players:names.map((name,i)=>({id:crypto.randomUUID(),name,number:[7,9,11,8,6,10,3,4,5,2,1][i],photo:'',x:layouts['4-3-3'][i][0],y:layouts['4-3-3'][i][1]}))};
 let saves=[],mode='move',editing=null,photo='',photoPending=false,playerPhotoJob=0,toastTimer;
 try{saves=JSON.parse(coachStorageGet('vestiaire-saves')||'[]');if(!Array.isArray(saves))saves=[];const draft=JSON.parse(coachStorageGet('vestiaire-draft')||'null');if(valid(draft))state=draft;}catch{ }
 if(!state.documentId&&!state.notes.trim()&&!state.arrows.length&&state.players.every(p=>/^Joueur \d+$/.test(p.name))){state.team=activeCoachTeam.team||state.team;state.category=activeCoachTeam.category||state.category;}

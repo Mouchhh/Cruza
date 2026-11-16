@@ -259,6 +259,7 @@ function coachAccountRenderClub({
       coachStorageSet(coachClubDetailsKey, JSON.stringify(value));
       dirty.delete("club");
       clubTheme.apply(value);
+      window.clubNameRefresh?.();
       pf.status.textContent =
         "Fiche club enregistrée pour votre compte sur cet appareil, commune à vos équipes.";
     } catch (error) {

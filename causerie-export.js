@@ -92,7 +92,7 @@
  async function build(snapshot,includeLinked,options={}){
   if(!window.causerieLayout?.build)throw Error('La présentation ne peut pas être préparée. Actualisez le site, puis réessayez.');
   const [,style]=await Promise.all([loadLibrary(),window.causerieEleven?Promise.resolve(null):loadStyle()]);
-  const pptx=new window.PptxGenJS();pptx.layout='LAYOUT_WIDE';pptx.author='Stade Mayennais';
+  const pptx=new window.PptxGenJS();pptx.layout='LAYOUT_WIDE';pptx.author=clubDisplayName();
   pptx.subject='Causerie du coach';pptx.title=snapshot.board.title||snapshot.board.team;pptx.lang='fr-FR';
   pptx.theme={headFontFace:'Montserrat',bodyFontFace:'Calistoga',lang:'fr-FR'};
   if(window.causerieEleven) return window.causerieEleven.build(pptx,snapshot,style,{pitchImage,...options});
