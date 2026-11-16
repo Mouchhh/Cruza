@@ -140,4 +140,9 @@
   }, true);
   new MutationObserver(sync).observe(document.body, { childList: true, subtree: true, attributes: true, attributeFilter: ['class', 'aria-current'] }); sync();
  });
+ // Écran tactile : le doigt qui se lève ne doit pas refermer les menus (CP, équipe, paramètres).
+ ['pointerleave'].forEach(type => window.addEventListener(type, e => {
+  if (e.pointerType === 'mouse' || !e.target || !e.target.closest) return;
+  if (e.target.closest('.coach-profile-menu, .team-space-picker, #coach-account-open, .settings-navigation-footer')) e.stopImmediatePropagation();
+ }, true));
 })();

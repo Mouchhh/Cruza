@@ -176,3 +176,8 @@ html body #report-tabs .mc-step-label{display:none}
  html body.reports-mode #report-next{flex:1 1 0!important}
 }
 @media screen and (max-width:700px){html body.document-completed-report #report-tabs .mc-step-label{display:none!important}}
+@media screen and (max-width:700px){
+ html body>header .coach-profile-trigger{width:44px!important;height:44px!important;min-height:44px!important;padding:0!important;gap:0!important;justify-content:center!important;align-items:center!important}
+ html body>header .coach-profile-avatar{margin:0!important}
+ html body>header .coach-profile-name{display:none!important}
+}
