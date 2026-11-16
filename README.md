@@ -1,4 +1,4 @@
-# CRUZA — application et installations de clubs
+# CRUZA — Stade Mayennais
 
 **[Centre de pilotage](pilotage/README.md)** · **[Sites et environnements](pilotage/environnements.json)** · **[Tableau de travail](pilotage/TABLEAU-DE-TRAVAIL.md)** · **[Supabase / nouveau club](pilotage/04-donnees-supabase/INSTALLER-UN-CLUB.md)**
 
