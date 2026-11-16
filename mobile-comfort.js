@@ -11,7 +11,7 @@
    const buttons = [...nav.querySelectorAll(':scope>button')];
    const mgr = document.getElementById('view-management');
    const demo = new URLSearchParams(location.search).get('mode') === 'local';
-   const keep = MAIN[mgr && !mgr.hidden && !demo ? 'manager' : 'coach'];
+   const keep = MAIN.coach; // même menu pour tous les comptes ; « Responsable » est dans le menu du rond CP
    const menu = document.getElementById('coach-profile-options');
    menu?.querySelectorAll('.mc-extra').forEach(e => e.remove());
    for (const b of buttons) {
