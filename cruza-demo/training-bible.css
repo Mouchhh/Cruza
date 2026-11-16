@@ -1,0 +1,263 @@
+/* La Bible de l'éduc : informations essentielles, détails à la demande. */
+.bible-catalogue{background:#fff;border:1px solid #dce6f3!important}
+.bible-catalogue>h2{letter-spacing:-.4px;font-size:19px!important;margin-bottom:7px}
+.bible-group-context{margin:0 0 5px;font-size:11px;color:#315c94;font-weight:650}
+.bible-main-filters{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:8px;margin:9px 0}
+.bible-main-filters select,.bible-search-options select{font-size:11px;padding:10px;min-width:0;border-radius:9px}
+.bible-catalogue #training-search{border-radius:10px;padding:12px;margin:12px 0 0}
+.bible-search-options{font-size:11px;color:#6c829e;margin:12px 0}
+.bible-search-options summary{cursor:pointer;padding:3px 0}
+.bible-search-options select{margin-top:10px}
+.bible-search-options label{display:flex;align-items:center;gap:8px;line-height:1.5;margin-top:10px}
+.bible-search-options input{width:15px;height:15px;flex-shrink:0;accent-color:#2855a2}
+.bible-results{font-size:11px!important;color:#72869f;margin:16px 0 0}
+.bible-reset{background:transparent;border:0;padding:7px 0;color:#2855a2;font-size:11px;text-decoration:underline;text-underline-offset:3px}
+.bible-card{padding:17px 0 0;margin-top:15px;border-color:#e6ecf5}
+.bible-card>.eyebrow{font-size:9px;letter-spacing:1px;color:#6883a7}
+.bible-card h3{font-size:15px;letter-spacing:-.2px;line-height:1.4;margin:8px 0}
+.bible-card>p{line-height:1.65;color:#657b96}
+.bible-card-format{font-size:10px!important;color:#325f99!important;font-weight:600}
+.bible-fit-warning{display:block;font-size:10px;color:#9b662e;margin-bottom:9px}
+.bible-card-preview>summary{padding:8px 0;list-style-position:inside;font-weight:600}
+.bible-card-actions{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin:11px 0 0}
+.bible-card-actions button{font-size:10px;padding:10px 12px;border-radius:9px;line-height:1.35}
+.bible-more{display:block;width:100%;margin:22px 0 0;border-radius:10px;font-size:11px}
+.bible-facts{display:flex;flex-wrap:wrap;gap:6px;margin:12px 0}
+.bible-facts span{padding:5px 8px;border-radius:6px;background:#edf3fc;color:#365f95;font-size:10px;line-height:1.4}
+.bible-sequence-tabs{display:flex;align-items:center;gap:6px;margin:18px 0 9px}
+.bible-sequence-tabs>span{font-size:11px;color:#6d819a;margin-right:auto}
+.bible-sequence-tabs button{display:grid;place-items:center;min-width:32px;height:32px;padding:0 8px;border:1px solid #d8e3f2;border-radius:9px;background:#fff;color:#6c83a3;font-size:11px;transition:background .18s,border-color .18s,box-shadow .18s}
+.bible-sequence-tabs button.active{background:#2c63b4;color:white;border-color:#2c63b4;box-shadow:0 3px 9px #265bb427}
+.bible-active-sequence{background:#f2f6fc;border:1px solid #e4ebf5;border-radius:11px;padding:13px 15px;margin:12px 0 18px}
+.bible-active-sequence h4{margin:0 0 5px;font-size:12px}
+.bible-active-sequence p{margin:6px 0;line-height:1.65}
+.bible-active-sequence .bible-sequence-time{font-size:10px;color:#7187a2}
+.bible-active-sequence .bible-sequence-rule{font-size:12px;color:#294e7b}
+.bible-active-sequence .bible-observe{font-size:10px;color:#637e9f}
+.bible-essential-rules{padding-left:19px;font-size:12px;line-height:1.8}
+.bible-essential-rules li{padding:2px 0}
+.bible-extra{border-top:1px solid #e3eaf4;padding:12px 0;margin:0}
+.bible-extra>summary{font-size:11px;font-weight:650;color:#386398;cursor:pointer;line-height:1.65}
+.bible-extra[open]>summary{margin-bottom:10px}
+.bible-extra p,.bible-extra li{font-size:11px;line-height:1.75}
+.bible-extra a{color:#2d64ae;text-decoration-thickness:1px;text-underline-offset:3px;overflow-wrap:anywhere}
+.bible-extra ul{padding-left:18px}
+.bible-material-total{color:#315b8d!important;font-weight:600}
+.bible-timeline{width:100%;border-collapse:collapse;font-size:10px;margin:13px 0}
+.bible-timeline th,.bible-timeline td{padding:9px 7px;text-align:left;vertical-align:top;border-bottom:1px solid #e3eaf4;line-height:1.6}
+.bible-timeline th{font-weight:650;color:#365f96;background:#f2f6fc}
+.bible-timeline td:nth-child(2){white-space:nowrap}
+.bible-space-dimensions{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;grid-column:span 2;padding:10px;border-radius:9px;background:#edf3fc}
+.bible-space-dimensions label{margin:0!important;font-size:10px}
+.bible-space-dimensions input{margin-top:6px!important}
+.bible-variant-dialog,.bible-sheet-dialog{border:1px solid #dfe7f2;border-radius:20px;padding:26px;background:#fff;color:#27476e;max-height:92dvh;overflow:auto;overscroll-behavior:contain;box-shadow:0 24px 110px #112d5c35;width:min(760px,calc(100vw - 28px));max-width:calc(100vw - 28px);animation:bible-dialog-in .18s ease-out}
+.bible-sheet-dialog{width:min(980px,calc(100vw - 28px))}
+.bible-variant-dialog::backdrop,.bible-sheet-dialog::backdrop{background:#132c4c85;backdrop-filter:blur(5px)}
+.bible-dialog-heading{display:flex;justify-content:space-between;align-items:flex-start;gap:18px;margin-bottom:15px}
+.bible-dialog-heading h2{font-size:24px;letter-spacing:-.6px;line-height:1.3;margin:5px 0 0;color:#213e65}
+.bible-dialog-heading>button{flex-shrink:0;border-radius:9px;font-size:11px;padding:10px 12px}
+.bible-dialog-heading .eyebrow{font-size:9px;color:#7790b0;letter-spacing:1.8px}
+.bible-variant-dialog .hint{font-size:11px;line-height:1.7;color:#7b8ea5}
+.bible-field{display:block;font-size:11px;color:#597595;margin:15px 0}
+.bible-field input,.bible-field textarea{display:block;width:100%;margin:7px 0 0;border-radius:9px;border:1px solid #d9e3f0;background:#fff;color:#264a76;font-size:12px;padding:11px 12px}
+.bible-variant-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:0 16px}
+.bible-variant-preview{background:#f2f6fc;border:1px solid #e1eaf6;padding:14px 17px;border-radius:12px;font-size:12px;margin:10px 0 17px}
+.bible-variant-preview p{font-size:11px;line-height:1.7;margin:7px 0 0}
+.bible-fit-ok{color:#32715e}
+.bible-variant-dialog button[type=submit]{border-radius:10px;padding:12px 17px;font-size:12px;margin-top:10px}
+.bible-sheet-dialog .training-detail{margin-bottom:0}
+.bible-sheet-dialog .training-diagram-svg{max-height:490px}
+.bible-sheet-dialog .bible-card-actions{position:sticky;bottom:-26px;padding:15px 0 5px;background:#fff;border-top:1px solid #e4ebf4}
+.bible-card:focus-within{scroll-margin:15px}
+.bible-catalogue button:focus-visible,.bible-detail button:focus-visible,.bible-variant-dialog button:focus-visible{outline:3px solid #90baff;outline-offset:3px}
+.bible-diagram-selection{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-bottom:8px;font-size:10px}
+.bible-diagram-selection select{max-width:100%;min-width:0;padding:7px;font-size:10px;border-radius:7px}
+.bible-diagram-key{font-size:10px;line-height:1.6}
+.bible-diagram-active-rule{font-size:10px;color:#567394}
+.bible-diagram-zoomed .training-diagram-screen{overflow:auto;max-height:65dvh;border-radius:8px;overscroll-behavior:contain}
+.bible-diagram-zoomed .training-diagram-screen .training-diagram-svg{min-width:760px;max-width:none;max-height:none!important;width:100%}
+.bible-diagram-zoom-toggle{border:1px solid #d5e1f0;border-radius:7px;padding:7px 9px;font-size:10px;color:#3c6295;background:#fff}
+.bible-sequence-stage{min-width:0}
+.bible-sequence-settings{border:1px solid #dce6f4;border-radius:12px;background:#f7faff;padding:10px 13px;margin:10px 0 14px}
+.bible-sequence-settings>summary{cursor:pointer;font-size:11px;font-weight:650;color:#365f95;line-height:1.7}
+.bible-criteria-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:0 12px;margin-top:5px}
+.bible-criteria-grid .bible-field{margin:10px 0;font-size:10px}
+.bible-criteria-grid input,.bible-criteria-grid select{min-width:0;width:100%;font-size:11px;padding:9px 10px;margin-top:6px;border-radius:8px}
+.bible-criteria-actions{display:flex;gap:7px;flex-wrap:wrap;margin:12px 0 0}
+.bible-criteria-actions button{font-size:10px;padding:8px 10px;border-radius:8px}
+.bible-criteria-status{font-size:10px!important;line-height:1.6!important;color:#52789b!important;margin:7px 0 0!important}
+.bible-edit-present{background:transparent;border:0;padding:0;color:#3d679e;text-decoration:underline;text-underline-offset:3px;font-size:10px;cursor:pointer}
+.bible-off-players{color:#855b27!important}
+.bible-animation-host{margin:9px 0 2px;border-top:1px solid #dce6f3;padding-top:12px}
+.bible-animation-controls{display:flex;align-items:center;gap:6px;flex-wrap:wrap}
+.bible-animation-controls button,.bible-animation-speed{border:1px solid #d2dff0;border-radius:8px;background:white;color:#355b8f;font-size:11px;line-height:1.4;padding:8px 10px;width:auto;min-height:33px}
+.bible-animation-controls .bible-animation-play{background:#2c63b4;color:#fff;border-color:#2c63b4;font-weight:600}
+.bible-animation-controls button:disabled{opacity:.4;cursor:default}
+.bible-animation-progress{width:100%;display:block;accent-color:#2c63b4;margin:11px 0 8px;cursor:pointer}
+.bible-animation-caption{font-size:11px;line-height:1.65;color:#315a8b;margin:6px 0}
+.bible-animation-caption strong{display:block;font-size:11px;color:#244c82}
+.bible-animation-status{font-size:10px;color:#7b8fa9;font-variant-numeric:tabular-nums}
+.bible-animation-unavailable{font-size:10px;color:#94703c;line-height:1.6}
+.bible-sequence-print{display:none}
+@keyframes bible-dialog-in{from{opacity:0;transform:translateY(7px)}to{opacity:1;transform:none}}
+@media(max-width:600px){
+ .training-workspace-tabs{width:100%;gap:2px}.training-workspace-tabs button{padding:9px 10px;font-size:10px}
+ .bible-variant-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:0 12px}
+ .bible-variant-dialog,.bible-sheet-dialog{padding:18px;border-radius:15px;max-height:94dvh}
+ .bible-dialog-heading h2{font-size:21px}.bible-field{font-size:10px}
+ .bible-timeline th,.bible-timeline td{padding:7px 4px;font-size:9px}
+ .bible-active-sequence{padding:11px}.bible-essential-rules{font-size:11px}
+ .bible-criteria-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:0 9px}
+ .bible-animation-controls{gap:5px}.bible-animation-controls button,.bible-animation-speed{font-size:10px;padding:8px}
+ .bible-sheet-dialog .bible-card-actions{bottom:-18px}
+}
+@media(prefers-reduced-motion:reduce){.bible-variant-dialog,.bible-sheet-dialog{animation:none}.bible-sequence-tabs button{transition:none}}
+@media print{
+ .bible-sheet-dialog,.bible-variant-dialog{display:none!important}
+ .bible-detail{font-size:10px}.bible-sequence-tabs,.bible-active-sequence,.bible-diagram-selection,.bible-diagram-active-rule{display:none!important}
+ .bible-detail details{display:block!important;content-visibility:visible}
+ .bible-detail details>summary{display:block;font-size:10px;margin:9px 0 4px;break-after:avoid}
+ .bible-detail details>*:not(summary){display:revert!important}
+ .bible-detail .bible-timeline{display:table!important;font-size:9px}
+ .bible-detail .bible-timeline tr{break-inside:avoid}
+ .bible-detail .bible-timeline td,.bible-detail .bible-timeline th{font-size:9px;padding:6px}
+ .bible-detail .training-diagram{break-inside:avoid}
+ .bible-detail .bible-diagram-zoom-toggle{display:none!important}
+ .bible-sequence-settings,.bible-animation-host{display:none!important}
+ .bible-sequence-print{display:block}
+ .bible-detail .bible-extra{padding:6px 0;border:0}
+ .bible-detail .bible-facts span{font-size:9px;padding:3px 5px}
+ .bible-detail .training-organisation li{break-inside:avoid}
+}
+
+/* Choisir l'organisation et lire une action à la fois. */
+.bible-distributions{border:1px solid #dce6f4;border-radius:12px;margin:10px 0 16px;padding:12px 14px;background:#fff}
+.bible-distributions>summary{cursor:pointer;color:#315b8d;font-weight:650;font-size:12px}
+.bible-distribution-choices{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;margin-top:12px}
+.bible-distribution-choice{text-align:left;border:1px solid #d9e4f3;border-radius:10px;padding:12px;background:#f7faff;color:#35567f;display:grid;gap:5px;transition:border-color .15s,background .15s}
+.bible-distribution-choice[aria-pressed=true]{border-color:#3978d0;background:#eef5ff;box-shadow:inset 3px 0 #3978d0}
+.bible-distribution-choice:disabled{opacity:.5;cursor:not-allowed}
+.bible-distribution-choice strong{font-size:12px}.bible-distribution-choice span,.bible-distribution-choice small{font-size:10px;line-height:1.5}
+.bible-team-breakdown,.bible-distribution-choices>.hint{grid-column:1/-1;margin:6px 0;font-size:11px;line-height:1.7}
+.bible-team-breakdown{padding-left:17px}
+.bible-animation-caption{background:#edf3fc;border-left:3px solid #3d78c7;padding:11px 13px;border-radius:4px 9px 9px 4px;min-height:66px}
+.bible-animation-caption strong{font-size:12px;margin-bottom:4px}.bible-animation-caption span{display:block}
+.bible-animation-phases{display:flex;gap:6px;overflow-x:auto;padding:4px 0 9px;scrollbar-width:thin}
+.bible-animation-phase{flex:0 0 auto;max-width:210px;white-space:normal;text-align:left;font-size:10px;line-height:1.5;background:#fff;color:#55718e;border:1px solid #dbe5f2;border-radius:8px;padding:8px 10px}
+.bible-animation-phase[aria-pressed=true]{color:#225da9;background:#eaf3ff;border-color:#7ca8e1}
+.bible-player{transition:opacity .2s}
+.training-block-overview{background:white;border:1px solid #dce6f3;border-radius:12px;padding:13px 15px;margin:12px 0 18px}
+.training-block-overview>strong{display:block;font-size:12px;color:#315b8d;margin-bottom:8px}
+.training-overview-row{display:flex;align-items:center;gap:9px;border-top:1px solid #edf1f7;min-height:42px}
+.training-overview-jump{background:none;border:0;color:#345e93;padding:8px 0;text-align:left;flex:1;min-width:0;font-size:11px}
+.training-overview-row>span{font-size:10px;color:#6d829d;white-space:nowrap}
+.training-overview-remove{border:1px solid #eddae0;background:#fff8f9;color:#b04760;width:30px;height:30px;border-radius:8px;padding:0;font-size:20px;flex-shrink:0}
+.training-remove-exercise{color:#a34559!important;border-color:#ead4dc!important;background:#fff9fa!important}
+@media(max-width:600px){.bible-distribution-choices{grid-template-columns:1fr}.bible-animation-phase{max-width:160px}.bible-animation-caption{font-size:11px}}
+@media(prefers-reduced-motion:reduce){.bible-player,.bible-distribution-choice{transition:none}}
+@media print{.bible-distributions,.training-block-overview{display:none!important}}
+
+.bible-sheet-dialog .training-diagram-screen .training-diagram-svg{max-height:min(420px,45dvh)}
+@media(max-width:600px){.bible-sheet-dialog .training-diagram-screen .training-diagram-svg{max-height:310px}.bible-animation-caption{min-height:0}}
+.bible-animation-key{font-size:9px!important;line-height:1.5!important;color:#647d99!important;margin:0 0 10px!important}
+
+/* La fiche de terrain relie l'installation à l'apprentissage recherché. */
+.bible-coach-guide{margin:16px 0 20px;border:1px solid #dce6f2;border-radius:13px;overflow:hidden;background:#fff}
+.bible-coach-intention{padding:15px 17px;background:#edf4fd;border-bottom:1px solid #dce6f2}
+.bible-coach-intention .eyebrow{font-size:9px;letter-spacing:1.3px;color:#6583a5}.bible-coach-intention h4{font-size:14px!important;line-height:1.5;margin:5px 0!important;color:#254f83}.bible-coach-intention p{margin:6px 0 0!important}
+.bible-coach-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:0}
+.bible-coach-grid>section{padding:14px 17px}.bible-coach-grid>section+section{border-left:1px solid #e5ecf6}
+.bible-coach-guide h4{font-size:12px;margin:0 0 9px;color:#315b8d}.bible-coach-guide p{font-size:11px;line-height:1.75;margin:7px 0;color:#496581}
+.bible-coach-guide .bible-material-total{font-size:10px;background:#f5f8fc;border-radius:7px;padding:9px}
+.bible-coach-interventions{border-top:1px solid #e1e9f4;padding:12px 17px}.bible-coach-interventions summary{cursor:pointer;font-size:11px;font-weight:650;color:#315b8d}
+.bible-animation-observe{border-radius:8px;background:#f0f6f1;color:#436b51!important;padding:10px 12px;font-size:11px!important;line-height:1.7!important;margin:9px 0!important}.bible-animation-observe:empty{display:none}
+@media(max-width:650px){.bible-coach-grid{grid-template-columns:1fr}.bible-coach-grid>section+section{border-left:0;border-top:1px solid #e5ecf6}.bible-coach-intention,.bible-coach-grid>section{padding:12px 14px}.bible-coach-guide p{font-size:11px}}
+@media print{.bible-coach-guide{break-inside:auto}.bible-coach-guide h4{break-after:avoid}.bible-coach-guide p{font-size:9px;line-height:1.5}.bible-coach-grid>section{break-inside:avoid}.bible-coach-guide .bible-coach-interventions{display:block!important}.bible-coach-guide .bible-coach-interventions>*{display:block!important}}
+.bible-learning-profile{padding:12px 17px;background:#f2f8f2;border-bottom:1px solid #dce8dd}.bible-learning-profile>strong{font-size:12px;color:#376348}.bible-learning-profile p{margin:6px 0!important;font-size:11px;color:#42694e}
+
+.bible-animation-guided{display:inline-flex;align-items:center;gap:6px;font-size:11px;color:#45617f;cursor:pointer}.bible-animation-guided input{width:15px;height:15px;accent-color:#2855a2;margin:0}.bible-match-context{font-size:11px!important;color:#44658a!important;border-top:1px solid #dce6f1;padding-top:8px;margin-top:10px!important}.bible-show-distributions{margin:0 0 12px}
+
+/* A football scene with recognisable players and equipment, like a coaching clip. */
+.bible-diagram-orientation{border:1px solid #d5e1f0;border-radius:8px;padding:8px 11px;font-size:11px;color:#315e8d;background:#fff;cursor:pointer}
+.bible-diagram-orientation[aria-pressed=true]{background:#eaf3ff;border-color:#8aafdc}
+.training-diagram-screen{background:#f2f6ef;border-radius:14px;overflow:hidden}
+.bible-sheet-dialog .training-diagram-screen .training-diagram-svg{max-height:min(620px,65dvh)}
+.bible-portrait .training-diagram-screen{display:flex;justify-content:center}
+.bible-portrait .training-diagram-screen .training-diagram-svg{width:100%;max-width:100%;height:auto;max-height:min(760px,75dvh)}
+.bible-diagram-zoomed.bible-portrait .training-diagram-screen .training-diagram-svg{width:auto;min-width:0;height:960px;max-width:none}
+@media(max-width:600px){.bible-portrait .training-diagram-screen .training-diagram-svg{height:auto;max-height:none;max-width:100%}.bible-sheet-dialog .training-diagram-screen .training-diagram-svg{max-height:560px}.bible-diagram-orientation{padding:8px;font-size:10px}}
+@media print{.bible-diagram-orientation{display:none!important}.training-diagram-print .bible-diagram-svg{max-height:none!important}}
+
+/* First explain the game, then show the movement. */
+.bible-game-direction{display:flex;flex-wrap:wrap;gap:8px;margin:8px 0 12px;font-size:12px;font-weight:700;line-height:1.5}
+.bible-game-direction>span{padding:8px 11px;border-radius:9px;border:1px solid #d7e4f4;background:#edf5ff;color:#24599d}
+.bible-game-direction>.bible-direction-red{background:#fff1f1;color:#a33342;border-color:#f1d8dc}
+.bible-game-state{padding:9px 12px!important;margin:0 0 10px!important;background:#eaf3ff;border-left:4px solid #3679dd;border-radius:6px;font-size:12px!important;font-weight:750;color:#24599d!important}
+.bible-game-state[data-team=red]{background:#fff1f1;border-color:#d94f5c;color:#a33342!important}
+@media print{.bible-game-direction{font-size:10px}.bible-game-state{display:none}}
+/* Clip out the print-only title and legend when the live scene is rotated. */
+.training-diagram-screen .training-diagram-svg{overflow:hidden}
+
+/* One clean player for the library; details remain available on demand. */
+.bible-animation-chapters{border-top:1px solid #e5edf6;margin-top:12px;padding-top:12px}.bible-animation-chapters>summary{cursor:pointer;font-size:11px;color:#42658d;font-weight:650}.bible-animation-chapters .bible-animation-phases{padding-top:10px}.bible-animation-controls{gap:7px}.bible-animation-controls button,.bible-animation-controls select{border-radius:10px!important}.bible-animation-progress{accent-color:#2855a2}.bible-animation-caption{background:#f3f7fc;border:1px solid #dfe9f5;border-left:3px solid #3877c8;border-radius:10px}.bible-live-actions path{vector-effect:non-scaling-stroke}.bible-animation-key{margin-bottom:5px!important}.bible-sheet-dialog .training-diagram-screen .training-diagram-svg{max-height:min(540px,56dvh)}
+@media(max-width:600px){.bible-sheet-dialog .training-diagram-screen .training-diagram-svg{max-height:none}.bible-animation-controls{flex-wrap:wrap}.bible-animation-caption strong{line-height:1.5}.bible-animation-observe{font-size:11px}}
+
+/* Compact team identification, shared by all opposition examples. */
+.bible-matchup{display:flex;flex-wrap:wrap;gap:7px;margin:10px 0 13px}.bible-matchup[hidden]{display:none}.bible-matchup-team{display:inline-flex;align-items:center;gap:7px;min-height:33px;padding:6px 11px;background:#fff;border:1px solid #dce6f2;border-radius:100px;font-size:11px;color:#294f7b;box-shadow:0 2px 5px #17345504}.bible-matchup-team i{width:9px;height:9px;border-radius:50%;background:#347bda;box-shadow:inset 0 0 0 1px #194b8b22}.bible-matchup-red i{background:#df465b}.bible-matchup-neutral i{background:#fff;border:1px solid #99acc2}.bible-matchup-team strong{font-weight:700}.bible-matchup-team small{font-size:10px;color:#75879d;border-left:1px solid #dce6f2;padding-left:7px}.bible-game-direction{gap:6px;font-size:11px}.bible-game-direction>span{background:#f3f7fd;border-color:#e2eaf5;border-radius:8px}.bible-game-direction>.bible-direction-red{background:#fff5f6;border-color:#f2e3e7}
+@media print{.bible-matchup{display:none!important}}
+
+/* Coach canvas: quiet surfaces and an optional view of collective occupation. */
+.bible-opposition .training-diagram-screen{border:1px solid #dbe5ee;border-radius:16px;background:#f8fafc;box-shadow:0 8px 24px #17345506;overflow:hidden}.bible-opposition .bible-matchup{align-items:center;background:#fff;border:1px solid #e0e8f1;border-radius:13px;padding:10px 12px;gap:9px}.bible-opposition .bible-matchup-team{border:0;background:#f1f6fd;box-shadow:none;min-height:32px}.bible-opposition .bible-matchup-red{background:#fff1f3}.bible-opposition .bible-matchup-neutral{background:#f3f5f8}.bible-matchup-versus{font-size:9px;letter-spacing:1px;font-weight:750;color:#91a1b4}.bible-structure-toggle{border:1px solid #dce5f0;background:white;color:#5a718e;padding:8px 10px;border-radius:9px;font-size:10px}.bible-structure-toggle[aria-pressed=true]{background:#eaf2fc;color:#285d9c;border-color:#b9cee8}.bible-structure-toggle[hidden]{display:none!important}.bible-volumes-off .bible-team-volumes{display:none}.bible-opposition .bible-game-direction>span{background:transparent;border:0;padding:3px 1px;color:#56708f;font-weight:550}.bible-opposition .bible-game-direction>.bible-direction-red{color:#996674}.bible-opposition .bible-game-direction{column-gap:18px;margin:4px 0 10px}.bible-opposition .bible-animation-key{opacity:.85}.bible-opposition .bible-animation-status{font-variant-numeric:tabular-nums}.bible-opposition .bible-diagram-selection{gap:7px}
+@media(max-width:600px){.bible-opposition .bible-matchup{gap:5px;padding:8px}.bible-opposition .bible-matchup-team{padding:6px 8px;font-size:10px}.bible-opposition .bible-game-direction{font-size:10px;gap:3px 12px}.bible-opposition .training-diagram-screen{border-radius:12px}.bible-matchup-versus{font-size:8px}}
+@media print{.bible-structure-toggle{display:none!important}}
+
+.bible-diagram-editor{width:min(1060px,96vw);max-height:94dvh;padding:22px;border:1px solid #dce6f2;border-radius:18px;background:#fff;color:#244365;overflow:auto}.bible-diagram-editor::backdrop{background:#17345585;backdrop-filter:blur(4px)}.bible-diagram-editor h2{font-size:20px}.bible-personal-tools{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin:12px 0}.bible-personal-tools select,.bible-personal-tools input{max-width:100%;min-width:0}.bible-personal-tools select{border:1px solid #dbe5f1;border-radius:9px;padding:9px;background:#f8fafd;color:#31577f}.bible-personal-canvas{display:block;width:100%;height:auto;border-radius:12px;background:#f8fafc}.bible-personal-canvas[hidden]{display:none}.bible-personal-editable{touch-action:none;cursor:grab;outline-offset:3px}.bible-personal-editable:active{cursor:grabbing}.bible-personal-steps{display:flex;gap:6px;overflow-x:auto;padding:4px 0 12px}.bible-personal-steps button{flex-shrink:0;border:1px solid #dce6f2;background:#fff;border-radius:9px;color:#55718e;padding:9px;font-size:11px}.bible-personal-steps button.active{background:#eaf2ff;color:#285c9b;border-color:#aac5e8}.bible-personal-transport{display:flex;gap:8px;align-items:center;padding:12px}.bible-personal-preview>input[type=range]{width:calc(100% - 24px);margin:0 12px;accent-color:#2855a2}.bible-personal-caption{margin:8px 12px 14px;font-size:12px;color:#375d87}.bible-personal-note:empty{display:none}.bible-personal-note{font-size:11px;color:#536f90;margin:10px 0}.bible-personalise{font-size:11px}.bible-personal-transport select{border:1px solid #dce6f2;border-radius:8px;padding:8px}.bible-diagram-editor .bible-field{margin:12px 0}.bible-diagram-editor .bible-field input{width:100%;padding:10px;border:1px solid #dce6f2;border-radius:9px}
+@media(max-width:600px){.bible-diagram-editor{padding:14px;width:98vw;max-height:97dvh}.bible-personal-tools button{font-size:11px}.bible-diagram-editor h2{font-size:17px}}
+@media print{.bible-personalise,.bible-personal-note,.bible-personal-transport,.bible-personal-caption{display:none!important}.training-diagram-print .bible-personal-canvas{max-height:none;width:100%}}
+
+.training-session-filters{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:12px 0}.training-session-filters label{display:grid;gap:7px;font-size:11px;color:#526e8f}.training-session-filters select{width:100%;min-width:0;padding:11px;border:1px solid #dce6f2;border-radius:10px;background:white;color:#2e557f}.training-session-results{font-size:11px;color:#69809c;margin:10px 0 16px}.training-session-sector{display:grid;gap:9px;margin:14px 0 24px;min-width:0}.training-session-sector h3{display:flex;align-items:center;gap:9px;margin:0 0 3px;font-size:14px;color:#315d91}.training-session-sector h3>span{background:#eaf1fb;border-radius:20px;padding:3px 7px;font-size:10px}.training-session-sector .training-saved-card{border-left:3px solid #8fb3e2}.training-session-tags{display:flex;gap:5px;flex-wrap:wrap}.training-session-tags span{font-size:10px;background:#f0f5fc;color:#4a6c95;padding:4px 7px;border-radius:6px}.training-session-goal{font-size:11px!important;color:#56718f;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;line-height:1.6}.training-session-goal b{font-weight:650}.training-saved-cards:has(.training-session-sector){display:block}
+@media(max-width:600px){.training-session-filters{grid-template-columns:1fr}.training-session-sector .training-saved-card{align-items:start}.training-session-sector .training-saved-card>div{min-width:0}}
+
+.bible-personal-editor-stage{overflow:auto;border:1px solid #e0e8f1;border-radius:12px;max-height:65dvh}.bible-personal-editor-stage .bible-personal-editable{max-width:none}.bible-diagram-editor>.bible-personal-tools:last-child{position:sticky;bottom:-22px;background:#fff;padding:12px 0;margin-bottom:0;border-top:1px solid #e5edf6;z-index:2}@media(max-width:600px){.bible-diagram-editor>.bible-personal-tools:last-child{bottom:-14px}}
+
+/* A compact decision first; the complete coaching knowledge remains one click away. */
+.bible-design-controls{display:flex;align-items:center;gap:1rem;padding:.85rem 1rem;margin:.8rem 0;border:1px solid #dce5f0;border-radius:16px;background:#f6f9fd}
+.bible-design-label{display:grid;gap:.35rem;font-size:.72rem;font-weight:750;color:#516984;min-width:220px}
+.bible-design-label select{padding:.65rem .85rem;border:1px solid #ccdaeb;border-radius:10px;background:#fff;color:#193d71;font:inherit;font-size:.85rem;max-width:100%}
+.bible-design-rule{margin:0;font-size:.85rem;line-height:1.55;color:#26466b}
+.bible-depth-panel{margin:1rem 0;border-top:1px solid #dce5f0;padding-top:.9rem}
+.bible-depth-panel>summary{cursor:pointer;color:#234d82;font-weight:750;padding:.5rem 0}
+.bible-depth-panel[open]>.bible-coach-guide{animation:bibleKnowledgeReveal .2s ease-out}
+.bible-quick-start{display:grid;grid-template-columns:1fr 1fr;gap:.5rem 1rem;font-size:.82rem;line-height:1.5;color:#365574;margin:.6rem 0}
+.bible-quick-start p{margin:0}.bible-quick-start strong{color:#193d71}
+@keyframes bibleKnowledgeReveal{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:none}}
+@media(max-width:650px){.bible-design-controls{align-items:stretch;flex-direction:column;gap:.6rem}.bible-design-label{min-width:0}.bible-quick-start{grid-template-columns:1fr}}
+@media(prefers-reduced-motion:reduce){.bible-depth-panel[open]>.bible-coach-guide{animation:none}}
+@media print{.bible-design-controls{display:block}.bible-design-label select{border:0}.bible-design-rule{display:block}}
+
+.training-diagram-screen .bible-design-title{display:none}
+
+/* Second reading stays closed until requested; it does not reduce the pitch. */
+.bible-decision-reading{border-top:1px solid #e2eaf3;margin:10px 0;padding-top:10px}
+.bible-decision-reading>summary{cursor:pointer;font-size:12px;font-weight:650;color:#31567f;list-style-position:inside}
+.bible-decision-reading p{font-size:12px!important;line-height:1.65!important;color:#49627d;margin:9px 0!important;max-width:78ch}
+.bible-decision-reading strong{color:#24466d}
+.bible-decision-prompt{border:1px solid #e8d7ad;background:#fff9e9;border-radius:10px;padding:11px 13px;color:#66512d!important;font-size:12px!important;line-height:1.6!important}
+.bible-decision-prompt[hidden]{display:none}
+@media(prefers-reduced-motion:no-preference){.bible-decision-reading[open] p{animation:bibleReadingAppear .18s ease-out}@keyframes bibleReadingAppear{from{opacity:0;transform:translateY(3px)}to{opacity:1;transform:translateY(0)}}}
+
+.bible-role-choices{display:flex;flex-wrap:wrap;gap:5px;margin:8px 0}.bible-role-choices[hidden],.bible-placement-reading[hidden]{display:none}
+.bible-role-choices button{border:1px solid #d2e1f4;border-radius:999px;background:#eef5ff;color:#24569a;padding:5px 9px;font-size:11px;cursor:pointer}
+.bible-role-choices button[data-team=red]{color:#9e3042;background:#fff1f3;border-color:#f1d5dc}
+.bible-role-choices button[aria-pressed=true]{outline:2px solid #ba8b33;outline-offset:1px}
+.bible-placement-reading{font-size:11px!important;color:#526a85!important;line-height:1.6!important;margin:7px 0!important}
+@media print{.bible-detail .bible-decision-reading,.bible-detail .bible-role-choices,.bible-detail .bible-placement-reading,.bible-detail .bible-decision-prompt{display:none!important}}
+
+/* Références vidéo du coach : terrain dégagé, repères lisibles hors du dessin. */
+.bible-scene-metrics{margin:0 0 9px!important;color:#526c8b!important;font-size:11px!important;font-weight:600;line-height:1.5!important;font-variant-numeric:tabular-nums}
+.training-diagram-screen [data-reader="clean"]{background:#f8fafc}
+.training-diagram-screen [data-reader-zone]{font-weight:600;paint-order:stroke;stroke:#2d6948;stroke-width:2px}
+@media print{.bible-scene-metrics{display:none!important}}
+
+/* Movement meaning remains readable without relying on colour. */
+.bible-animation-key{display:flex;flex-wrap:wrap;gap:7px 14px;font-size:12px!important;line-height:1.4!important;color:#304f70!important}.bible-animation-key>span{display:inline-flex;align-items:center;gap:6px}.bible-animation-key svg{width:40px;height:22px;flex:none;background:#174c37;border-radius:4px}.bible-action-reading{padding:10px 12px;background:#eaf2fd;border-left:3px solid #3765a7;font-size:14px!important;line-height:1.5!important;color:#193f6b!important;overflow-wrap:anywhere}.bible-action-reading[data-action=recovery]{border-color:#ad4354}.bible-action-reading[data-action=carry]{border-color:#9d741e}
