@@ -1,4 +1,5 @@
 /* Confort téléphone uniquement (≤ 700 px). L'ordinateur et la tablette large ne changent pas. */
+html body #workspace-navigation>button.mc-plus,.mc-sheet{display:none}
 @media screen and (max-width:700px){
  html body.task-navigation.responsive-navigation #workspace-navigation{display:flex!important;flex-wrap:nowrap!important;gap:0!important;padding:4px 4px calc(4px + env(safe-area-inset-bottom,0px))!important}
  html body.task-navigation.responsive-navigation #workspace-navigation>button{flex:1 1 0!important;min-height:56px!important;font-size:11px!important;padding:6px 2px!important;gap:3px!important;white-space:nowrap!important}
