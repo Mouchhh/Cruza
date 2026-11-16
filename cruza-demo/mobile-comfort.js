@@ -48,4 +48,24 @@
   const b = document.getElementById('save'); if (!b) return;
   new MutationObserver(clean).observe(b, { childList: true, characterData: true, subtree: true }); clean();
  });
+ // Téléphone : page Séances. Étapes 1-4 remplacées par « Étape 3 sur 4 » ; actions sur une ligne ; Fiche terrain en bas.
+ document.addEventListener('DOMContentLoaded', () => {
+  let done = false;
+  const phone = matchMedia('(max-width:700px)');
+  function init() {
+  const first = document.getElementById('training-step-link-0'); if (!first || done) return; done = true;
+  const bar = first.parentElement; bar.classList.add('mc-step-stepper');
+  const label = document.createElement('div'); label.className = 'mc-step-label'; bar.before(label);
+  const steps = [...bar.querySelectorAll('button')];
+  const upd = () => { const i = steps.findIndex(b => b.classList.contains('active')); if (i < 0) return; const name = steps[i].textContent.replace(/^\s*\d+\s*/, '').trim(); label.textContent = 'Étape ' + (i + 1) + ' sur ' + steps.length + ' · ' + name; };
+  new MutationObserver(upd).observe(bar, { attributes: true, subtree: true, attributeFilter: ['class'] }); upd();
+  const field = document.getElementById('training-field-open'), next = document.getElementById('training-next');
+  if (field && next) {
+   const home = { parent: field.parentElement, before: field.nextSibling };
+   const place = () => { if (phone.matches) { field.classList.add('mc-field-link'); next.parentElement.after(field); } else { field.classList.remove('mc-field-link'); home.parent.insertBefore(field, home.before); } };
+   phone.addEventListener('change', place); place();
+  }
+  }
+  new MutationObserver(init).observe(document.body, { childList: true, subtree: true }); init();
+ });
 })();
