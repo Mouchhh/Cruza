@@ -143,3 +143,14 @@ html body .mc-search-row{display:contents}
  html body #training-library-page .training-saved-card>button{flex:1 1 0!important;min-height:44px}
  html body .training-workspace-tabs,html body #training-space>.task-section-tabs{margin-bottom:8px!important}
 }
+/* Téléphone : onglets répartis à égalité, Agenda allégé, Assistant retiré */
+@media screen and (max-width:700px){
+ html body .task-section-tabs{display:grid!important;grid-auto-flow:column!important;grid-auto-columns:minmax(0,1fr)!important;grid-template-columns:none!important;gap:6px!important}
+ html body .task-section-tabs .task-section-tab{width:auto!important;min-width:0!important;text-align:center;justify-content:center}
+ html body #club-assistant-open{display:none!important}
+ html body #coach-agenda-new{display:none!important}
+ html body #coach-agenda-new~*{margin:0}
+ html body .reports-heading .report-actions{display:flex!important;gap:8px!important;flex-wrap:nowrap!important}
+ html body .reports-heading .report-actions>button{flex:1 1 0!important;min-width:0!important;font-size:13px!important;min-height:44px;padding:6px 8px!important}
+ html body .agenda-day-details p.hint,html body .agenda-overview-note,html body .agenda-overview-card small,html body #training-themes-help,html body #training-library-page .training-step-heading p{display:none!important}
+}
