@@ -28,8 +28,8 @@
     c.innerHTML = (b.querySelector('svg')?.outerHTML || '') + '<span>' + b.textContent.trim() + '</span>';
     c.onclick = () => { close(); b.click(); }; sheet.append(c);
    }
-   buttons.forEach((b, i) => { b.style.order = keep.includes(b.id) ? keep.indexOf(b.id) : 9; });
-   plus.style.order = 5; plus.classList.toggle('mc-current', current);
+   buttons.forEach((b, i) => { b.style.setProperty('--mc-order', keep.includes(b.id) ? keep.indexOf(b.id) : 9); });
+   plus.style.setProperty('--mc-order', 5); plus.classList.toggle('mc-current', current);
   }
   plus.onclick = () => { const open = sheet.hidden; build(); sheet.hidden = !open; plus.setAttribute('aria-expanded', String(open)); };
   document.addEventListener('click', e => { if (!sheet.hidden && !sheet.contains(e.target) && !plus.contains(e.target)) close(); });
