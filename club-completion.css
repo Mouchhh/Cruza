@@ -34,3 +34,7 @@
 #club-network-status:empty{display:none}#club-network-status{padding:12px 14px;border-radius:10px;background:#edf3fe;line-height:1.6;overflow-wrap:anywhere}
 
 #report-quick-panel .report-quick-result{display:inline-block;background:#edf3fc;border:1px solid #d7e3f4;border-radius:8px;color:#244e95;font-weight:650;padding:6px 10px;margin:5px 0}
+/* Écran de connexion : logo Cruza, rien du club tant qu'on n'est pas connecté. */
+#club-auth-gate .club-auth-brand{display:flex;align-items:center;gap:12px;margin:0 0 22px;font-weight:800;letter-spacing:.2em;font-size:15px;color:#0b2e8a}
+#club-auth-gate .club-auth-logo{width:44px;height:44px;border-radius:10px}
+#club-auth-gate>p.hint{display:none}

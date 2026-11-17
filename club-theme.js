@@ -254,6 +254,15 @@
     }
   }
   window.clubTheme = { apply, syncShirt, palette, readable: (hex) => toHex(readable(hex)), defaults: DEFAULTS };
-  if (document.readyState === "complete") apply();
-  else window.addEventListener("load", () => apply());
+  // Apply as soon as the page is parsed (not after every image has loaded), and only then show the page:
+  // the default club look never flashes before the saved club's colours, logo and name.
+  const reveal = () => document.documentElement.classList.remove("club-branding-pending");
+  const run = () => {
+    apply();
+    window.clubNameRefresh?.();
+    reveal();
+  };
+  if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", run);
+  else run();
+  window.addEventListener("load", () => apply());
 })();
