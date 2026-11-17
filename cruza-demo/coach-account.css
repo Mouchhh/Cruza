@@ -40,14 +40,17 @@
     color: #142d50;
   }
   .account-tabs {
-    display: flex;
-    flex-wrap: wrap;
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
     gap: 6px;
     margin: 20px 0;
     padding-bottom: 12px;
     border-bottom: 1px solid #dce5ef;
   }
   .account-tabs button {
+    min-width: 0;
+    line-height: 1.2;
+    text-align: center;
     min-height: 44px;
     padding: 9px 12px;
     border: 1px solid #dce5ef;
@@ -260,7 +263,7 @@
 @media screen {
   .account-tabs {
     display: grid;
-    grid-template-columns: repeat(4, minmax(0, 1fr));
+    grid-template-columns: repeat(3, minmax(0, 1fr));
   }
   .account-tabs button {
     white-space: normal;
@@ -407,7 +410,7 @@
   }
   @media (max-width: 650px) {
     .account-tabs {
-      grid-template-columns: repeat(2, minmax(0, 1fr));
+      grid-template-columns: repeat(3, minmax(0, 1fr));
     }
     .account-club-contact {
       grid-template-columns: minmax(0, 1fr);

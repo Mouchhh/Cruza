@@ -160,7 +160,7 @@
         fontSize: 24,
         bold: true,
       });
-      slide.addText("STADE MAYENNAIS · Démonstration · Cliquez pour lancer", {
+      slide.addText(clubDisplayNameUpper() + " · Démonstration · Cliquez pour lancer", {
         x: 0.5,
         y: 0.75,
         w: 12,
