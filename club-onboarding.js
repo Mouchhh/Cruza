@@ -17,7 +17,14 @@
     try {
       if (typeof coachStorageGet !== "function" || typeof coachClubDetailsKey === "undefined") return false;
       if (coachStorageGet(DONE_KEY)) return false;
-      return !coachStorageGet(coachClubDetailsKey);
+      // Comptes déjà existants inclus : la fenêtre s'ouvre une fois tant que le club n'a pas de logo réglé.
+      const raw = coachStorageGet(coachClubDetailsKey);
+      if (!raw) return true;
+      try {
+        return !JSON.parse(raw)?.logo;
+      } catch {
+        return true;
+      }
     } catch {
       return false;
     }
@@ -397,7 +404,9 @@
         const response = await fetch(gatewayURL() + "/api/sportcorico-teams?slug=" + encodeURIComponent(club.slug), { cache: "no-store", credentials: "omit", signal: AbortSignal.timeout(60000) });
         if (!response.ok) throw new Error("unavailable");
         const data = await response.json(),
-          teams = Array.isArray(data.teams) ? data.teams.filter((team) => team && typeof team.name === "string" && typeof team.url === "string") : [];
+          teams = Array.isArray(data.teams)
+            ? data.teams.filter((team) => team && typeof team.name === "string" && typeof team.url === "string" && !coachTeams.some((t) => t.sportcoricoURL === team.url && (t.sportcoricoCompetition || "") === (team.split || "")))
+            : [];
         if (!teams.length || selectedClub !== club) return;
         teamsBox.append(text("p", "club-onboarding-help", "Quelle est votre équipe ? (le calendrier, le classement et la forme se rempliront tout seuls)"));
         for (const team of teams) {
@@ -566,7 +575,8 @@
     dialog.showModal();
     queryInput.focus();
   }
-  const check = () => setTimeout(open, 600);
+  // Plusieurs essais : la session et les autres fenêtres du site peuvent arriver après le premier test.
+  const check = () => [600, 2500, 6000, 12000].forEach((delay) => setTimeout(open, delay));
   document.addEventListener("DOMContentLoaded", check);
   document.addEventListener("club-session-ready", check);
 })();
