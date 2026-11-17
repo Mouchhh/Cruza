@@ -78,7 +78,7 @@
   const LOGO_HOSTS = ["s3.pub2.infomaniak.cloud", "www.sportcorico.com", "sportcorico.com"];
   // Équipe choisie : configure l'équipe active (nom, lien Sportcorico) et ajoute ses matchs à l'agenda.
   async function applyTeam(team, clubName, gateway) {
-    const response = await fetch(gateway + "/api/sportcorico?url=" + encodeURIComponent(team.url), { cache: "no-store", credentials: "omit", signal: AbortSignal.timeout(60000) });
+    const response = await fetch(gateway + "/api/sportcorico?url=" + encodeURIComponent(team.url) + (team.split ? "&competition=" + encodeURIComponent(team.split) : ""), { cache: "no-store", credentials: "omit", signal: AbortSignal.timeout(60000) });
     if (!response.ok) throw new Error("unavailable");
     const data = await response.json(),
       // La catégorie du championnat fait foi (ex. « U19 1 » qui joue en poule U18 → U18).
@@ -87,8 +87,9 @@
         id: activeCoachTeam.id,
         label: (age ? String(team.name).replace(/\bU\s?\d{2}\b/i, "U" + age[1]) : String(team.name)).slice(0, 60),
         category: age ? "U" + age[1] : /senior/i.test(team.name) ? "Seniors" : String(team.name).split(/\s+/)[0].slice(0, 30),
-        team: String(data.teamName || clubName + " " + team.name).slice(0, 50),
+        team: String(team.split && age ? clubName + " U" + age[1] : data.teamName || clubName + " " + team.name).slice(0, 50),
         sportcoricoURL: coachTeamSportcoricoURL(team.url),
+        ...(team.split ? { sportcoricoCompetition: String(team.split).slice(0, 120) } : {}),
       };
     if (!coachTeamValid(entry) || !entry.sportcoricoURL) throw new Error("invalid");
     const stored = JSON.parse(localStorage.getItem(coachTeamManifestKey) || "[]"),

@@ -57,7 +57,8 @@ function coachTeamValid(team) {
     team.category.length <= 30 &&
     typeof team.team === "string" &&
     team.team.length <= 50 &&
-    (team.sportcoricoURL === undefined || typeof team.sportcoricoURL === "string" && coachTeamSportcoricoURL(team.sportcoricoURL) === team.sportcoricoURL)
+    (team.sportcoricoURL === undefined || typeof team.sportcoricoURL === "string" && coachTeamSportcoricoURL(team.sportcoricoURL) === team.sportcoricoURL) &&
+    (team.sportcoricoCompetition === undefined || typeof team.sportcoricoCompetition === "string" && team.sportcoricoCompetition.length <= 120)
   );
 }
 function coachTeamFromCategory(category, team = "") {
@@ -632,6 +633,7 @@ function coachTeamAddDialog(edit = false, targetTeam = activeCoachTeam) {
       category: category.value.trim(),
       team: team.value.trim(),
       sportcoricoURL,
+      ...(edit && editedTeam.sportcoricoCompetition && sportcoricoURL === editedTeam.sportcoricoURL ? { sportcoricoCompetition: editedTeam.sportcoricoCompetition } : {}),
     };
     if (!coachTeamValid(entry) || !entry.category || !entry.team) {
       status.textContent = "Renseignez les trois champs.";

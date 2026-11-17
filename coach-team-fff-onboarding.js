@@ -38,7 +38,7 @@ async function coachFFFEnsure(){
   try{
    const user=await clubNetworkRequest('/auth/v1/user');
    if(!clubNetworkBound()||clubNetworkSession.user.id!==userId||trainingAgendaIdentity()!==owner)return false;
-   const profiles=Array.isArray(user.user_metadata?.[coachFFFMetadataKey])?user.user_metadata[coachFFFMetadataKey].filter(coachFFFProfileValid):[];
+   const profiles=Array.isArray(user.user_metadata?.[coachFFFMetadataKey])?user.user_metadata[coachFFFMetadataKey].filter(p=>coachFFFProfileValid(p)&&!coachTeamRemoved.has(p.id)):[]; // une équipe supprimée ici n'est jamais ressortie du compte (sinon rechargement sans fin)
    if(profiles.length){
     const hadConfiguredTeam=coachTeams.some(coachFFFProfileValid);
     coachFFFApplyProfiles(profiles);

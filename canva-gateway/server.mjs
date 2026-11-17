@@ -153,7 +153,7 @@ export function createCanvaGateway(config,{fetcher=fetch,auth=token=>authorize(t
     try{return send(200,await listSportcoricoTeams(route.searchParams.get('slug')));}catch(e){return send(e.status||502,{message:e.status===400?e.message:'Équipes Sportcorico temporairement indisponibles.'});}
    }
    if(route.pathname==='/api/sportcorico'&&req.method==='GET'){
-    try{return send(200,await readSportcorico(route.searchParams.get('url')));}catch(e){return send(e.status||502,{message:e.status===400?e.message:'Classement Sportcorico temporairement indisponible.'});}
+    try{return send(200,await readSportcorico(route.searchParams.get('url'),route.searchParams.get('competition')||''));}catch(e){return send(e.status||502,{message:e.status===400?e.message:'Classement Sportcorico temporairement indisponible.'});}
    }
    const owner=await auth((req.headers.authorization||'').replace(/^Bearer /,''));if(!uuid.test(owner||''))throw error('Compte invalide.',401);
    const rate=rates.get(owner)||{count:0,until:now()+60000};if(++rate.count>60)throw error('Trop de demandes. Réessayez dans une minute.',429);rates.set(owner,rate);

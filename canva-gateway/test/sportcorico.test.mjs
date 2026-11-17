@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {sportcoricoSource,parseSportcorico,sportcoricoReader,parseClubSearch,parseGames,parseClubTeams} from '../sportcorico.mjs';
+import {sportcoricoSource,parseSportcorico,sportcoricoReader,parseClubSearch,parseGames,parseClubTeams,splitTeams,competitionAge,sameCompetition} from '../sportcorico.mjs';
 const source='https://www.sportcorico.com/clubs/test-club/test-u15';
 function page(){
  const nodes=[['ShallowReactive',1],null];
@@ -48,4 +48,14 @@ test('team games keep only this team, valid dates and scores',()=>{
 test('club teams are read from the public club page',()=>{
  const html='<a href="/clubs/fc-test/fc-test-3" class="x"><span>U17 1</span><span>Régional 2 POULE B</span></a><a href="/clubs/fc-test/fc-test-3"><span>U17 1</span></a><a href="/clubs/other/x"><span>Autre</span></a>';
  assert.deepEqual(parseClubTeams(html,'fc-test'),[{slug:'fc-test-3',name:'U17 1',competition:'Régional 2 POULE B',url:'https://www.sportcorico.com/clubs/fc-test/fc-test-3'}]);
+});
+
+test('a team playing two age categories is split, cups and friendlies stay with the main team',()=>{
+ const teams=[{slug:'t-2',name:'U15 1',competitions:['Régional 2 U15 POULE B','U14 Division 1','Coupe District U15','MATCHES AMICAUX U 16']},{slug:'t-4',name:'U19 1',competitions:['Régional 2 U 18 POULE B','MATCHES AMICAUX U 19','COUPE GAMBARDELLA']}];
+ const out=splitTeams(teams,'club');
+ assert.deepEqual(out.map(t=>t.name),['U15 1','U14 (avec U15 1)','U19 1']);
+ assert.equal(out[1].split,'U14 Division 1');
+ assert.equal(competitionAge('Régional 2 U 18'),18);
+ assert.ok(sameCompetition('U14 Division 1','U14 Division 1 Groupe unique'));
+ assert.ok(!sameCompetition('U14 Division 1','Régional 2 U15'));
 });
