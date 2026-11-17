@@ -220,3 +220,20 @@ html body #report-tabs .mc-step-label{display:none}
  html body>header .team-space-trigger{width:100%!important}
  html body>header .team-space-trigger strong{max-width:none!important;font-size:12px!important}
 }
+/* Téléphone : équipe réduite à gauche, logos Cruza × club au centre de la barre, profil à droite */
+@media screen and (max-width:700px){
+ html body>header{display:grid!important;grid-template-columns:minmax(0,1fr) auto auto auto minmax(0,1fr)!important;align-items:center!important;column-gap:0!important}
+ html body>header .team-space-picker{grid-column:1!important;order:0!important;justify-self:start!important;max-width:100%!important;width:auto!important;flex:none!important;margin:0!important}
+ html body>header .team-space-trigger{width:auto!important;max-width:100%!important}
+ html body>header .team-space-trigger strong{font-size:11px!important;max-width:82px!important}
+ html body>header .cruza-lockup{grid-column:2!important;order:0!important}
+ html body>header .brand-times{grid-column:3!important;order:0!important;margin:0 8px!important}
+ html body>header .brand{grid-column:4!important;order:0!important;flex:none!important;justify-content:center!important}
+ html body>header .coach-profile-menu{grid-column:5!important;order:0!important;justify-self:end!important}
+ html body>header #save{display:none!important}
+}
+@media screen and (max-width:700px){
+ html body>header .team-space-picker,html body>header .cruza-lockup,html body>header .brand-times,html body>header .brand,html body>header .coach-profile-menu{grid-row:1!important}
+ html body.home-mode #home-page-0 #home-live-widgets{grid-template-rows:repeat(3,minmax(0,1fr))!important}
+ html body .home-photo-banner{margin-top:10px;flex:0 0 auto}
+}
