@@ -62,7 +62,7 @@
   function storeFor(teamId, data) {
     try {
       if (typeof agendaPasteValid !== "function" || !Array.isArray(data?.games) || !/^team-[a-z0-9-]{1,80}$/.test(teamId)) return 0;
-      const key = coachStorageKey("vestiaire-pasted-fixtures") + ":team:" + teamId,
+      const key = coachTeamBaseKey("vestiaire-pasted-fixtures") + ":team:" + teamId, // clé de base (sans l'équipe ouverte) + équipe visée
         old = JSON.parse(localStorage.getItem(key) || "null"),
         map = new Map((Array.isArray(old?.fixtures) ? old.fixtures : []).map((f) => [f.key, f]));
       let changed = 0;

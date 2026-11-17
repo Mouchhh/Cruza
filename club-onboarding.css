@@ -40,3 +40,5 @@ html body dialog.club-onboarding.workspace-sheet::after,html body dialog.club-on
 .club-picker h3{margin:0;font-size:16px;color:#0b2e8a}
 .club-picker input[type=text]{font:inherit;font-size:16px;padding:10px 12px;border:1px solid #cfd8e6;border-radius:10px;min-height:44px}
 .club-picker>.club-onboarding-found>button.export{min-height:44px;border:1px solid #cfd8e6;border-radius:12px;background:#fff;color:#2855a2;font-weight:700;cursor:pointer}
+.club-picker-change{align-self:flex-start;min-height:40px;padding:0 14px;border:1px solid #cfd8e6;border-radius:12px;background:#fff;color:#2855a2;font-size:14px;font-weight:700;cursor:pointer;margin-top:4px}
+.coach-team-manual{margin:14px 0 0}.coach-team-manual>summary{cursor:pointer;color:#47617b;font-size:14px;padding:8px 0}

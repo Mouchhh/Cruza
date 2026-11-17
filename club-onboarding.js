@@ -137,7 +137,7 @@
   };
   const rememberClub = (club) => {
     try {
-      if (club && /^[a-z0-9-]{2,100}$/.test(club.slug)) coachStorageSet(CLUB_KEY, JSON.stringify({ slug: club.slug, name: String(club.name).slice(0, 70) }));
+      if (club && /^[a-z0-9-]{2,100}$/.test(club.slug)) coachStorageSet(CLUB_KEY, JSON.stringify({ slug: club.slug, name: String(club.name).slice(0, 70), ...(typeof club.logo === "string" && club.logo.length <= 1000 ? { logo: club.logo } : {}) }));
     } catch {
       /* Facultatif. */
     }
@@ -147,6 +147,47 @@
     if (!response.ok) throw new Error("unavailable");
     return response.json();
   }
+  // Nom, logo et couleurs du club (comme à la première connexion) quand le club n'a pas encore été réglé ou vient d'être changé.
+  async function applyClubIdentity(club) {
+    let logoValue = "",
+      colorsFound = {};
+    try {
+      let logoURL = typeof club.logo === "string" ? club.logo : "";
+      if (!logoURL && gatewayBase()) {
+        const data = await relay("/api/sportcorico-search?q=" + encodeURIComponent(club.name)),
+          same = (Array.isArray(data.clubs) ? data.clubs : []).find((c) => c.slug === club.slug);
+        logoURL = typeof same?.logo === "string" ? same.logo : "";
+      }
+      const u = new URL(logoURL);
+      if (u.protocol === "https:" && LOGO_HOSTS.includes(u.hostname)) {
+        const blob = await (await fetch(u.href, { credentials: "omit", referrerPolicy: "no-referrer" })).blob();
+        logoValue = await shrinkLogo(blob);
+        colorsFound = await logoColors(blob);
+      }
+    } catch {
+      /* Le nom suffit : le logo se règle ensuite dans le compte. */
+    }
+    let current = {};
+    try {
+      current = JSON.parse(coachStorageGet(coachClubDetailsKey) || "null") || {};
+    } catch {
+      current = {};
+    }
+    const { logo: oldLogo, primaryColor: oldPrimary, secondaryColor: oldSecondary, ...rest } = current,
+      value = {
+        ...coachClubDetailsDefaults(),
+        ...rest,
+        name: String(club.name).slice(0, 70),
+        ...(colorsFound.primary && colorsFound.primary.toLowerCase() !== clubTheme.defaults.primary ? { primaryColor: colorsFound.primary.toLowerCase() } : {}),
+        ...(colorsFound.secondary && colorsFound.secondary.toLowerCase() !== clubTheme.defaults.secondary ? { secondaryColor: colorsFound.secondary.toLowerCase() } : {}),
+        ...(logoValue ? { logo: logoValue } : {}),
+      };
+    if (!coachClubDetailsValid(value)) return;
+    coachStorageSet(coachClubDetailsKey, JSON.stringify(value));
+    clubTheme.apply(value);
+    window.clubNameRefresh?.();
+    markDone();
+  }
   // Liste « Choisir dans mon club » à poser dans une fenêtre (Ajouter une équipe) : un clic crée l'équipe et ouvre son interface.
   function mountPicker(container, closeDialog) {
     if (!gatewayBase()) return;
@@ -155,11 +196,23 @@
       list = text("div", "club-onboarding-found");
     box.append(text("h3", "", "Choisir dans mon club"), list, status);
     container.append(box);
+    let identityPending = false; // vrai si le club vient d'être choisi ou changé ici
+    const fail = (message) => {
+      status.style.color = "#b3261e";
+      status.textContent = message;
+    };
     const add = async (club, team) => {
       status.style.color = "";
       status.textContent = "Ajout de l’équipe et de ses matchs…";
       try {
         if (typeof flushCoachWorkspace === "function" && !flushCoachWorkspace()) throw new Error("busy");
+        let hasDetails = false;
+        try {
+          hasDetails = !!coachStorageGet(coachClubDetailsKey);
+        } catch {
+          hasDetails = false;
+        }
+        if (identityPending || !hasDetails) await applyClubIdentity(club);
         const entry = await applyTeam(team, club.name, gatewayBase());
         closeDialog?.();
         coachTeamRememberView(entry.id);
@@ -167,21 +220,72 @@
         history.replaceState(null, "", location.href);
         location.reload();
       } catch {
-        status.style.color = "#b3261e";
-        status.textContent = "Équipe non ajoutée : réessayez, ou remplissez les champs ci-dessous.";
+        fail("Équipe non ajoutée : réessayez, ou remplissez les champs ci-dessous.");
       }
+    };
+    const showSearch = () => {
+      list.replaceChildren();
+      status.textContent = "";
+      const query = document.createElement("input"),
+        go = text("button", "export", "Rechercher mon club");
+      query.type = "text";
+      query.maxLength = 60;
+      query.placeholder = "Nom de votre club";
+      query.setAttribute("aria-label", "Nom de votre club");
+      go.type = "button";
+      list.append(query, go);
+      const search = async () => {
+        status.textContent = "";
+        if (query.value.trim().length < 2) return;
+        try {
+          const data = await relay("/api/sportcorico-search?q=" + encodeURIComponent(query.value.trim())),
+            clubs = (Array.isArray(data.clubs) ? data.clubs : []).filter((c) => c && typeof c.name === "string" && /^[a-z0-9-]{2,100}$/.test(c.slug || ""));
+          list.replaceChildren(query, go);
+          for (const found of clubs) {
+            const button = text("button", "club-onboarding-club"),
+              labels = text("span", "club-onboarding-club-text");
+            button.type = "button";
+            if (found.logo) {
+              const img = document.createElement("img");
+              img.alt = "";
+              img.referrerPolicy = "no-referrer";
+              img.src = found.logo;
+              img.onerror = () => img.remove();
+              button.append(img);
+            }
+            labels.append(text("span", "", found.name), text("small", "", found.city || ""));
+            button.append(labels);
+            button.onclick = () => {
+              rememberClub(found);
+              identityPending = true;
+              showTeams(found);
+            };
+            list.append(button);
+          }
+          if (!clubs.length) status.textContent = "Aucun club trouvé.";
+        } catch {
+          fail("Recherche indisponible pour le moment.");
+        }
+      };
+      go.onclick = search;
+      query.addEventListener("keydown", (event) => {
+        if (event.key === "Enter") {
+          event.preventDefault();
+          search();
+        }
+      });
+      query.focus();
     };
     const showTeams = async (club) => {
       list.replaceChildren();
       status.textContent = "";
+      const change = text("button", "export club-picker-change", "Ce n’est pas votre club ? Changer de club");
+      change.type = "button";
+      change.onclick = showSearch;
       try {
         const data = await relay("/api/sportcorico-teams?slug=" + encodeURIComponent(club.slug)),
           taken = (team) => coachTeams.some((t) => t.sportcoricoURL === team.url && (t.sportcoricoCompetition || "") === (team.split || "")),
           teams = (Array.isArray(data.teams) ? data.teams : []).filter((team) => team && typeof team.name === "string" && typeof team.url === "string" && !taken(team));
-        if (!teams.length) {
-          status.textContent = "Toutes les équipes de ce club sont déjà ajoutées.";
-          return;
-        }
         list.append(text("p", "club-onboarding-help", club.name + " : touchez l’équipe à ajouter"));
         for (const team of teams) {
           const button = text("button", "club-onboarding-club"),
@@ -192,55 +296,15 @@
           button.onclick = () => add(club, team);
           list.append(button);
         }
+        if (!teams.length) status.textContent = "Toutes les équipes de ce club sont déjà ajoutées.";
       } catch {
-        status.style.color = "#b3261e";
-        status.textContent = "Équipes du club indisponibles pour le moment. Remplissez les champs ci-dessous.";
+        fail("Équipes du club indisponibles pour le moment. Remplissez les champs ci-dessous.");
       }
+      list.append(change);
     };
     const club = savedClub();
-    if (club) {
-      showTeams(club);
-      return;
-    }
-    // Club jamais choisi : recherche par nom, comme à la première connexion.
-    const query = document.createElement("input"),
-      go = text("button", "export", "Rechercher mon club");
-    query.type = "text";
-    query.maxLength = 60;
-    query.placeholder = "Nom de votre club";
-    query.setAttribute("aria-label", "Nom de votre club");
-    go.type = "button";
-    list.append(query, go);
-    const search = async () => {
-      status.textContent = "";
-      if (query.value.trim().length < 2) return;
-      try {
-        const data = await relay("/api/sportcorico-search?q=" + encodeURIComponent(query.value.trim())),
-          clubs = (Array.isArray(data.clubs) ? data.clubs : []).filter((c) => c && typeof c.name === "string" && /^[a-z0-9-]{2,100}$/.test(c.slug || ""));
-        list.replaceChildren(query, go);
-        for (const found of clubs) {
-          const button = text("button", "club-onboarding-club");
-          button.type = "button";
-          button.append(text("span", "club-onboarding-club-text", found.name));
-          button.onclick = () => {
-            rememberClub(found);
-            showTeams(found);
-          };
-          list.append(button);
-        }
-        if (!clubs.length) status.textContent = "Aucun club trouvé.";
-      } catch {
-        status.style.color = "#b3261e";
-        status.textContent = "Recherche indisponible pour le moment.";
-      }
-    };
-    go.onclick = search;
-    query.addEventListener("keydown", (event) => {
-      if (event.key === "Enter") {
-        event.preventDefault();
-        search();
-      }
-    });
+    if (club) showTeams(club);
+    else showSearch();
   }
   window.clubSportcorico = { mountPicker };
   function notifyTeamFailed() {

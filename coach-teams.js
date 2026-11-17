@@ -622,6 +622,12 @@ function coachTeamAddDialog(edit = false, targetTeam = activeCoachTeam) {
   save.type = "submit";
   status.setAttribute("role", "status");
   form.append(hint, status, save);
+  // La liste du club (Sportcorico) suffit à la plupart des coachs : les champs à la main sont repliés.
+  if (!edit && form.querySelector(".club-picker")) {
+    const manual = el("details", "coach-team-manual");
+    manual.append(el("summary", "", "Configurer à la main (sans Sportcorico)"), ...[...form.children].slice(2));
+    form.append(manual);
+  }
   if (edit && editedTeam.id !== "unassigned") {
     const remove = el("button", "danger coach-team-remove", "Supprimer cette équipe");
     remove.type = "button";
