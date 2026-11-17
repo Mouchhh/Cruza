@@ -119,12 +119,13 @@ export function splitTeams(teams,clubSlug){
  const out=[];
  for(const team of teams){
   const url='https://www.sportcorico.com/clubs/'+clubSlug+'/'+team.slug,mainAge=competitionAge(team.competitions[0]);
-  out.push({slug:team.slug,name:team.name,competition:(team.competitions[0]||'').slice(0,120),url});
+  // Le championnat fait foi pour l'âge : « U19 1 » qui joue en poule U18 devient « U18 1 ».
+  out.push({slug:team.slug,name:mainAge!==null&&competitionAge(team.name)!==null&&competitionAge(team.name)!==mainAge?team.name.replace(/\bU\s?\d{2}\b/i,'U'+mainAge):team.name,competition:(team.competitions[0]||'').slice(0,120),url});
   const added=new Set();
   for(const name of team.competitions.slice(1)){
    const age=competitionAge(name);
    if(mainAge===null||age===null||age===mainAge||NOT_A_LEAGUE.test(name)||added.has(age))continue;
-   added.add(age);out.push({slug:team.slug,name:'U'+age+' (avec '+team.name+')',competition:name.slice(0,120),split:name.slice(0,120),url});
+   added.add(age);out.push({slug:team.slug,name:'U'+age,competition:name.slice(0,120),split:name.slice(0,120),url});
   }
  }
  return out.slice(0,80);

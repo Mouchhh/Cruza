@@ -53,7 +53,7 @@ test('club teams are read from the public club page',()=>{
 test('a team playing two age categories is split, cups and friendlies stay with the main team',()=>{
  const teams=[{slug:'t-2',name:'U15 1',competitions:['Régional 2 U15 POULE B','U14 Division 1','Coupe District U15','MATCHES AMICAUX U 16']},{slug:'t-4',name:'U19 1',competitions:['Régional 2 U 18 POULE B','MATCHES AMICAUX U 19','COUPE GAMBARDELLA']}];
  const out=splitTeams(teams,'club');
- assert.deepEqual(out.map(t=>t.name),['U15 1','U14 (avec U15 1)','U19 1']);
+ assert.deepEqual(out.map(t=>t.name),['U15 1','U14','U18 1']);
  assert.equal(out[1].split,'U14 Division 1');
  assert.equal(competitionAge('Régional 2 U 18'),18);
  assert.ok(sameCompetition('U14 Division 1','U14 Division 1 Groupe unique'));
