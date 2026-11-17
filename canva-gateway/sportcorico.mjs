@@ -158,3 +158,22 @@ export function sportcoricoTeamLister(fetcher=fetch,now=Date.now){
   if(cache.size>=200)cache.delete(cache.keys().next().value);cache.set(slug,{time:now(),data});return data;
  };
 }
+
+// Logo d'un club renvoyé par le relais (image publique Sportcorico) : fonctionne même si le navigateur bloque le site d'images
+// (bloqueur de pubs ou de traceurs). Jamais de SVG, taille limitée.
+export function sportcoricoLogoLoader(fetcher=fetch,now=Date.now){
+ const cache=new Map();
+ return async value=>{
+  const url=sportcoricoLogo(String(value||''));
+  if(!url)throw Object.assign(Error('Logo invalide.'),{status:400});
+  const cached=cache.get(url);if(cached&&now()-cached.time<60*60000)return cached.data;
+  const response=await fetcher(url,{redirect:'error',headers:{Accept:'image/*','User-Agent':'CRUZA-ranking/1.0'},signal:AbortSignal.timeout(12000)});
+  if(!response.ok)throw Object.assign(Error('Logo indisponible.'),{status:502});
+  const type=(response.headers.get('content-type')||'').split(';')[0].trim().toLowerCase();
+  if(!/^image\/(png|jpeg|webp|gif)$/.test(type))throw Object.assign(Error('Format de logo non pris en charge.'),{status:502});
+  const reader=response.body?.getReader();if(!reader)throw Error('Logo vide.');const chunks=[];let size=0;
+  try{while(true){const {done,value:part}=await reader.read();if(done)break;size+=part.byteLength;if(size>600000){await reader.cancel();throw Object.assign(Error('Logo trop volumineux.'),{status:502});}chunks.push(part);}}finally{reader.releaseLock();}
+  const data={version:1,type,base64:Buffer.concat(chunks).toString('base64')};
+  if(cache.size>=200)cache.delete(cache.keys().next().value);cache.set(url,{time:now(),data});return data;
+ };
+}

@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {sportcoricoSource,parseSportcorico,sportcoricoReader,parseClubSearch,parseGames,parseClubTeams,splitTeams,competitionAge,sameCompetition} from '../sportcorico.mjs';
+import {sportcoricoSource,parseSportcorico,sportcoricoReader,parseClubSearch,parseGames,parseClubTeams,splitTeams,competitionAge,sameCompetition,sportcoricoLogoLoader} from '../sportcorico.mjs';
 const source='https://www.sportcorico.com/clubs/test-club/test-u15';
 function page(){
  const nodes=[['ShallowReactive',1],null];
@@ -58,4 +58,14 @@ test('a team playing two age categories is split, cups and friendlies stay with 
  assert.equal(competitionAge('Régional 2 U 18'),18);
  assert.ok(sameCompetition('U14 Division 1','U14 Division 1 Groupe unique'));
  assert.ok(!sameCompetition('U14 Division 1','Régional 2 U15'));
+});
+
+test('club logo is only loaded from the allowed Sportcorico image host, as a safe raster image',async()=>{
+ const png=Buffer.from('89504e470d0a1a0a','hex');
+ const ok=async()=>new Response(png,{headers:{'content-type':'image/png'}});
+ const load=sportcoricoLogoLoader(ok);
+ const data=await load('https://s3.pub2.infomaniak.cloud/object/v1/x/logos/a.png');
+ assert.equal(data.type,'image/png');assert.equal(Buffer.from(data.base64,'base64').length,8);
+ await assert.rejects(()=>load('https://evil.example/a.png'),/Logo invalide/);
+ await assert.rejects(()=>sportcoricoLogoLoader(async()=>new Response('<svg/>',{headers:{'content-type':'image/svg+xml'}}))('https://s3.pub2.infomaniak.cloud/x.svg'),/Format/);
 });

@@ -53,6 +53,25 @@
       bitmap.close();
     }
   }
+  // Logo du club : d'abord via le relais (marche même si le navigateur bloque le site d'images, ex. Opera), sinon en direct.
+  async function logoBlob(url) {
+    const base = String(window.CLUB_RANKING_GATEWAY || window.CLUB_CANVA_GATEWAY || "").replace(/\/$/, "");
+    if (base) {
+      try {
+        const response = await fetch(base + "/api/sportcorico-logo?url=" + encodeURIComponent(url), { cache: "no-store", credentials: "omit", signal: AbortSignal.timeout(30000) });
+        if (response.ok) {
+          const data = await response.json();
+          if (typeof data.base64 === "string" && /^image\/(png|jpeg|webp|gif)$/.test(data.type)) {
+            const bytes = Uint8Array.from(atob(data.base64), (c) => c.charCodeAt(0));
+            return new Blob([bytes], { type: data.type });
+          }
+        }
+      } catch {
+        /* On essaie en direct. */
+      }
+    }
+    return (await fetch(url, { credentials: "omit", referrerPolicy: "no-referrer" })).blob();
+  }
   // Couleurs dominantes d'un logo (on ignore blanc, noir et gris).
   async function logoColors(blob) {
     const bitmap = await createImageBitmap(blob);
@@ -167,7 +186,7 @@
       }
       const u = new URL(logoURL);
       if (u.protocol === "https:" && LOGO_HOSTS.includes(u.hostname)) {
-        const blob = await (await fetch(u.href, { credentials: "omit", referrerPolicy: "no-referrer" })).blob();
+        const blob = await logoBlob(u.href);
         logoValue = await shrinkLogo(blob);
         colorsFound = await logoColors(blob);
       }
@@ -213,13 +232,17 @@
       status.textContent = "Ajout de l’équipe et de ses matchs…";
       try {
         if (typeof flushCoachWorkspace === "function" && !flushCoachWorkspace()) throw new Error("busy");
-        let hasDetails = false;
+        let hasDetails = false,
+          hasLogo = false;
         try {
-          hasDetails = !!coachStorageGet(coachClubDetailsKey);
+          const raw = coachStorageGet(coachClubDetailsKey);
+          hasDetails = !!raw;
+          hasLogo = !!(raw && JSON.parse(raw)?.logo);
         } catch {
           hasDetails = false;
         }
-        if (identityPending || !hasDetails) await applyClubIdentity(club);
+        // Club réglé sans logo (ancien compte) : le logo, le nom et les couleurs du club choisi sont appliqués.
+        if (identityPending || !hasDetails || !hasLogo) await applyClubIdentity(club);
         const entry = await applyTeam(team, club.name, gatewayBase());
         closeDialog?.();
         coachTeamRememberView(entry.id);
@@ -441,7 +464,7 @@
       try {
         const u = new URL(typeof row.logo === "string" ? row.logo : "");
         if (u.protocol !== "https:" || !LOGO_HOSTS.includes(u.hostname)) return;
-        const blob = await (await fetch(u.href, { credentials: "omit", referrerPolicy: "no-referrer" })).blob();
+        const blob = await logoBlob(u.href);
         logoValue = await shrinkLogo(blob);
         preview.src = logoValue;
         preview.hidden = false;
