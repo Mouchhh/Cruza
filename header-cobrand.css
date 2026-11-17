@@ -13,3 +13,5 @@ html body>header .brand small{display:none!important}
  html body>header .brand-times{margin:0 7px;font-size:17px}
 }
 @media print{html body>header .cruza-lockup,html body>header .brand-times{display:none}}
+/* Accueil : plus de photos en fond ni de galerie d'origine. */
+html body #home-backdrop,html body #home-slideshow-controls,html body .home-club-life{display:none!important}
