@@ -89,7 +89,14 @@ function coachFFFOpen({add=false}={}){
  const queue=el('section','coach-fff-queue');queue.setAttribute('aria-label','Équipes à enregistrer');
  const another=el('button','export','+ Ajouter une autre équipe');another.type='button';
  const footer=el('div','coach-fff-footer');footer.append(another,save);
- form.append(queue,search,results,fallback,status,footer);panel.append(form);document.body.append(panel);window.workspaceSheets?.prioritize(panel);category.focus();
+ form.append(queue,search,results,fallback,status,footer);panel.append(form);document.body.append(panel);
+ // Sportcorico d'abord : le club puis ses équipes, un clic. Le formulaire FFF reste dessous pour les cas particuliers.
+ {const manual=el('details','coach-fff-manual'),holder=el('div');
+  manual.append(el('summary','','Configurer à la main (lien FFF)'),...[...form.children].slice(2));
+  form.append(holder,manual);
+  window.clubSportcorico?.mountPicker(holder,()=>panel.remove());
+  manual.open=!holder.children.length;
+  if(holder.children.length){const intro=form.children[1];if(intro)intro.textContent='Tapez le nom de votre club puis touchez vos équipes : le calendrier, le classement et la forme se remplissent tout seuls.';}}window.workspaceSheets?.prioritize(panel);category.focus();
  let chosen=null,run=0,pending=[],selectedId='',canEditActive=!add,draftId='team-'+crypto.randomUUID();
  const context=()=>JSON.stringify([category.value,gender.value,number.value,format.value,level.value,season.value]);
  const isOwner=()=>clubNetworkBound()&&clubNetworkSession.user.id===userId&&trainingAgendaIdentity()===owner;
