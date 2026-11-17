@@ -1,0 +1,52 @@
+/* One compact app header. Dropdowns keep their existing positioning and actions. */
+@media screen{
+ html body.task-navigation.responsive-navigation>header{box-sizing:border-box;height:54px!important;min-height:54px!important;padding:6px 16px!important;row-gap:0!important;column-gap:8px!important;background:#fff!important;overflow:visible!important}
+ html body.task-navigation.responsive-navigation>header .cruza-lockup{gap:7px!important;white-space:nowrap;font-size:12px!important}
+ html body.task-navigation.responsive-navigation>header .cruza-lockup img{width:28px!important;height:28px!important;border-radius:7px}
+ html body.task-navigation.responsive-navigation>header .brand-times{font-size:15px!important;margin:0 3px!important}
+ html body.task-navigation.responsive-navigation>header .brand{gap:7px!important;min-width:0!important;white-space:nowrap}
+ html body.task-navigation.responsive-navigation>header .brand .club-logo{width:28px!important;height:28px!important;flex:0 0 28px!important}
+ html body.task-navigation.responsive-navigation>header .brand>span:not(.club-monogram){font-size:12px!important;white-space:nowrap!important;overflow:hidden;text-overflow:ellipsis;min-width:0;max-width:210px;line-height:1.2!important}
+ html body.task-navigation.responsive-navigation>header .team-space-trigger{height:34px!important;min-height:34px!important;padding:4px 9px!important;gap:5px!important;white-space:nowrap;box-sizing:border-box}
+ html body.task-navigation.responsive-navigation>header .team-space-trigger strong{font-size:11px!important;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0}
+ html body.task-navigation.responsive-navigation>header .coach-profile-trigger{height:36px!important;min-height:36px!important;padding:3px 9px 3px 4px!important;gap:7px!important;box-sizing:border-box;white-space:nowrap}
+ html body.task-navigation.responsive-navigation>header .coach-profile-avatar{width:28px!important;height:28px!important;min-width:28px!important;flex:0 0 28px!important;font-size:11px!important}
+ html body.task-navigation.responsive-navigation>header .coach-profile-name{font-size:11px!important;line-height:1.2!important;white-space:nowrap!important;overflow:hidden;text-overflow:ellipsis;max-width:145px;min-width:0}
+ html body.task-navigation.responsive-navigation>header #club-network-shortcut{min-height:34px!important;height:34px!important;padding:5px 10px!important;font-size:11px!important;white-space:nowrap!important;line-height:1.2;box-sizing:border-box}
+ html body.task-navigation.responsive-navigation>header #club-save-indicator{font-size:10px!important;white-space:nowrap;flex:0 0 auto!important;margin:0!important}
+ html body.task-navigation.responsive-navigation>header #club-save-indicator>summary{min-height:32px;box-sizing:border-box;padding:5px 8px;font-size:10px!important;white-space:nowrap}
+}
+@media screen and (min-width:701px){
+ html body.task-navigation.responsive-navigation>header{display:flex!important;flex-wrap:nowrap!important;align-items:center!important;justify-content:flex-start!important}
+ html body.task-navigation.responsive-navigation>header .cruza-lockup{flex:0 0 auto!important}
+ html body.task-navigation.responsive-navigation>header .brand{flex:0 1 auto!important;margin-right:auto!important}
+ html body.task-navigation.responsive-navigation>header .header-actions{display:flex!important;flex:0 1 auto!important;flex-wrap:nowrap!important;align-items:center!important;justify-content:flex-end!important;gap:7px!important;min-width:0!important;width:auto!important;margin:0!important}
+ html body.task-navigation.responsive-navigation>header .team-space-picker{min-width:0!important;max-width:160px!important;flex:0 1 auto!important}
+ html body.task-navigation.responsive-navigation>header .coach-profile-menu{flex:0 1 auto!important;min-width:36px!important;margin:0!important;align-self:center!important}
+ html body.task-navigation.responsive-navigation>header .coach-profile-trigger{max-width:190px!important;width:auto!important}
+}
+@media screen and (min-width:701px) and (max-width:1199px){
+ html body.task-navigation.responsive-navigation>header #club-save-label{position:absolute!important;width:1px;height:1px;padding:0;overflow:hidden;clip-path:inset(50%);white-space:nowrap}
+ html body.task-navigation.responsive-navigation>header #club-save-indicator>summary{width:28px;min-height:32px;display:grid;place-items:center;padding:5px}
+ html body.task-navigation.responsive-navigation>header #club-save-indicator>summary::before{content:'';width:8px;height:8px;border-radius:50%;background:#158358}
+ html body.task-navigation.responsive-navigation>header #club-save-indicator[data-state=pending]>summary::before{background:#b7790d}
+ html body.task-navigation.responsive-navigation>header #club-save-indicator[data-state=error]>summary::before{background:#d93b4b}
+ html body.task-navigation.responsive-navigation>header .brand>span:not(.club-monogram){max-width:170px;font-size:11px!important}
+ html body.task-navigation.responsive-navigation>header .coach-profile-name{max-width:105px}
+}
+@media screen and (min-width:701px) and (max-width:900px){
+ html body.task-navigation.responsive-navigation>header .coach-profile-name{display:none!important}
+ html body.task-navigation.responsive-navigation>header .coach-profile-trigger{padding:3px!important;width:36px!important;justify-content:center!important}
+ html body.task-navigation.responsive-navigation>header .brand>span:not(.club-monogram){max-width:140px}
+ html body.task-navigation.responsive-navigation>header .team-space-picker{max-width:140px!important}
+}
+@media screen and (max-width:700px){
+ html body.task-navigation.responsive-navigation>header{height:50px!important;min-height:50px!important;padding:3px 8px!important;column-gap:0!important}
+ html body.task-navigation.responsive-navigation>header .coach-profile-trigger{width:40px!important;height:40px!important;min-height:40px!important;padding:5px!important;justify-content:center!important}
+ html body.task-navigation.responsive-navigation>header .team-space-trigger{min-height:34px!important;height:34px!important;padding:4px 6px!important}
+ html body.task-navigation.responsive-navigation>header .cruza-lockup img,html body.task-navigation.responsive-navigation>header .brand .club-logo{width:26px!important;height:26px!important;flex-basis:26px!important}
+ html body.task-navigation.responsive-navigation>header .brand-times{margin:0 6px!important}
+}
+@media screen{
+ html.club-private-request:not(.club-authenticated) body.task-navigation.responsive-navigation>header{display:none!important}
+}
