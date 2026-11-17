@@ -10,21 +10,35 @@
     if (content) node.textContent = content;
     return node;
   };
+  // Adresse du site terminée par ?onboarding=reset : remet la fenêtre de bienvenue à zéro pour ce compte (club mémorisé et « déjà vue »).
+  let resetAsked = false;
+  try {
+    resetAsked = new URL(location.href).searchParams.get("onboarding") === "reset";
+  } catch {
+    resetAsked = false;
+  }
+  function applyReset() {
+    if (!resetAsked) return;
+    resetAsked = false;
+    try {
+      localStorage.removeItem(coachStorageKey(DONE_KEY));
+      localStorage.removeItem(coachStorageKey("vestiaire-club-sportcorico"));
+      const url = new URL(location.href);
+      url.searchParams.delete("onboarding");
+      history.replaceState(history.state, "", url.href);
+    } catch {
+      /* Sans stockage, rien à remettre à zéro. */
+    }
+  }
   function needed() {
     if (shown || document.querySelector("dialog[open]")) return false;
     const root = document.documentElement;
     if (root.classList.contains("club-private-request") && !root.classList.contains("club-authenticated")) return false;
+    applyReset();
     try {
       if (typeof coachStorageGet !== "function" || typeof coachClubDetailsKey === "undefined") return false;
-      if (coachStorageGet(DONE_KEY)) return false;
-      // Comptes déjà existants inclus : la fenêtre s'ouvre une fois tant que le club n'a pas de logo réglé.
-      const raw = coachStorageGet(coachClubDetailsKey);
-      if (!raw) return true;
-      try {
-        return !JSON.parse(raw)?.logo;
-      } catch {
-        return true;
-      }
+      // Tous les comptes, anciens compris : la fenêtre s'ouvre une seule fois (jusqu'à « Enregistrer » ou « Passer »).
+      return !coachStorageGet(DONE_KEY);
     } catch {
       return false;
     }
@@ -425,6 +439,13 @@
     queryInput.maxLength = 60;
     queryInput.autocomplete = "off";
     queryInput.placeholder = "Ex. : St Mayennais FC";
+    try {
+      // Compte déjà réglé : on propose son nom de club actuel dans la recherche.
+      const known = JSON.parse(coachStorageGet(coachClubDetailsKey) || "null")?.name;
+      if (typeof known === "string" && known.trim() && known !== "Mon club") queryInput.value = known.trim().slice(0, 60);
+    } catch {
+      /* Champ laissé vide. */
+    }
     const chosen = text("p", "club-onboarding-chosen"),
       find = text("button", "export", "Rechercher mon club"),
       linkRow = text("div", "club-onboarding-linkrow"),
@@ -573,8 +594,17 @@
       }
       save.disabled = true;
       try {
+        // Compte déjà réglé : contacts et autres informations sont conservés, seuls nom, logo et couleurs changent.
+        let existing = {};
+        try {
+          existing = JSON.parse(coachStorageGet(coachClubDetailsKey) || "null") || {};
+        } catch {
+          existing = {};
+        }
+        const { logo: oldLogo, primaryColor: oldPrimary, secondaryColor: oldSecondary, ...kept } = existing;
         const value = {
           ...coachClubDetailsDefaults(),
+          ...kept,
           name: name.value.trim(),
           ...(primary.value.toLowerCase() !== clubTheme.defaults.primary ? { primaryColor: primary.value.toLowerCase() } : {}),
           ...(secondary.value.toLowerCase() !== clubTheme.defaults.secondary ? { secondaryColor: secondary.value.toLowerCase() } : {}),
