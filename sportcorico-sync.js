@@ -7,7 +7,7 @@
     const age = /\bU\s?(\d{2})\b/i.exec(text);
     if (age) return "U" + age[1];
     if (/senior/i.test(text)) return "Seniors";
-    return text.split(/\s+/)[0].slice(0, 30);
+    return "";
   };
   function fixtureFrom(game, data) {
     const ownHome = game.homeId === data.teamId,
@@ -22,7 +22,7 @@
         competition: String(game.competition || data.competition || "Championnat").slice(0, 200),
         round: 0,
         roundLabel: "",
-        category: category(data.category || data.teamName),
+        category: category(data.competition) || category(data.category) || category(data.teamName) || String(data.teamName || "").split(/\s+/)[0].slice(0, 30),
         location: ownHome ? "À domicile · stade à préciser" : "À l’extérieur · stade à préciser",
         status: "confirmed",
         sequence: 0,

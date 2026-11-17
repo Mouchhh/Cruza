@@ -81,10 +81,11 @@
     const response = await fetch(gateway + "/api/sportcorico?url=" + encodeURIComponent(team.url), { cache: "no-store", credentials: "omit", signal: AbortSignal.timeout(60000) });
     if (!response.ok) throw new Error("unavailable");
     const data = await response.json(),
-      age = /\bU\s?(\d{2})\b/i.exec(team.name),
+      // La catégorie du championnat fait foi (ex. « U19 1 » qui joue en poule U18 → U18).
+      age = /\bU\s?(\d{2})\b/i.exec(data.competition || team.competition || "") || /\bU\s?(\d{2})\b/i.exec(team.name),
       entry = {
         id: activeCoachTeam.id,
-        label: String(team.name).slice(0, 60),
+        label: (age ? String(team.name).replace(/\bU\s?\d{2}\b/i, "U" + age[1]) : String(team.name)).slice(0, 60),
         category: age ? "U" + age[1] : /senior/i.test(team.name) ? "Seniors" : String(team.name).split(/\s+/)[0].slice(0, 30),
         team: String(data.teamName || clubName + " " + team.name).slice(0, 50),
         sportcoricoURL: coachTeamSportcoricoURL(team.url),
