@@ -221,3 +221,52 @@
  html body.home-mode .home-hero #home-last-saved{color:#e1eafa}
 }
 @media screen and (max-width:700px){html body.home-mode.home-has-slides .home-hero{min-height:210px}}
+
+@media screen{
+ :is(#home-live-widgets,.home-sportcorico-dialog) .home-sportcorico-table{max-height:275px;overflow:auto;margin-top:14px;border:1px solid var(--smfc-line,#e2e6ee);border-radius:9px}
+ :is(#home-live-widgets,.home-sportcorico-dialog) .home-sportcorico-table table{width:100%;border-collapse:collapse;table-layout:fixed;font:11px/1.4 SMFCArchivo,Arial,sans-serif}
+ :is(#home-live-widgets,.home-sportcorico-dialog) .home-sportcorico-table th,:is(#home-live-widgets,.home-sportcorico-dialog) .home-sportcorico-table td{padding:8px 5px;border-bottom:1px solid #e2e6ee;text-align:center;color:#173151;background:white}
+ :is(#home-live-widgets,.home-sportcorico-dialog) .home-sportcorico-table th{position:sticky;top:0;background:#eef3fb;z-index:1}
+ :is(#home-live-widgets,.home-sportcorico-dialog) .home-sportcorico-table th:nth-child(2),:is(#home-live-widgets,.home-sportcorico-dialog) .home-sportcorico-table td:nth-child(2){width:55%;text-align:left;overflow-wrap:anywhere}
+ #home-live-widgets .home-sportcorico-own td{background:#e7effc;font-weight:750;color:#0b2e8a}
+ #home-live-widgets .home-live-ranking a.home-live-open{display:inline-block;text-decoration:none}
+}
+
+@media screen{
+ .home-sportcorico-expand{display:none}
+ .home-sportcorico-stamp{display:block;flex:1 1 100%;font-size:10px;line-height:1.4;color:var(--smfc-muted,#53617b);margin-top:6px}
+ .home-sportcorico-dialog{width:min(650px,94vw);max-height:90dvh;padding:20px;box-sizing:border-box;border:1px solid #e2e6ee;border-radius:14px;background:#fff;color:#173151}
+ .home-sportcorico-dialog .home-sportcorico-table{max-height:60dvh;overflow:auto}
+ .home-sportcorico-dialog a{display:inline-block;margin:12px}
+}
+@media screen and (max-width:700px){
+ html body.home-mode #home-page-0 #home-live-widgets .home-live-ranking>.home-sportcorico-table{display:none}
+ html body.home-mode #home-page-0 #home-live-widgets .home-live-ranking>.home-sportcorico-expand{display:inline-block!important}
+ html body.home-mode #home-page-0 #home-live-widgets .home-live-ranking>a.home-live-open{display:none!important}
+ html body.home-mode #home-page-0 #home-live-widgets .home-live-ranking{order:1}
+ html body.home-mode #home-page-0 #home-live-widgets .home-live-ranking .home-sportcorico-stamp{margin:0;font-size:9px}
+}
+
+@media screen{html body #home-live-widgets .home-sportcorico-configure{background:transparent;border:0;color:var(--smfc-blue,#0b2e8a);padding:6px 0;min-height:32px;font-size:11px;text-decoration:underline}}
+
+@media screen{
+ html body #home-live-widgets .home-live-ranking{background:linear-gradient(155deg,#fff 45%,#edf4ff)!important;border-top:3px solid var(--smfc-blue,#2855a2)!important}
+ :is(#home-live-widgets,.home-sportcorico-dialog) .home-sportcorico-table{border-color:#dbe5f3;max-height:350px;box-shadow:0 4px 18px #0b2e8a08}
+ :is(#home-live-widgets,.home-sportcorico-dialog) .home-sportcorico-table th{background:#173861;color:white;font-size:10px;border-bottom:0;padding-block:10px}
+ :is(#home-live-widgets,.home-sportcorico-dialog) .home-sportcorico-table td{padding-block:10px;font-variant-numeric:tabular-nums;vertical-align:middle}
+ :is(#home-live-widgets,.home-sportcorico-dialog) .home-sportcorico-table tr:nth-child(even) td{background:#f6f9fe}
+ :is(#home-live-widgets,.home-sportcorico-dialog) .home-sportcorico-table .home-sportcorico-own td{background:#e4efff;color:#0b2e8a}
+ :is(#home-live-widgets,.home-sportcorico-dialog) .home-sportcorico-own td:first-child{box-shadow:inset 3px 0 #2855a2}
+ :is(#home-live-widgets,.home-sportcorico-dialog) .home-sportcorico-table .home-sportcorico-top{color:#946314;font-weight:800}
+ :is(#home-live-widgets,.home-sportcorico-dialog) .home-sportcorico-table td:nth-child(4){font-weight:800;color:#0b2e8a}
+ .home-sportcorico-identity{display:flex;gap:6px;align-items:center;min-width:0}
+ .home-sportcorico-name{font-size:10px;line-height:1.35}
+ .home-sportcorico-badge{position:relative;display:grid;place-items:center;flex:0 0 26px;width:26px;height:26px;border-radius:50%;background:#e6edf8;border:1px solid #dbe4f0;color:#2855a2;font:700 9px Arial,sans-serif}
+ .home-sportcorico-logo{position:absolute;inset:0;width:26px;height:26px;object-fit:contain;border-radius:50%;background:white}
+ .home-sportcorico-form{display:flex;gap:3px;align-items:center;margin:5px 0 0 32px}
+ .home-sportcorico-result{display:grid;place-items:center;width:16px;height:16px;flex:0 0 16px;border-radius:5px;font:750 9px/1 Arial,sans-serif;color:white}
+ .home-sportcorico-result.result-V{background:#158358}.home-sportcorico-result.result-N{background:#ad7409}.home-sportcorico-result.result-D{background:#d93b4b}.home-sportcorico-result.result-\?{background:#7a879a}
+ .home-sportcorico-empty{font-size:9px;color:#65738b}
+ .home-sportcorico-legend{display:block;font-size:9px;line-height:1.5;color:#53617b;margin-top:8px}
+}
+@media screen and (max-width:700px){html body.home-mode #home-page-0 #home-live-widgets .home-live-ranking>.home-sportcorico-legend{display:none}.home-sportcorico-dialog .home-sportcorico-table{max-height:60dvh}}
