@@ -20,9 +20,10 @@ function renderHomeWidgets(){
  const card=(title,kind)=>{const node=el('article','home-live-card '+kind);node.append(el('h2','',title));root.append(node);return node;};
  const ranking=card('Classement · Sportcorico','home-live-ranking');
  renderHomeSportcorico(ranking);
+ const sc=!s.form.length&&window.sportcoricoSync?window.sportcoricoSync.form(typeof homeSportcoricoData!=='undefined'?homeSportcoricoData:null):null;if(sc){s.form=sc.form;s.points=sc.points;}
  const form=card('Forme · 5 derniers matchs','home-live-form');form.append(el('strong','home-live-value',s.form.length?s.points+' pts / '+s.form.length*3:'Aucun résultat validé'));
  const circles=el('div','home-live-results');s.form.slice().reverse().forEach(v=>{const circle=el('span','home-live-result result-'+v,v);circle.title={V:'Victoire',N:'Match nul',D:'Défaite'}[v];circles.append(circle);});form.append(circles);
- const last=s.scored[0];form.append(el('p','',last?'Dernier match : '+last.info.goalsFor+' – '+last.info.goalsAgainst+' · '+last.info.opponent:'Les résultats apparaîtront après validation des bilans.'));
+ const last=s.scored[0];form.append(el('p','',last?'Dernier match : '+last.info.goalsFor+' – '+last.info.goalsAgainst+' · '+last.info.opponent:sc?'Dernier match : '+sc.last.goalsFor+' – '+sc.last.goalsAgainst+' · '+sc.last.opponent:'Les résultats apparaîtront après validation des bilans.'));
  const label=e=>homeDayLabel(e.date,s.now.day)+(e.time?' · '+e.time:'')+' · '+e.title;
  form.append(el('p','home-live-caption',s.match?'Prochain rendez-vous : '+label(s.match):'Aucun prochain match planifié'));
  const training=card('Agenda & séance','home-live-training'),event=s.training;

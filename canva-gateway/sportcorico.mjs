@@ -5,6 +5,19 @@ export function sportcoricoSource(value){
 export function sportcoricoLogo(value){
  try{const u=new URL(value);return typeof value==='string'&&value.length<=1000&&u.protocol==='https:'&&['s3.pub2.infomaniak.cloud','www.sportcorico.com','sportcorico.com'].includes(u.hostname)&&!u.username&&!u.password&&!u.port?u.href:'';}catch{return '';}
 }
+
+// Matchs de l'équipe (calendrier et résultats) : champs minimaux, jamais de HTML.
+export function parseGames(list,teamId){
+ if(!Array.isArray(list))return [];
+ const text=(v,max)=>typeof v==='string'&&v.trim()&&v.length<=max?v.trim():'',score=v=>Number.isInteger(v)&&v>=0&&v<=99?v:null;
+ return list.slice(0,120).flatMap(g=>{
+  if(!g||!Number.isInteger(g.id)||![g.home_team_id,g.outside_team_id].includes(teamId))return [];
+  const date=/^(\d{4}-\d{2}-\d{2})/.exec(String(g.event_date||''))?.[1],time=/^([01]\d|2[0-3]):[0-5]\d$/.test(g.planned_time||'')?g.planned_time:'',home=text(g.home_team_name,150),away=text(g.outside_team_name,150);
+  if(!date||!home||!away||g.exempt)return [];
+  const played=g.status==='Terminé'&&score(g.home_score)!==null&&score(g.outside_score)!==null;
+  return [{id:g.id,date,time,home,away,homeId:g.home_team_id,awayId:g.outside_team_id,competition:text(g.championship_name,150),status:played?'played':'planned',...(played?{homeScore:g.home_score,awayScore:g.outside_score}:{})}];
+ }).sort((a,b)=>(a.date+a.time).localeCompare(b.date+b.time));
+}
 export function parseSportcorico(html,sourceURL){
  sourceURL=sportcoricoSource(sourceURL);
  const match=html.match(/<script\b[^>]*\bid="__NUXT_DATA__"[^>]*>([\s\S]*?)<\/script>/);
@@ -24,7 +37,7 @@ export function parseSportcorico(html,sourceURL){
  if(rows.length<2||rows.length>80||new Set(rows.map(r=>r.rank)).size!==rows.length||new Set(rows.map(r=>r.team_id)).size!==rows.length||rows.some(r=>typeof r.team!=='string'||!r.team||r.team.length>200||!['rank','points','games_played','difference','team_id'].every(k=>Number.isInteger(r[k])&&Math.abs(r[k])<1000000)||r.rank<1||r.rank>100||r.games_played<0||r.games_played>200))throw Error('Tableau Sportcorico invalide.');
  for(let i=0;i<rows.length;i++){rows[i].logo=sportcoricoLogo(t.lines[i].logo);rows[i].form=Array.isArray(t.lines[i].shape_of_the_moment)?t.lines[i].shape_of_the_moment.slice(0,5).map(v=>['V','N','D'].includes(v)?v:'?'):[];}
  const meta=[entry.current_season?.label,t.championship_name,t.pool_name,team.category?.name];if(meta.some(v=>typeof v!=='string'||v.length>200))throw Error('Championnat non reconnu.');
- return {version:1,sourceURL,teamSlug:slug,teamId:team.id,teamName:team.club_name+' '+team.name_generated,category:meta[3],season:meta[0],competition:meta[1],pool:meta[2],rows:rows.sort((a,b)=>a.rank-b.rank)};
+ return {version:1,sourceURL,teamSlug:slug,teamId:team.id,teamName:team.club_name+' '+team.name_generated,category:meta[3],season:meta[0],competition:meta[1],pool:meta[2],rows:rows.sort((a,b)=>a.rank-b.rank),games:parseGames(entry.games,team.id)};
 }
 export function sportcoricoReader(fetcher=fetch,now=Date.now){
  const cache=new Map(),pending=new Map();
@@ -67,5 +80,31 @@ export function sportcoricoSearcher(fetcher=fetch,now=Date.now){
   try{while(true){const {done,value:part}=await reader.read();if(done)break;size+=part.byteLength;if(size>2000000){await reader.cancel();throw Error('Page trop volumineuse.');}chunks.push(part);}}finally{reader.releaseLock();}
   const data={version:1,query,clubs:parseClubSearch(Buffer.concat(chunks).toString('utf8'))};
   if(cache.size>=200)cache.delete(cache.keys().next().value);cache.set(key,{time:now(),data});return data;
+ };
+}
+
+// Équipes d'un club (page club publique), pour choisir la sienne.
+export function parseClubTeams(html,clubSlug){
+ const teams=[],seen=new Set(),pattern=new RegExp('<a [^>]*href="/clubs/'+clubSlug+'/([a-z0-9-]+)"[^>]*>([\\s\\S]*?)</a>','g');
+ for(let m;(m=pattern.exec(html))&&teams.length<60;){
+  if(seen.has(m[1]))continue;
+  const parts=m[2].replace(/<[^>]+>/g,'\n').split('\n').map(decodeEntities).filter(Boolean);
+  if(!parts[0]||parts[0].length>80)continue;
+  seen.add(m[1]);teams.push({slug:m[1],name:parts[0],competition:(parts[1]||'').slice(0,120),url:'https://www.sportcorico.com/clubs/'+clubSlug+'/'+m[1]});
+ }
+ return teams;
+}
+export function sportcoricoTeamLister(fetcher=fetch,now=Date.now){
+ const cache=new Map();
+ return async value=>{
+  const slug=String(value||'');
+  if(!/^[a-z0-9-]{2,100}$/.test(slug))throw Object.assign(Error('Club inconnu.'),{status:400});
+  const cached=cache.get(slug);if(cached&&now()-cached.time<15*60000)return cached.data;
+  const response=await fetcher('https://www.sportcorico.com/clubs/'+slug,{redirect:'error',headers:{Accept:'text/html','User-Agent':'CRUZA-ranking/1.0'},signal:AbortSignal.timeout(12000)});
+  if(!response.ok)throw Object.assign(Error('Sportcorico est indisponible.'),{status:502});
+  const reader=response.body?.getReader();if(!reader)throw Error('Page vide.');const chunks=[];let size=0;
+  try{while(true){const {done,value:part}=await reader.read();if(done)break;size+=part.byteLength;if(size>3000000){await reader.cancel();throw Error('Page trop volumineuse.');}chunks.push(part);}}finally{reader.releaseLock();}
+  const data={version:1,slug,teams:parseClubTeams(Buffer.concat(chunks).toString('utf8'),slug)};
+  if(cache.size>=200)cache.delete(cache.keys().next().value);cache.set(slug,{time:now(),data});return data;
  };
 }

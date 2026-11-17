@@ -76,6 +76,34 @@
     }
   }
   const LOGO_HOSTS = ["s3.pub2.infomaniak.cloud", "www.sportcorico.com", "sportcorico.com"];
+  // Équipe choisie : configure l'équipe active (nom, lien Sportcorico) et ajoute ses matchs à l'agenda.
+  async function applyTeam(team, clubName, gateway) {
+    const response = await fetch(gateway + "/api/sportcorico?url=" + encodeURIComponent(team.url), { cache: "no-store", credentials: "omit", signal: AbortSignal.timeout(60000) });
+    if (!response.ok) throw new Error("unavailable");
+    const data = await response.json(),
+      age = /\bU\s?(\d{2})\b/i.exec(team.name),
+      entry = {
+        id: activeCoachTeam.id,
+        label: String(team.name).slice(0, 60),
+        category: age ? "U" + age[1] : /senior/i.test(team.name) ? "Seniors" : String(team.name).split(/\s+/)[0].slice(0, 30),
+        team: String(data.teamName || clubName + " " + team.name).slice(0, 50),
+        sportcoricoURL: coachTeamSportcoricoURL(team.url),
+      };
+    if (!coachTeamValid(entry) || !entry.sportcoricoURL) throw new Error("invalid");
+    const stored = JSON.parse(localStorage.getItem(coachTeamManifestKey) || "[]"),
+      merged = new Map([...coachTeams, ...(Array.isArray(stored) ? stored.filter(coachTeamValid) : [])].map((t) => [t.id, t]));
+    merged.set(entry.id, entry);
+    localStorage.setItem(coachTeamManifestKey, JSON.stringify([...merged.values()]));
+    window.sportcoricoSync?.store(data, true);
+    return entry;
+  }
+  function notifyTeamFailed() {
+    try {
+      if (typeof notify === "function") notify("Club enregistré. L’équipe n’a pas pu être récupérée : vous pourrez la régler dans Mon équipe.");
+    } catch {
+      /* Message facultatif. */
+    }
+  }
   function open() {
     if (!needed()) return;
     shown = true;
@@ -145,10 +173,47 @@
     const chosen = text("p", "club-onboarding-chosen"),
       find = text("button", "export", "Rechercher mon club"),
       linkRow = text("div", "club-onboarding-linkrow"),
-      found = text("div", "club-onboarding-found");
+      found = text("div", "club-onboarding-found"),
+      teamsBox = text("div", "club-onboarding-found");
+    let selectedClub = null,
+      selectedTeam = null;
     find.type = "button";
     linkRow.append(field("Nom de votre club", queryInput), find);
+    const gatewayURL = () => String(window.CLUB_RANKING_GATEWAY || window.CLUB_CANVA_GATEWAY || "").replace(/\/$/, "");
+    async function loadTeams(club) {
+      teamsBox.replaceChildren();
+      if (!gatewayURL() || typeof club.slug !== "string") return;
+      try {
+        const response = await fetch(gatewayURL() + "/api/sportcorico-teams?slug=" + encodeURIComponent(club.slug), { cache: "no-store", credentials: "omit", signal: AbortSignal.timeout(60000) });
+        if (!response.ok) throw new Error("unavailable");
+        const data = await response.json(),
+          teams = Array.isArray(data.teams) ? data.teams.filter((team) => team && typeof team.name === "string" && typeof team.url === "string") : [];
+        if (!teams.length || selectedClub !== club) return;
+        teamsBox.append(text("p", "club-onboarding-help", "Quelle est votre équipe ? (le calendrier, le classement et la forme se rempliront tout seuls)"));
+        for (const team of teams) {
+          const button = text("button", "club-onboarding-club"),
+            labels = text("span", "club-onboarding-club-text");
+          button.type = "button";
+          labels.append(text("span", "", team.name), text("small", "", team.competition || ""));
+          button.append(labels);
+          button.onclick = () => {
+            selectedTeam = team;
+            chosen.textContent = name.value + " · " + team.name;
+            teamsBox.replaceChildren();
+          };
+          teamsBox.append(button);
+        }
+      } catch {
+        /* Le club seul suffit : l’équipe se règle ensuite dans le compte. */
+      }
+    }
     async function pick(row) {
+      selectedClub = row;
+      selectedTeam = null;
+      await pickLogo(row);
+      loadTeams(row);
+    }
+    async function pickLogo(row) {
       status.textContent = "";
       name.value = String(row.name || "").slice(0, 70);
       chosen.textContent = name.value;
@@ -208,8 +273,8 @@
           labels.append(text("span", "", club.name), text("small", "", club.city || ""));
           button.append(labels);
           button.onclick = async () => {
-            await pick(club);
             found.replaceChildren();
+            await pick(club);
           };
           found.append(button);
         }
@@ -229,7 +294,7 @@
     });
     const picked = text("div", "club-onboarding-picked");
     picked.append(preview, chosen);
-    form.append(title, intro, linkRow, picked, found, status, actions);
+    form.append(title, intro, linkRow, picked, found, teamsBox, status, actions);
     dialog.append(form);
     document.body.append(dialog);
     const finish = () => {
@@ -242,13 +307,14 @@
       event.preventDefault();
       finish();
     });
-    form.onsubmit = (event) => {
+    form.onsubmit = async (event) => {
       event.preventDefault();
       if (!name.value.trim()) {
         status.textContent = "Cherchez votre club et touchez-le dans la liste, ou passez cette étape.";
         queryInput.focus();
         return;
       }
+      save.disabled = true;
       try {
         const value = {
           ...coachClubDetailsDefaults(),
@@ -261,9 +327,29 @@
         coachStorageSet(coachClubDetailsKey, JSON.stringify(value));
         clubTheme.apply(value);
         window.clubNameRefresh?.();
-        finish();
       } catch {
         status.textContent = "Enregistrement impossible : vérifiez le nom du club.";
+        save.disabled = false;
+        return;
+      }
+      let teamEntry = null;
+      if (selectedTeam) {
+        status.textContent = "Récupération de votre équipe et de ses matchs…";
+        try {
+          if (typeof flushCoachWorkspace === "function" && !flushCoachWorkspace()) throw new Error("busy");
+          teamEntry = await applyTeam(selectedTeam, name.value.trim(), gatewayURL());
+        } catch {
+          teamEntry = null;
+        }
+      }
+      finish();
+      if (teamEntry) {
+        coachTeamRememberView(teamEntry.id);
+        sessionStorage.setItem(coachTeamSelectionKey, teamEntry.id);
+        history.replaceState(null, "", location.href);
+        location.reload();
+      } else if (selectedTeam) {
+        notifyTeamFailed();
       }
     };
     dialog.showModal();
