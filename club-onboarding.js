@@ -76,22 +76,13 @@
     }
   }
   const LOGO_HOSTS = ["s3.pub2.infomaniak.cloud", "www.sportcorico.com", "sportcorico.com"];
-  function sportcoricoLink(value) {
-    try {
-      const url = new URL(value.trim());
-      return url.protocol === "https:" && /^(www\.)?sportcorico\.com$/.test(url.hostname) && url.pathname.startsWith("/clubs/") && !url.username ? url.href : "";
-    } catch {
-      return "";
-    }
-  }
-  const cleanTeamName = (value) => String(value || "").replace(/\s+\d+$/, "").trim();
   function open() {
     if (!needed()) return;
     shown = true;
     const dialog = text("dialog", "club-onboarding"),
       form = text("form", "club-onboarding-form"),
       title = text("h2", "", "Bienvenue sur Cruza"),
-      intro = text("p", "club-onboarding-intro", "Collez le lien Sportcorico de votre équipe : le nom, le logo et les couleurs de votre club se règlent tout seuls. Tout reste modifiable dans votre compte."),
+      intro = text("p", "club-onboarding-intro", "Tapez le nom de votre club : son logo et ses couleurs se règlent tout seuls. Tout reste modifiable dans votre compte."),
       status = text("p", "club-onboarding-status");
     dialog.setAttribute("aria-labelledby", "club-onboarding-title");
     title.id = "club-onboarding-title";
@@ -146,30 +137,25 @@
     save.type = "submit";
     skip.type = "button";
     actions.append(save, skip);
-    const linkInput = document.createElement("input");
-    linkInput.type = "text";
-    linkInput.inputMode = "url";
-    linkInput.placeholder = "https://www.sportcorico.com/clubs/…";
+    const queryInput = document.createElement("input");
+    queryInput.type = "text";
+    queryInput.maxLength = 60;
+    queryInput.autocomplete = "off";
+    queryInput.placeholder = "Ex. : St Mayennais FC";
     const chosen = text("p", "club-onboarding-chosen"),
-      find = text("button", "export", "Récupérer mon club"),
+      find = text("button", "export", "Rechercher mon club"),
       linkRow = text("div", "club-onboarding-linkrow"),
-      help = text("p", "club-onboarding-help"),
       found = text("div", "club-onboarding-found");
     find.type = "button";
-    linkRow.append(field("Lien Sportcorico de votre équipe (le plus simple)", linkInput), find);
-        const helpLink = document.createElement("a");
-    helpLink.href = "https://www.sportcorico.com";
-    helpLink.target = "_blank";
-    helpLink.rel = "noopener noreferrer";
-    helpLink.textContent = "Trouvez votre équipe sur Sportcorico ↗";
-    help.append(helpLink, " puis copiez l’adresse de la page.");
+    linkRow.append(field("Nom de votre club", queryInput), find);
     async function pick(row) {
       status.textContent = "";
-      name.value = cleanTeamName(row.team).slice(0, 70);
+      name.value = String(row.name || "").slice(0, 70);
       chosen.textContent = name.value;
-      const logoUrl = typeof row.logo === "string" ? row.logo : "";
+      logoValue = "";
+      preview.hidden = true;
       try {
-        const u = new URL(logoUrl);
+        const u = new URL(typeof row.logo === "string" ? row.logo : "");
         if (u.protocol !== "https:" || !LOGO_HOSTS.includes(u.hostname)) return;
         const blob = await (await fetch(u.href, { credentials: "omit", referrerPolicy: "no-referrer" })).blob();
         logoValue = await shrinkLogo(blob);
@@ -179,51 +165,71 @@
         if (colorsFound.primary) primary.value = colorsFound.primary;
         if (colorsFound.secondary) secondary.value = colorsFound.secondary;
       } catch {
-        status.textContent = "Nom récupéré, mais pas le logo : vous pourrez l’ajouter dans votre compte.";
+        status.textContent = "Club trouvé, mais pas son logo : vous pourrez l’ajouter dans votre compte.";
       }
     }
-    find.onclick = async () => {
+    async function search() {
       status.textContent = "";
       found.replaceChildren();
-      const source = sportcoricoLink(linkInput.value),
+      const query = queryInput.value.trim(),
         gateway = window.CLUB_RANKING_GATEWAY || window.CLUB_CANVA_GATEWAY;
-      if (!source) {
-        status.textContent = "Collez l’adresse d’une page équipe Sportcorico (sportcorico.com/clubs/…).";
+      if (query.length < 2) {
+        status.textContent = "Tapez le nom de votre club.";
         return;
       }
       if (!gateway) {
-        status.textContent = "Récupération indisponible pour le moment : réglez votre club dans votre compte.";
+        status.textContent = "Recherche indisponible pour le moment : réglez votre club dans votre compte.";
         return;
       }
       find.disabled = true;
       find.textContent = "Recherche…";
       try {
-        const response = await fetch(gateway.replace(/\/$/, "") + "/api/sportcorico?url=" + encodeURIComponent(source), { cache: "no-store", credentials: "omit", signal: AbortSignal.timeout(60000) });
+        const response = await fetch(gateway.replace(/\/$/, "") + "/api/sportcorico-search?q=" + encodeURIComponent(query), { cache: "no-store", credentials: "omit", signal: AbortSignal.timeout(60000) });
         if (!response.ok) throw new Error("unavailable");
         const data = await response.json(),
-          rows = Array.isArray(data.rows) ? data.rows.filter((row) => row && typeof row.team === "string") : [];
-        if (!rows.length) throw new Error("empty");
-        const own = rows.find((row) => row.team_id === data.teamId) || rows[0];
-        await pick(own);
-        if (rows.length > 1) {
-          found.append(text("p", "club-onboarding-help", "Ce n’est pas votre club ? Touchez le bon :"));
-          for (const row of rows) {
-            const button = text("button", "club-onboarding-club", cleanTeamName(row.team));
-            button.type = "button";
-            button.onclick = () => pick(row);
-            found.append(button);
+          clubs = Array.isArray(data.clubs) ? data.clubs.filter((club) => club && typeof club.name === "string") : [];
+        if (!clubs.length) {
+          status.textContent = "Aucun club trouvé. Essayez avec moins de mots (ex. « Mayennais »).";
+          return;
+        }
+        for (const club of clubs) {
+          const button = text("button", "club-onboarding-club"),
+            labels = text("span", "club-onboarding-club-text");
+          button.type = "button";
+          if (club.logo) {
+            const img = document.createElement("img");
+            img.alt = "";
+            img.loading = "lazy";
+            img.referrerPolicy = "no-referrer";
+            img.src = club.logo;
+            img.onerror = () => img.remove();
+            button.append(img);
           }
+          labels.append(text("span", "", club.name), text("small", "", club.city || ""));
+          button.append(labels);
+          button.onclick = async () => {
+            await pick(club);
+            found.replaceChildren();
+          };
+          found.append(button);
         }
       } catch {
-        status.textContent = "Impossible de lire ce lien pour l’instant. Vérifiez l’adresse ou passez cette étape et réglez le club dans votre compte.";
+        status.textContent = "Impossible de chercher pour l’instant. Réessayez, ou passez cette étape et réglez le club dans votre compte.";
       } finally {
         find.disabled = false;
-        find.textContent = "Récupérer mon club";
+        find.textContent = "Rechercher mon club";
       }
-    };
+    }
+    find.onclick = search;
+    queryInput.addEventListener("keydown", (event) => {
+      if (event.key === "Enter") {
+        event.preventDefault();
+        search();
+      }
+    });
     const picked = text("div", "club-onboarding-picked");
     picked.append(preview, chosen);
-    form.append(title, intro, linkRow, help, picked, found, status, actions);
+    form.append(title, intro, linkRow, picked, found, status, actions);
     dialog.append(form);
     document.body.append(dialog);
     const finish = () => {
@@ -239,8 +245,8 @@
     form.onsubmit = (event) => {
       event.preventDefault();
       if (!name.value.trim()) {
-        status.textContent = "Collez le lien Sportcorico puis touchez « Récupérer mon club », ou passez cette étape.";
-        linkInput.focus();
+        status.textContent = "Cherchez votre club et touchez-le dans la liste, ou passez cette étape.";
+        queryInput.focus();
         return;
       }
       try {
@@ -261,7 +267,7 @@
       }
     };
     dialog.showModal();
-    linkInput.focus();
+    queryInput.focus();
   }
   const check = () => setTimeout(open, 600);
   document.addEventListener("DOMContentLoaded", check);

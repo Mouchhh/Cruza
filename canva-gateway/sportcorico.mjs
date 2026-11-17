@@ -41,3 +41,31 @@ export function sportcoricoReader(fetcher=fetch,now=Date.now){
   })().finally(()=>pending.delete(source));pending.set(source,task);return task;
  };
 }
+
+// Recherche d'un club par son nom (page publique « Recherche club »), football uniquement.
+const decodeEntities=t=>t.replace(/&amp;/g,'&').replace(/&lt;/g,'<').replace(/&gt;/g,'>').replace(/&quot;/g,'"').replace(/&#x27;|&#39;/g,"'").replace(/&nbsp;/g,' ').trim();
+export function parseClubSearch(html){
+ const clubs=[],seen=new Set(),pattern=/<a href="\/clubs\/([a-z0-9-]+)" class="rs-row[^"]*"[^>]*>([\s\S]*?)<\/a>/g;
+ for(let m;(m=pattern.exec(html))&&clubs.length<12;){
+  const body=m[2],text=name=>{const r=body.match(new RegExp('rs-row__'+name+'[^>]*>([^<]*)<'));return r?decodeEntities(r[1]).slice(0,120):'';};
+  const sport=text('sport-name'),name=text('name');
+  if(!name||seen.has(m[1])||(sport&&sport!=='Football'))continue;
+  seen.add(m[1]);const img=body.match(/<img src="([^"]+)"/);
+  clubs.push({slug:m[1],name,city:text('meta'),logo:sportcoricoLogo(img?decodeEntities(img[1]):'')});
+ }
+ return clubs;
+}
+export function sportcoricoSearcher(fetcher=fetch,now=Date.now){
+ const cache=new Map();
+ return async value=>{
+  const query=String(value||'').normalize('NFC').replace(/\s+/g,' ').trim();
+  if(query.length<2||query.length>60)throw Object.assign(Error('Tapez au moins 2 lettres.'),{status:400});
+  const key=query.toLowerCase(),cached=cache.get(key);if(cached&&now()-cached.time<15*60000)return cached.data;
+  const response=await fetcher('https://www.sportcorico.com/recherche?q='+encodeURIComponent(query),{redirect:'error',headers:{Accept:'text/html','User-Agent':'CRUZA-ranking/1.0'},signal:AbortSignal.timeout(12000)});
+  if(!response.ok)throw Object.assign(Error('Sportcorico est indisponible.'),{status:502});
+  const reader=response.body?.getReader();if(!reader)throw Error('Page vide.');const chunks=[];let size=0;
+  try{while(true){const {done,value:part}=await reader.read();if(done)break;size+=part.byteLength;if(size>2000000){await reader.cancel();throw Error('Page trop volumineuse.');}chunks.push(part);}}finally{reader.releaseLock();}
+  const data={version:1,query,clubs:parseClubSearch(Buffer.concat(chunks).toString('utf8'))};
+  if(cache.size>=200)cache.delete(cache.keys().next().value);cache.set(key,{time:now(),data});return data;
+ };
+}

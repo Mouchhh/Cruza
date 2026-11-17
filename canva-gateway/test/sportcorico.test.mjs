@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {sportcoricoSource,parseSportcorico,sportcoricoReader} from '../sportcorico.mjs';
+import {sportcoricoSource,parseSportcorico,sportcoricoReader,parseClubSearch} from '../sportcorico.mjs';
 const source='https://www.sportcorico.com/clubs/test-club/test-u15';
 function page(){
  const nodes=[['ShallowReactive',1],null];
@@ -32,4 +32,10 @@ test('gateway route checks site origin and serves public rankings without club c
   const ok=await fetch(base+'/api/sportcorico?url='+encodeURIComponent(source),{headers:{Origin:'https://club.example'}});assert.equal(ok.status,200);assert.equal(ok.headers.get('Access-Control-Allow-Origin'),'https://club.example');assert.equal((await ok.json()).teamSlug,'test-u15');assert.equal(authCalls,0);
   const invalid=await fetch(base+'/api/sportcorico?url='+encodeURIComponent('http://localhost/'),{headers:{Origin:'https://club.example'}});assert.equal(invalid.status,400);
  }finally{app.server.closeAllConnections();await new Promise(resolve=>app.server.close(resolve));fs.rmSync(directory,{recursive:true,force:true});}
+});
+
+test('club search keeps football clubs with an allowed logo only',()=>{
+ const row=(slug,name,sport,logo)=>'<a href="/clubs/'+slug+'" class="rs-row rs-item" data-v-1><span class="rs-row__logo"><img src="'+logo+'" alt></span><span class="rs-row__text"><span class="rs-row__name">'+name+'</span><span class="rs-row__meta">Laval &amp; Mayenne</span></span><span class="rs-row__sport"><span class="rs-row__sport-name">'+sport+'</span></span></a>';
+ const html=row('fc-test','FC Test','Football','https://s3.pub2.infomaniak.cloud/x/logo.jpg')+row('rugby-test','Rugby Test','Rugby','https://s3.pub2.infomaniak.cloud/x/r.jpg')+row('fc-evil','FC Evil','Football','https://evil.example/logo.jpg');
+ assert.deepEqual(parseClubSearch(html),[{slug:'fc-test',name:'FC Test',city:'Laval & Mayenne',logo:'https://s3.pub2.infomaniak.cloud/x/logo.jpg'},{slug:'fc-evil',name:'FC Evil',city:'Laval & Mayenne',logo:''}]);
 });

@@ -23,7 +23,12 @@ dialog.club-onboarding::backdrop{background:#0b1d3a99}
 .club-onboarding-help a{color:#2855a2;font-weight:700}
 .club-onboarding-found{display:flex;flex-wrap:wrap;gap:6px}
 .club-onboarding-found .club-onboarding-help{flex:1 1 100%}
-.club-onboarding-club{min-height:36px;padding:0 12px;border:1px solid #cfd8e6;border-radius:999px;background:#fff;color:#1b2a41;font-size:13px;cursor:pointer}
+.club-onboarding-found{flex-direction:column;flex-wrap:nowrap}
+.club-onboarding-club{display:flex;align-items:center;gap:12px;width:100%;min-height:52px;padding:6px 12px;border:1px solid #cfd8e6;border-radius:12px;background:#fff;color:#1b2a41;font:inherit;text-align:left;cursor:pointer}
+.club-onboarding-club img{width:36px;height:36px;object-fit:contain;flex:none}
+.club-onboarding-club-text{display:flex;flex-direction:column;min-width:0}
+.club-onboarding-club-text span{font-size:15px;font-weight:700}
+.club-onboarding-club-text small{font-size:12px;color:#53617b}
 .club-onboarding-picked{display:flex;align-items:center;gap:12px}
 .club-onboarding-picked:has(.club-onboarding-logo[hidden]):not(:has(.club-onboarding-chosen:not(:empty))){display:none}
 .club-onboarding-chosen{margin:0;font-size:18px;font-weight:800;color:#0b2e8a}
