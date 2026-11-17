@@ -3,7 +3,7 @@ const coachClubDetailsKey = "vestiaire-club-details";
 function coachClubDetailsDefaults() {
   return {
     version: 1,
-    name: "Stade Mayennais",
+    name: "Mon club",
     city: "",
     stadium: "",
     email: "",

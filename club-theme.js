@@ -213,7 +213,14 @@
   let logoObserver = null;
   // Site identity images are recognised by marker (.club-logo, header) or by the
   // original file, not only by their current URL (a composition may carry its own logo).
-  const identity = (img) => img.matches(".club-logo, header img, .account-club-brand img") || (img.getAttribute("src") || "").includes(LOGO);
+  const identity = (img) => !img.closest(".cruza-lockup") && (img.matches(".club-logo, header img, .account-club-brand img") || img.dataset.clubLogoOriginal !== undefined || (img.getAttribute("src") || "").includes(LOGO));
+  // Without an uploaded logo, a round badge with the club initials (the Stade Mayennais crest only stays for that club).
+  function initialsBadge(name, color) {
+    const initials = String(name || "").trim().split(/\s+/).filter(Boolean).slice(0, 2).map((w) => Array.from(w)[0]).join("").toLocaleUpperCase("fr-FR") || "C";
+    const safe = initials.replace(/[<>&"']/g, "");
+    const svg = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120"><circle cx="60" cy="60" r="58" fill="' + color + '"/><text x="60" y="62" text-anchor="middle" dominant-baseline="central" font-family="Arial,Helvetica,sans-serif" font-weight="700" font-size="' + (safe.length > 1 ? 46 : 58) + '" fill="#ffffff">' + safe + "</text></svg>";
+    return "data:image/svg+xml;charset=utf-8," + encodeURIComponent(svg);
+  }
   function swapLogo(img, logo) {
     if (!identity(img)) return;
     if (logo) {
@@ -228,11 +235,13 @@
     }
   }
   function applyLogo(details) {
-    const logo = /^data:image\/(jpeg|png|webp);base64,/.test(details?.logo || "") ? details.logo : "";
+    const uploaded = /^data:image\/(jpeg|png|webp);base64,/.test(details?.logo || "") ? details.logo : "";
+    const clubName = typeof clubDisplayName === "function" ? clubDisplayName() : details?.name || "";
+    const logo = uploaded || (/stade mayennais/i.test(clubName) ? "" : initialsBadge(clubName, shirtColor || DEFAULTS.primary));
     for (const img of document.querySelectorAll("img")) swapLogo(img, logo);
     for (const link of document.querySelectorAll('link[rel~="icon"], link[rel="apple-touch-icon"]')) {
       if (!link.dataset.clubLogoOriginal) link.dataset.clubLogoOriginal = link.getAttribute("href");
-      link.setAttribute("href", logo || link.dataset.clubLogoOriginal);
+      link.setAttribute("href", uploaded || link.dataset.clubLogoOriginal);
     }
     logoObserver?.disconnect();
     logoObserver = new MutationObserver((records) => {
