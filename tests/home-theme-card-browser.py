@@ -1,11 +1,13 @@
 from playwright.sync_api import sync_playwright
+import os
+BASE=os.environ.get("TEST_BASE_URL","http://127.0.0.1:3113")
 with sync_playwright() as p:
  b=p.chromium.launch(executable_path='/usr/bin/chromium',args=['--no-sandbox'])
  for path in ['', 'apercu-educateur/']:
   for w in [1440,390]:
    pg=b.new_page(viewport={'width':w,'height':900},reduced_motion='reduce');errors=[];pg.on('pageerror',lambda e:errors.append(str(e)))
-   pg.route('**/*',lambda r:r.continue_() if r.request.url.startswith('http://127.0.0.1:3113') else r.abort())
-   pg.goto('http://127.0.0.1:3113/'+path+'index.html?mode=local');pg.wait_for_function("document.body.classList.contains('home-has-slides')")
+   pg.route('**/*',lambda r:r.continue_() if r.request.url.startswith(BASE) else r.abort())
+   pg.goto(BASE+'/'+path+'index.html?mode=local');pg.wait_for_function("document.body.classList.contains('home-has-slides')")
    pg.wait_for_timeout(1500)
    assert pg.evaluate('document.documentElement.scrollWidth<=innerWidth+1')
    assert pg.evaluate("getComputedStyle(document.getElementById('home-backdrop')).maskImage==='none'")

@@ -23,6 +23,10 @@ with sync_playwright() as p:
  page.wait_for_timeout(300);assert page.locator('#view-management').is_hidden()
  allowed[0]=True;page.evaluate("document.dispatchEvent(new CustomEvent('club-session-ready'))");page.wait_for_selector('#view-management:not([hidden])')
  assert page.locator('#view-management .navigation-icon').count()==1
+ # Phones keep the role-authorized entry in the profile menu.
+ page.set_viewport_size({'width':390,'height':844});page.locator('#coach-profile-trigger').click()
+ page.get_by_role('button',name='Responsable',exact=True).wait_for(state='visible')
+ page.locator('#coach-profile-trigger').click();page.set_viewport_size({'width':1440,'height':1000})
  # Seed the normal session bridge used by the real app; do not create a new login store.
  page.evaluate("sessionStorage.setItem('vestiaire-private-session:https://fake-cruza.supabase.co',JSON.stringify({session:clubNetworkSession}))")
  page.locator('#view-management').click();page.wait_for_url('**/manager.html');page.wait_for_selector('#content:not([hidden])')
