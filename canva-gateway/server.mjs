@@ -1,4 +1,4 @@
-import {sportcoricoReader,sportcoricoSearcher,sportcoricoTeamLister} from './sportcorico.mjs';
+import {sportcoricoReader,sportcoricoSearcher,sportcoricoTeamLister,sportcoricoLogoLoader} from './sportcorico.mjs';
 import http from 'node:http';
 import fs from 'node:fs';
 import path from 'node:path';
@@ -95,7 +95,7 @@ export function createCanvaGateway(config,{fetcher=fetch,auth=token=>authorize(t
   for await(const chunk of req){size+=chunk.length;if(size>max)throw tooLarge();chunks.push(chunk);}
   return Buffer.concat(chunks);
  }
- const readSportcorico=sportcoricoReader(fetcher,now),searchSportcorico=sportcoricoSearcher(fetcher,now),listSportcoricoTeams=sportcoricoTeamLister(fetcher,now);
+ const readSportcorico=sportcoricoReader(fetcher,now),searchSportcorico=sportcoricoSearcher(fetcher,now),listSportcoricoTeams=sportcoricoTeamLister(fetcher,now),loadSportcoricoLogo=sportcoricoLogoLoader(fetcher,now);
  const server=http.createServer(async(req,res)=>{
   res.setHeader('Cache-Control','no-store');res.setHeader('X-Content-Type-Options','nosniff');res.setHeader('Referrer-Policy','no-referrer');
   res.setHeader('Content-Security-Policy',"default-src 'none'; frame-ancestors 'none'");
@@ -148,6 +148,9 @@ export function createCanvaGateway(config,{fetcher=fetch,auth=token=>authorize(t
    }
    if(route.pathname==='/api/sportcorico-search'&&req.method==='GET'){
     try{return send(200,await searchSportcorico(route.searchParams.get('q')));}catch(e){return send(e.status||502,{message:e.status===400?e.message:'Recherche Sportcorico temporairement indisponible.'});}
+   }
+   if(route.pathname==='/api/sportcorico-logo'&&req.method==='GET'){
+    try{return send(200,await loadSportcoricoLogo(route.searchParams.get('url')));}catch(e){return send(e.status||502,{message:e.status===400?e.message:'Logo temporairement indisponible.'});}
    }
    if(route.pathname==='/api/sportcorico-teams'&&req.method==='GET'){
     try{return send(200,await listSportcoricoTeams(route.searchParams.get('slug')));}catch(e){return send(e.status||502,{message:e.status===400?e.message:'Équipes Sportcorico temporairement indisponibles.'});}
