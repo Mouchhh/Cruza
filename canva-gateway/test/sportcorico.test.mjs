@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {sportcoricoSource,parseSportcorico,sportcoricoReader,parseClubSearch,parseGames,parseClubTeams,splitTeams,competitionAge,sameCompetition,sportcoricoLogoLoader} from '../sportcorico.mjs';
+import {sportcoricoSource,parseSportcorico,sportcoricoReader,parseClubSearch,parseGames,parseClubTeams,splitTeams,competitionAge,sameCompetition,sportcoricoLogoLoader,competitionKind} from '../sportcorico.mjs';
 const source='https://www.sportcorico.com/clubs/test-club/test-u15';
 function page(){
  const nodes=[['ShallowReactive',1],null];
@@ -68,4 +68,11 @@ test('club logo is only loaded from the allowed Sportcorico image host, as a saf
  assert.equal(data.type,'image/png');assert.equal(Buffer.from(data.base64,'base64').length,8);
  await assert.rejects(()=>load('https://evil.example/a.png'),/Logo invalide/);
  await assert.rejects(()=>sportcoricoLogoLoader(async()=>new Response('<svg/>',{headers:{'content-type':'image/svg+xml'}}))('https://s3.pub2.infomaniak.cloud/x.svg'),/Format/);
+});
+
+test('veterans competitions never count as the matches of a seniors team',()=>{
+ assert.equal(competitionKind('Vétérans - Vendredi'),'vet');
+ assert.equal(competitionKind('Coupe Vétérans ALTONÉO - V'),'vet');
+ assert.equal(competitionKind('Régional 2'),'senior');
+ assert.equal(competitionKind('U17 Division 1'),'U17');
 });

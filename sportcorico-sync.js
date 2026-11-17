@@ -52,6 +52,13 @@
         map.set(fixture.key, fixture);
         changed++;
       }
+      // Sportcorico fait foi : un match Sportcorico qui n'est plus dans la liste (ex. matchs « Vétérans » importés par erreur) est retiré.
+      const current_keys = new Set(fixtures(data).map((f) => f.key));
+      for (const key of [...map.keys()])
+        if (key.startsWith(PREFIX) && !current_keys.has(key)) {
+          map.delete(key);
+          changed++;
+        }
       if (changed) coachStorageSet("vestiaire-pasted-fixtures", JSON.stringify({ version: 1, fixtures: [...map.values()] }));
       return changed;
     } catch {

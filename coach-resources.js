@@ -8,17 +8,7 @@
     ["media", "Vidéos et animations"],
   ];
   const documents = [
-    {
-      id: "coups-de-pied-arretes",
-      title: "Les coups de pied arrêtés",
-      category: "tactics",
-      description:
-        "Repères, rôles et schémas pour travailler les coups de pied arrêtés.",
-      kind: "html",
-      format: "Guide",
-      tags: ["CPA", "Corners", "Coups francs"],
-      url: "assets/resources/coups-de-pied-arretes.html",
-    },
+    // Le guide « Les coups de pied arrêtés » n'est plus proposé (fichier conservé dans assets/resources/).
     {
       id: "preparation-physique",
       title: "La préparation physique",

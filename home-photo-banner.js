@@ -17,7 +17,12 @@
       link = document.createElement("button"),
       close = document.createElement("button");
     box.className = "home-photo-banner";
+    // Toujours rouge, quelle que soit la couleur du club (le thème ne touche pas aux styles directs).
+    box.style.setProperty("background", "#c62828", "important");
+    box.style.setProperty("color", "#ffffff", "important");
+    box.style.setProperty("opacity", "1", "important");
     box.setAttribute("role", "note");
+    text.style.setProperty("color", "#ffffff", "important");
     text.textContent = "Ajoutez les photos de votre club dans la bibliothèque : elles servent à personnaliser vos causeries.";
     link.type = close.type = "button";
     link.className = "home-photo-banner-link";
