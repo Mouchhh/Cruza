@@ -1,0 +1,44 @@
+/* Fenêtre de première connexion : identité du club. */
+dialog.club-onboarding{width:min(480px,calc(100vw - 24px));max-height:calc(100dvh - 24px);padding:0;border:0;border-radius:18px;background:#fff;color:#1b2a41;box-shadow:0 24px 80px #0b1d3a55;overflow:auto}
+dialog.club-onboarding::backdrop{background:#0b1d3a99}
+.club-onboarding-form{display:flex;flex-direction:column;gap:14px;padding:26px 24px 22px}
+.club-onboarding-form h2{margin:0;font-size:24px;letter-spacing:-.4px;color:#0b2e8a}
+.club-onboarding-intro{margin:0;font-size:14px;line-height:1.6;color:#53617b}
+.club-onboarding-field{display:flex;flex-direction:column;gap:6px;font-size:13px;font-weight:700;color:#304f75}
+.club-onboarding-field input[type=text],.club-onboarding-field input[type=file]{font:inherit;font-size:16px;font-weight:400;padding:10px 12px;border:1px solid #cfd8e6;border-radius:10px;background:#fff;color:#1b2a41;min-height:44px}
+.club-onboarding-field input[type=color]{width:100%;height:44px;padding:3px;border:1px solid #cfd8e6;border-radius:10px;background:#fff;cursor:pointer}
+.club-onboarding-colors{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.club-onboarding-logo{width:72px;height:72px;object-fit:contain;border-radius:50%;border:1px solid #dbe1eb;align-self:flex-start}
+.club-onboarding-logo[hidden]{display:none}
+.club-onboarding-status{margin:0;min-height:0;font-size:13px;color:#b3261e}
+.club-onboarding-status:empty{display:none}
+.club-onboarding-actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:4px}
+.club-onboarding-actions button{flex:1 1 180px;min-height:46px;border-radius:12px;font-size:15px;font-weight:700;cursor:pointer}
+.club-onboarding-actions .primary{border:1px solid #2855a2;background:#2855a2;color:#fff}
+.club-onboarding-actions .export{border:1px solid #cfd8e6;background:#fff;color:#2855a2}
+.club-onboarding :focus-visible{outline:3px solid #7ea2dd;outline-offset:2px}
+.club-onboarding-linkrow{display:flex;flex-direction:column;gap:8px}
+.club-onboarding-linkrow button{min-height:44px;border:1px solid #cfd8e6;border-radius:12px;background:#fff;color:#2855a2;font-size:15px;font-weight:700;cursor:pointer}
+.club-onboarding-help{margin:0;font-size:13px;line-height:1.5;color:#53617b}
+.club-onboarding-help a{color:#2855a2;font-weight:700}
+.club-onboarding-found{display:flex;flex-wrap:wrap;gap:6px}
+.club-onboarding-found .club-onboarding-help{flex:1 1 100%}
+.club-onboarding-found{flex-direction:column;flex-wrap:nowrap}
+.club-onboarding-club{display:flex;align-items:center;gap:12px;width:100%;min-height:52px;padding:6px 12px;border:1px solid #cfd8e6;border-radius:12px;background:#fff;color:#1b2a41;font:inherit;text-align:left;cursor:pointer}
+.club-onboarding-club img{width:36px;height:36px;object-fit:contain;flex:none}
+.club-onboarding-club-text{display:flex;flex-direction:column;min-width:0}
+.club-onboarding-club-text span{font-size:15px;font-weight:700}
+.club-onboarding-club-text small{font-size:12px;color:#53617b}
+.club-onboarding-picked{display:flex;align-items:center;gap:12px}
+.club-onboarding-picked:has(.club-onboarding-logo[hidden]):not(:has(.club-onboarding-chosen:not(:empty))){display:none}
+.club-onboarding-chosen{margin:0;font-size:18px;font-weight:800;color:#0b2e8a}
+@media print{dialog.club-onboarding{display:none}}
+/* Le site transforme toutes les fenêtres en feuilles plein écran : ici, une carte centrée. */
+html body dialog.club-onboarding.workspace-sheet{position:fixed!important;inset:auto!important;top:50%!important;left:50%!important;transform:translate(-50%,-50%)!important;width:min(480px,calc(100vw - 24px))!important;height:auto!important;max-height:calc(100dvh - 24px)!important;border-radius:18px!important;background:#fff!important;box-shadow:0 0 0 100vmax #0b1d3a99,0 24px 80px #0b1d3a55!important;padding:0!important}
+html body dialog.club-onboarding.workspace-sheet::after,html body dialog.club-onboarding.workspace-sheet::before{content:none!important;display:none!important}
+.club-picker{display:flex;flex-direction:column;gap:10px;margin:6px 0 14px;padding:14px;border:1px solid #cfd8e6;border-radius:14px;background:#f6f9ff}
+.club-picker h3{margin:0;font-size:16px;color:#0b2e8a}
+.club-picker input[type=text]{font:inherit;font-size:16px;padding:10px 12px;border:1px solid #cfd8e6;border-radius:10px;min-height:44px}
+.club-picker>.club-onboarding-found>button.export{min-height:44px;border:1px solid #cfd8e6;border-radius:12px;background:#fff;color:#2855a2;font-weight:700;cursor:pointer}
+.club-picker-change{align-self:flex-start;min-height:40px;padding:0 14px;border:1px solid #cfd8e6;border-radius:12px;background:#fff;color:#2855a2;font-size:14px;font-weight:700;cursor:pointer;margin-top:4px}
+.coach-team-manual{margin:14px 0 0}.coach-team-manual>summary{cursor:pointer;color:#47617b;font-size:14px;padding:8px 0}

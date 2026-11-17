@@ -1,4 +1,4 @@
-import {sportcoricoReader} from './sportcorico.mjs';
+import {sportcoricoReader,sportcoricoSearcher,sportcoricoTeamLister} from './sportcorico.mjs';
 import http from 'node:http';
 import fs from 'node:fs';
 import path from 'node:path';
@@ -95,7 +95,7 @@ export function createCanvaGateway(config,{fetcher=fetch,auth=token=>authorize(t
   for await(const chunk of req){size+=chunk.length;if(size>max)throw tooLarge();chunks.push(chunk);}
   return Buffer.concat(chunks);
  }
- const readSportcorico=sportcoricoReader(fetcher,now);
+ const readSportcorico=sportcoricoReader(fetcher,now),searchSportcorico=sportcoricoSearcher(fetcher,now),listSportcoricoTeams=sportcoricoTeamLister(fetcher,now);
  const server=http.createServer(async(req,res)=>{
   res.setHeader('Cache-Control','no-store');res.setHeader('X-Content-Type-Options','nosniff');res.setHeader('Referrer-Policy','no-referrer');
   res.setHeader('Content-Security-Policy',"default-src 'none'; frame-ancestors 'none'");
@@ -146,8 +146,14 @@ export function createCanvaGateway(config,{fetcher=fetch,auth=token=>authorize(t
    if(req.method==='OPTIONS'){
     res.setHeader('Access-Control-Allow-Methods','GET, POST, DELETE, OPTIONS');res.setHeader('Access-Control-Allow-Headers','Authorization, Content-Type, X-Design-Title');res.writeHead(204);return res.end();
    }
+   if(route.pathname==='/api/sportcorico-search'&&req.method==='GET'){
+    try{return send(200,await searchSportcorico(route.searchParams.get('q')));}catch(e){return send(e.status||502,{message:e.status===400?e.message:'Recherche Sportcorico temporairement indisponible.'});}
+   }
+   if(route.pathname==='/api/sportcorico-teams'&&req.method==='GET'){
+    try{return send(200,await listSportcoricoTeams(route.searchParams.get('slug')));}catch(e){return send(e.status||502,{message:e.status===400?e.message:'Équipes Sportcorico temporairement indisponibles.'});}
+   }
    if(route.pathname==='/api/sportcorico'&&req.method==='GET'){
-    try{return send(200,await readSportcorico(route.searchParams.get('url')));}catch(e){return send(e.status||502,{message:e.status===400?e.message:'Classement Sportcorico temporairement indisponible.'});}
+    try{return send(200,await readSportcorico(route.searchParams.get('url'),route.searchParams.get('competition')||''));}catch(e){return send(e.status||502,{message:e.status===400?e.message:'Classement Sportcorico temporairement indisponible.'});}
    }
    const owner=await auth((req.headers.authorization||'').replace(/^Bearer /,''));if(!uuid.test(owner||''))throw error('Compte invalide.',401);
    const rate=rates.get(owner)||{count:0,until:now()+60000};if(++rate.count>60)throw error('Trop de demandes. Réessayez dans une minute.',429);rates.set(owner,rate);

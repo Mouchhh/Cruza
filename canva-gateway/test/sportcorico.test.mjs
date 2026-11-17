@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {sportcoricoSource,parseSportcorico,sportcoricoReader} from '../sportcorico.mjs';
+import {sportcoricoSource,parseSportcorico,sportcoricoReader,parseClubSearch,parseGames,parseClubTeams,splitTeams,competitionAge,sameCompetition} from '../sportcorico.mjs';
 const source='https://www.sportcorico.com/clubs/test-club/test-u15';
 function page(){
  const nodes=[['ShallowReactive',1],null];
@@ -32,4 +32,30 @@ test('gateway route checks site origin and serves public rankings without club c
   const ok=await fetch(base+'/api/sportcorico?url='+encodeURIComponent(source),{headers:{Origin:'https://club.example'}});assert.equal(ok.status,200);assert.equal(ok.headers.get('Access-Control-Allow-Origin'),'https://club.example');assert.equal((await ok.json()).teamSlug,'test-u15');assert.equal(authCalls,0);
   const invalid=await fetch(base+'/api/sportcorico?url='+encodeURIComponent('http://localhost/'),{headers:{Origin:'https://club.example'}});assert.equal(invalid.status,400);
  }finally{app.server.closeAllConnections();await new Promise(resolve=>app.server.close(resolve));fs.rmSync(directory,{recursive:true,force:true});}
+});
+
+test('club search keeps football clubs with an allowed logo only',()=>{
+ const row=(slug,name,sport,logo)=>'<a href="/clubs/'+slug+'" class="rs-row rs-item" data-v-1><span class="rs-row__logo"><img src="'+logo+'" alt></span><span class="rs-row__text"><span class="rs-row__name">'+name+'</span><span class="rs-row__meta">Laval &amp; Mayenne</span></span><span class="rs-row__sport"><span class="rs-row__sport-name">'+sport+'</span></span></a>';
+ const html=row('fc-test','FC Test','Football','https://s3.pub2.infomaniak.cloud/x/logo.jpg')+row('rugby-test','Rugby Test','Rugby','https://s3.pub2.infomaniak.cloud/x/r.jpg')+row('fc-evil','FC Evil','Football','https://evil.example/logo.jpg');
+ assert.deepEqual(parseClubSearch(html),[{slug:'fc-test',name:'FC Test',city:'Laval & Mayenne',logo:'https://s3.pub2.infomaniak.cloud/x/logo.jpg'},{slug:'fc-evil',name:'FC Evil',city:'Laval & Mayenne',logo:''}]);
+});
+
+test('team games keep only this team, valid dates and scores',()=>{
+ const game=(id,extra)=>({id,home_team_id:1,outside_team_id:2,home_team_name:'A',outside_team_name:'B',event_date:'2026-10-10 17:00',planned_time:'17:00',championship_name:'U17 D1',status:'Terminé',home_score:2,outside_score:1,...extra});
+ const games=parseGames([game(1,{}),game(2,{status:'À venir',home_score:null,outside_score:null}),game(3,{home_team_id:8,outside_team_id:9}),game(4,{event_date:'bad'}),game(5,{exempt:true})],1);
+ assert.deepEqual(games.map(g=>[g.id,g.status,g.homeScore]),[[1,'played',2],[2,'planned',undefined]]);
+});
+test('club teams are read from the public club page',()=>{
+ const html='<a href="/clubs/fc-test/fc-test-3" class="x"><span>U17 1</span><span>Régional 2 POULE B</span></a><a href="/clubs/fc-test/fc-test-3"><span>U17 1</span></a><a href="/clubs/other/x"><span>Autre</span></a>';
+ assert.deepEqual(parseClubTeams(html,'fc-test'),[{slug:'fc-test-3',name:'U17 1',competition:'Régional 2 POULE B',url:'https://www.sportcorico.com/clubs/fc-test/fc-test-3'}]);
+});
+
+test('a team playing two age categories is split, cups and friendlies stay with the main team',()=>{
+ const teams=[{slug:'t-2',name:'U15 1',competitions:['Régional 2 U15 POULE B','U14 Division 1','Coupe District U15','MATCHES AMICAUX U 16']},{slug:'t-4',name:'U19 1',competitions:['Régional 2 U 18 POULE B','MATCHES AMICAUX U 19','COUPE GAMBARDELLA']}];
+ const out=splitTeams(teams,'club');
+ assert.deepEqual(out.map(t=>t.name),['U15 1','U14','U18 1']);
+ assert.equal(out[1].split,'U14 Division 1');
+ assert.equal(competitionAge('Régional 2 U 18'),18);
+ assert.ok(sameCompetition('U14 Division 1','U14 Division 1 Groupe unique'));
+ assert.ok(!sameCompetition('U14 Division 1','Régional 2 U15'));
 });

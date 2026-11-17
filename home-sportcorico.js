@@ -48,8 +48,8 @@ async function refreshHomeSportcorico(){
  homeSportcoricoLoading=true;homeSportcoricoChecked=Date.now();
  try{
   const source=homeSportcoricoSourceURL(),gateway=window.CLUB_RANKING_GATEWAY||window.CLUB_CANVA_GATEWAY;
-  const url=source===homeSportcoricoDefaultSource?'data/sportcorico-u17.json':gateway?gateway.replace(/\/$/,'')+'/api/sportcorico?url='+encodeURIComponent(source):'';
-  if(!url)throw Error('Service not configured');const response=await fetch(url,{cache:'no-store',credentials:'omit',signal:AbortSignal.timeout(20000)});if(!response.ok)throw Error('Snapshot unavailable');const data=await response.json();if(source!==homeSportcoricoSourceURL()||!homeSportcoricoValid(data,source))throw Error('Invalid snapshot');homeSportcoricoData=data;homeSportcoricoError=false;
+  const url=source===homeSportcoricoDefaultSource?'data/sportcorico-u17.json':gateway?gateway.replace(/\/$/,'')+'/api/sportcorico?url='+encodeURIComponent(source)+(activeCoachTeam.sportcoricoCompetition?'&competition='+encodeURIComponent(activeCoachTeam.sportcoricoCompetition):''):'';
+  if(!url)throw Error('Service not configured');const response=await fetch(url,{cache:'no-store',credentials:'omit',signal:AbortSignal.timeout(20000)});if(!response.ok)throw Error('Snapshot unavailable');const data=await response.json();if(source!==homeSportcoricoSourceURL()||!homeSportcoricoValid(data,source))throw Error('Invalid snapshot');homeSportcoricoData=data;homeSportcoricoError=false;window.sportcoricoSync?.store(data);
  }
  catch{homeSportcoricoError=true;}
  finally{homeSportcoricoLoading=false;if(document.body.classList.contains('home-mode'))renderHomeWidgets();}

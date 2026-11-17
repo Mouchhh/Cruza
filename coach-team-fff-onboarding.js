@@ -29,6 +29,16 @@ function coachFFFApplyProfiles(profiles){
  if(merged.size>100)throw Error('100 équipes maximum.');
  coachTeams=[...merged.values()];localStorage.setItem(coachTeamManifestKey,JSON.stringify(coachTeams));coachTeamsRefreshSelector();
 }
+// Retire une équipe supprimée du compte (sinon elle serait remise à la prochaine ouverture ou sur un autre appareil).
+async function coachFFFForget(id){
+ if(typeof clubNetworkBound!=='function'||!clubNetworkBound())return;
+ try{
+  const user=await clubNetworkRequest('/auth/v1/user'),all=Array.isArray(user.user_metadata?.[coachFFFMetadataKey])?user.user_metadata[coachFFFMetadataKey]:[],rest=all.filter(p=>p?.id!==id);
+  if(rest.length===all.length)return;
+  const data={[coachFFFMetadataKey]:rest};if(user.user_metadata?.stade_active_team_v1===id)data.stade_active_team_v1=rest.find(coachFFFProfileValid)?.id||'';
+  await clubNetworkRequest('/auth/v1/user',{method:'PUT',body:{data}});
+ }catch{/* La suppression locale reste valable ; le compte sera nettoyé à une prochaine suppression. */}
+}
 async function coachFFFEnsure(){
  if(!clubNetworkBound())return false;
  if(coachFFFProfileValid(activeCoachTeam))return true;
@@ -38,7 +48,7 @@ async function coachFFFEnsure(){
   try{
    const user=await clubNetworkRequest('/auth/v1/user');
    if(!clubNetworkBound()||clubNetworkSession.user.id!==userId||trainingAgendaIdentity()!==owner)return false;
-   const profiles=Array.isArray(user.user_metadata?.[coachFFFMetadataKey])?user.user_metadata[coachFFFMetadataKey].filter(coachFFFProfileValid):[];
+   const profiles=Array.isArray(user.user_metadata?.[coachFFFMetadataKey])?user.user_metadata[coachFFFMetadataKey].filter(p=>coachFFFProfileValid(p)&&!coachTeamRemoved.has(p.id)):[]; // une équipe supprimée ici n'est jamais ressortie du compte (sinon rechargement sans fin)
    if(profiles.length){
     const hadConfiguredTeam=coachTeams.some(coachFFFProfileValid);
     coachFFFApplyProfiles(profiles);
@@ -79,7 +89,14 @@ function coachFFFOpen({add=false}={}){
  const queue=el('section','coach-fff-queue');queue.setAttribute('aria-label','Équipes à enregistrer');
  const another=el('button','export','+ Ajouter une autre équipe');another.type='button';
  const footer=el('div','coach-fff-footer');footer.append(another,save);
- form.append(queue,search,results,fallback,status,footer);panel.append(form);document.body.append(panel);window.workspaceSheets?.prioritize(panel);category.focus();
+ form.append(queue,search,results,fallback,status,footer);panel.append(form);document.body.append(panel);
+ // Sportcorico d'abord : le club puis ses équipes, un clic. Le formulaire FFF reste dessous pour les cas particuliers.
+ {const manual=el('details','coach-fff-manual'),holder=el('div');
+  manual.append(el('summary','','Configurer à la main (lien FFF)'),...[...form.children].slice(2));
+  form.append(holder,manual);
+  window.clubSportcorico?.mountPicker(holder,()=>panel.remove());
+  manual.open=!holder.children.length;
+  if(holder.children.length){const intro=form.children[1];if(intro)intro.textContent='Tapez le nom de votre club puis touchez vos équipes : le calendrier, le classement et la forme se remplissent tout seuls.';}}window.workspaceSheets?.prioritize(panel);category.focus();
  let chosen=null,run=0,pending=[],selectedId='',canEditActive=!add,draftId='team-'+crypto.randomUUID();
  const context=()=>JSON.stringify([category.value,gender.value,number.value,format.value,level.value,season.value]);
  const isOwner=()=>clubNetworkBound()&&clubNetworkSession.user.id===userId&&trainingAgendaIdentity()===owner;

@@ -800,7 +800,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const calendarEvents = agendaCalendarEvents;
   agendaCalendarEvents = function () {
     return calendarEvents().map((event) => {
-      if (event.recurring) return event;
+      if (event.recurring || event.otherTeam) return event; // match d'une autre équipe : s'ouvre dans l'interface de cette équipe
       if (event.kind === "match")
         return {
           ...event,

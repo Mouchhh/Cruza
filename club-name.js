@@ -1,6 +1,7 @@
 // Le nom du club saisi dans Paramètres → Mon club s'applique partout : textes de l'écran, titre de la page,
 // exports (images, PowerPoint). Le nom d'origine « Stade Mayennais » sert de repère à remplacer.
-const clubDefaultName = "Stade Mayennais";
+const clubDefaultName = "Stade Mayennais"; // texte d'origine à remplacer
+const clubFallbackName = "Mon club"; // nom affiché tant que le club n'est pas configuré
 function clubDisplayName() {
   try {
     const stored = JSON.parse(coachStorageGet("vestiaire-club-details") || "null");
@@ -9,7 +10,7 @@ function clubDisplayName() {
   } catch {
     /* Storage not ready or unreadable: the default name stays. */
   }
-  return clubDefaultName;
+  return clubFallbackName;
 }
 function clubDisplayNameUpper() {
   return clubDisplayName().toLocaleUpperCase("fr-FR");
