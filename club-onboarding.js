@@ -91,7 +91,7 @@
     const dialog = text("dialog", "club-onboarding"),
       form = text("form", "club-onboarding-form"),
       title = text("h2", "", "Bienvenue sur Cruza"),
-      intro = text("p", "club-onboarding-intro", "Donnez une identité à votre espace. Cela ne prend qu’une minute et reste modifiable à tout moment dans Paramètres → Mon club."),
+      intro = text("p", "club-onboarding-intro", "Collez le lien Sportcorico de votre équipe : le nom, le logo et les couleurs de votre club se règlent tout seuls. Tout reste modifiable dans votre compte."),
       status = text("p", "club-onboarding-status");
     dialog.setAttribute("aria-labelledby", "club-onboarding-title");
     title.id = "club-onboarding-title";
@@ -150,14 +150,14 @@
     linkInput.type = "text";
     linkInput.inputMode = "url";
     linkInput.placeholder = "https://www.sportcorico.com/clubs/…";
-    const find = text("button", "export", "Récupérer mon club"),
+    const chosen = text("p", "club-onboarding-chosen"),
+      find = text("button", "export", "Récupérer mon club"),
       linkRow = text("div", "club-onboarding-linkrow"),
       help = text("p", "club-onboarding-help"),
       found = text("div", "club-onboarding-found");
     find.type = "button";
     linkRow.append(field("Lien Sportcorico de votre équipe (le plus simple)", linkInput), find);
-    help.append("Pas de lien ? ");
-    const helpLink = document.createElement("a");
+        const helpLink = document.createElement("a");
     helpLink.href = "https://www.sportcorico.com";
     helpLink.target = "_blank";
     helpLink.rel = "noopener noreferrer";
@@ -166,6 +166,7 @@
     async function pick(row) {
       status.textContent = "";
       name.value = cleanTeamName(row.team).slice(0, 70);
+      chosen.textContent = name.value;
       const logoUrl = typeof row.logo === "string" ? row.logo : "";
       try {
         const u = new URL(logoUrl);
@@ -178,7 +179,7 @@
         if (colorsFound.primary) primary.value = colorsFound.primary;
         if (colorsFound.secondary) secondary.value = colorsFound.secondary;
       } catch {
-        status.textContent = "Nom récupéré, mais pas le logo : vous pouvez l’ajouter ci-dessous.";
+        status.textContent = "Nom récupéré, mais pas le logo : vous pourrez l’ajouter dans votre compte.";
       }
     }
     find.onclick = async () => {
@@ -191,7 +192,7 @@
         return;
       }
       if (!gateway) {
-        status.textContent = "Récupération indisponible ici : renseignez le club à la main.";
+        status.textContent = "Récupération indisponible pour le moment : réglez votre club dans votre compte.";
         return;
       }
       find.disabled = true;
@@ -214,13 +215,15 @@
           }
         }
       } catch {
-        status.textContent = "Impossible de lire ce lien pour l’instant. Vérifiez l’adresse ou renseignez le club à la main.";
+        status.textContent = "Impossible de lire ce lien pour l’instant. Vérifiez l’adresse ou passez cette étape et réglez le club dans votre compte.";
       } finally {
         find.disabled = false;
         find.textContent = "Récupérer mon club";
       }
     };
-    form.append(title, intro, linkRow, help, found, field("Nom du club", name), colors, logoWrap, preview, status, actions);
+    const picked = text("div", "club-onboarding-picked");
+    picked.append(preview, chosen);
+    form.append(title, intro, linkRow, help, picked, found, status, actions);
     dialog.append(form);
     document.body.append(dialog);
     const finish = () => {
@@ -236,8 +239,8 @@
     form.onsubmit = (event) => {
       event.preventDefault();
       if (!name.value.trim()) {
-        status.textContent = "Indiquez le nom de votre club.";
-        name.focus();
+        status.textContent = "Collez le lien Sportcorico puis touchez « Récupérer mon club », ou passez cette étape.";
+        linkInput.focus();
         return;
       }
       try {
@@ -258,7 +261,7 @@
       }
     };
     dialog.showModal();
-    name.focus();
+    linkInput.focus();
   }
   const check = () => setTimeout(open, 600);
   document.addEventListener("DOMContentLoaded", check);
