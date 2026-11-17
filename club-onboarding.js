@@ -72,7 +72,8 @@
     }
     return (await fetch(url, { credentials: "omit", referrerPolicy: "no-referrer" })).blob();
   }
-  // Couleurs dominantes d'un logo (on ignore blanc, noir et gris).
+  // Couleurs d'un logo : la teinte dominante, puis une AUTRE teinte (pas une variante plus claire de la première).
+  // Blanc, noir et gris sont ignorés ; si le logo n'a qu'une couleur, la seconde est un noir bleuté ou la première foncée.
   async function logoColors(blob) {
     const bitmap = await createImageBitmap(blob);
     try {
@@ -82,21 +83,35 @@
       ctx.drawImage(bitmap, 0, 0, 48, 48);
       const data = ctx.getImageData(0, 0, 48, 48).data,
         buckets = new Map();
+      let opaque = 0,
+        dark = 0;
       for (let i = 0; i < data.length; i += 4) {
         const r = data[i], g = data[i + 1], b = data[i + 2];
         if (data[i + 3] < 128) continue;
+        opaque++;
         const max = Math.max(r, g, b), min = Math.min(r, g, b);
+        if (max < 60) dark++;
         if (max > 235 || max < 40 || (max - min) / max < 0.3) continue;
         const key = (r >> 5) * 64 + (g >> 5) * 8 + (b >> 5),
           item = buckets.get(key) || { n: 0, r: 0, g: 0, b: 0 };
         item.n++; item.r += r; item.g += g; item.b += b;
         buckets.set(key, item);
       }
-      const list = [...buckets.values()].sort((a, b) => b.n - a.n).map((x) => [x.r / x.n, x.g / x.n, x.b / x.n]);
+      const hue = (c) => {
+        const [r, g, b] = c.map((v) => v / 255), max = Math.max(r, g, b), d = max - Math.min(r, g, b);
+        if (!d) return 0;
+        const h = max === r ? ((g - b) / d) % 6 : max === g ? (b - r) / d + 2 : (r - g) / d + 4;
+        return (h * 60 + 360) % 360;
+      };
+      const gap = (a, b) => Math.min(Math.abs(hue(a) - hue(b)), 360 - Math.abs(hue(a) - hue(b)));
+      const list = [...buckets.values()].sort((a, b) => b.n - a.n).map((x) => ({ n: x.n, c: [x.r / x.n, x.g / x.n, x.b / x.n] }));
       const hex = (c) => "#" + c.map((v) => Math.round(v).toString(16).padStart(2, "0")).join("");
+      // Logo noir et blanc : noir bleuté et gris plutôt que les couleurs par défaut du site.
+      if (!list.length) return opaque && dark / opaque >= 0.06 ? { primary: "#1d2230", secondary: "#8c96a8" } : { primary: "", secondary: "" };
       const first = list[0],
-        second = list.find((c) => first && Math.hypot(c[0] - first[0], c[1] - first[1], c[2] - first[2]) > 110);
-      return { primary: first ? hex(first) : "", secondary: second ? hex(second) : "" };
+        second = list.find((x) => x.n >= Math.max(6, first.n * 0.12) && gap(first.c, x.c) >= 35);
+      const secondary = second ? hex(second.c) : opaque && dark / opaque >= 0.06 ? "#1d2230" : hex(first.c.map((v) => v * 0.55));
+      return { primary: hex(first.c), secondary };
     } finally {
       bitmap.close();
     }
