@@ -1,0 +1,11 @@
+/* En-tête : logo Cruza × logo et nom du club (ordinateur et téléphone). */
+html body>header .cruza-lockup{display:flex;align-items:center;gap:10px;flex:0 0 auto;text-decoration:none;color:#0a2d8a;font-weight:800;letter-spacing:.18em;font-size:15px;line-height:1}
+html body>header .cruza-lockup img{width:34px;height:34px;border-radius:9px;display:block}
+html body>header .brand-times{flex:0 0 auto;margin:0 16px;color:#9aa8bd;font-size:22px;font-weight:300;line-height:1}
+@media screen and (max-width:700px){
+ html body>header .cruza-lockup{gap:0}
+ html body>header .cruza-lockup span{display:none}
+ html body>header .cruza-lockup img{width:30px;height:30px}
+ html body>header .brand-times{margin:0 7px;font-size:17px}
+}
+@media print{html body>header .cruza-lockup,html body>header .brand-times{display:none}}
