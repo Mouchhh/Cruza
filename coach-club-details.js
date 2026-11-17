@@ -87,13 +87,15 @@ function coachAccountRenderClub({
     el("p", "hint", "Logo et couleurs du club : ils s’appliquent à tout le site sur cet appareil."),
   );
   brand.append(logo, identity);
-  panel.append(brand);
   const pf = formIn("club", panel),
     name = field(pf.form, "Nom du club", "text", data.name, 70, true),
     city = field(pf.form, "Ville", "text", data.city, 80),
     stadium = field(pf.form, "Nom du stade", "text", data.stadium, 120),
     email = field(pf.form, "E-mail du club", "email", data.email, 254),
     phone = field(pf.form, "Téléphone du club", "tel", data.phone, 40);
+  // Ville et nom du stade ne sont plus affichés (valeurs conservées telles quelles à l'enregistrement).
+  city.parentElement.remove();
+  stadium.parentElement.remove();
   // Colours and logo, saved with the club sheet.
   const identityBox = el("fieldset", "account-club-identity");
   identityBox.append(el("legend", "", "Couleurs et logo du club"));
@@ -169,15 +171,15 @@ function coachAccountRenderClub({
       bitmap?.close();
     }
   };
-  identityBox.append(reset, logoLabel, logoRemove);
-  pf.form.prepend(identityBox);
+  identityBox.append(reset, brand, logoLabel, logoRemove);
+  name.parentElement.after(identityBox);
   city.placeholder = "À renseigner";
   stadium.placeholder = "À renseigner";
   phone.autocomplete = "tel";
   email.autocomplete = "email";
-  const contacts = el("div", "account-club-contacts"),
+  const contacts = el("details", "account-club-contacts"),
     rows = [];
-  contacts.append(el("h3", "", "Contacts utiles"));
+  contacts.append(el("summary", "", "Contacts du club (facultatif)"), email.parentElement, phone.parentElement);
   pf.form.append(contacts);
   function contactRow(contact) {
     const card = el("fieldset", "account-club-contact"),
@@ -226,7 +228,7 @@ function coachAccountRenderClub({
   };
   data.contacts.forEach(contactRow);
   add.disabled = rows.length >= 12;
-  pf.form.append(add);
+  contacts.append(add);
   submit(pf.form, "Enregistrer les détails du club");
   pf.form.onsubmit = (e) => {
     e.preventDefault();
@@ -257,6 +259,7 @@ function coachAccountRenderClub({
       coachStorageSet(coachClubDetailsKey, JSON.stringify(value));
       dirty.delete("club");
       clubTheme.apply(value);
+      window.clubNameRefresh?.();
       pf.status.textContent =
         "Fiche club enregistrée pour votre compte sur cet appareil, commune à vos équipes.";
     } catch (error) {

@@ -245,8 +245,9 @@ function coachAccountOpen(initialTab = "profile") {
   const content = el("div", "account-panels"),
     panels = new Map();
   function activate(id, focus = false) {
+    if (id === "teams") id = "profile";
     for (const [key, { panel, tab }] of panels) {
-      panel.hidden = key !== id;
+      panel.hidden = key !== id && !(key === "teams" && id === "profile");
       tab.setAttribute("aria-selected", String(key === id));
       tab.tabIndex = key === id ? 0 : -1;
     }
@@ -254,10 +255,10 @@ function coachAccountOpen(initialTab = "profile") {
     if (focus) panels.get(id).tab.focus({ preventScroll: true });
   }
   for (const [id, label] of [
-    ["profile", "Mon profil & sécurité"],
-    ["club", "Détails du club"],
-    ["teams", "Catégories & équipes"],
-    ["preferences", "Préférences & déconnexion"],
+    ["profile", "Mon profil et mes équipes"],
+    ["club", "Mon club"],
+    ["teams", "Catégories et équipes"],
+    ["preferences", "Préférences et déconnexion"],
   ]) {
     const tab = el("button", "", label);
     tab.type = "button";
@@ -269,14 +270,18 @@ function coachAccountOpen(initialTab = "profile") {
     panel.setAttribute("role", "tabpanel");
     panel.setAttribute("aria-labelledby", tab.id);
     panel.hidden = true;
-    tabs.append(tab);
-    content.append(panel);
+    // « Catégories et équipes » n'a plus d'onglet : son contenu s'affiche sous « Mon profil et mes équipes ».
+    if (id === "teams") panels.get("profile").panel.append(panel);
+    else {
+      tabs.append(tab);
+      content.append(panel);
+    }
     panels.set(id, { panel, tab });
     tab.onclick = () => activate(id);
   }
   tabs.onkeydown = (e) => {
     if (!["ArrowLeft", "ArrowRight", "Home", "End"].includes(e.key)) return;
-    const all = [...panels.keys()],
+    const all = [...panels.keys()].filter((k) => k !== "teams"),
       index = all.findIndex(
         (k) => panels.get(k).tab === document.activeElement,
       );
@@ -300,7 +305,7 @@ function coachAccountOpen(initialTab = "profile") {
       panel = el("section", "account-subsection");
       panel.id = "account-panel-security";
       panel.append(el("h3", "", "Mot de passe et identifiants"));
-      panels.get("profile").panel.append(panel);
+      panels.get("preferences").panel.append(panel);
     } else if (id === "notifications" || id === "support") {
       panel = el("details", "account-extra");
       panel.id = "account-panel-" + id;
@@ -758,7 +763,7 @@ function coachAccountOpen(initialTab = "profile") {
     const url = new URL(
       "https://github.com/Mouchhh/cruza-stade-mayennais/issues/new",
     );
-    url.searchParams.set("title", "Problème sur Le Vestiaire");
+    url.searchParams.set("title", "Problème sur Cruza");
     url.searchParams.set(
       "body",
       (description.value.trim() ||

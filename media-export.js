@@ -1,3 +1,5 @@
+// Club colour for exported pictures (follows the colour chosen in Paramètres → Mon club).
+function exportClubColor(){return (getComputedStyle(document.documentElement).getPropertyValue('--club-theme-primary')||'').trim()||'#2855a2';}
 // Export local sur canvas : aucun compte, aucune photo ni donnée envoyée à Canva.
 let videoExportJob=null;
 function mediaDownload(blob,name){const url=URL.createObjectURL(blob);const a=el('a');a.href=url;a.download=name;document.body.append(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),10000);}
@@ -8,7 +10,7 @@ function wrapMediaText(ctx,text,x,y,maxWidth,lineHeight){
 function renderMedia(canvas,snapshot,landscape,category=state.category,{pitchOnly=false,phaseColor=null}={}){
  const ctx=canvas.getContext('2d');const W=canvas.width,H=canvas.height;const s=simpleScenario(snapshot);
  ctx.fillStyle='#f0f4fb';ctx.fillRect(0,0,W,H);
- if(!pitchOnly){ctx.fillStyle='#2855a2';ctx.font='bold 22px Arial';ctx.fillText('STADE MAYENNAIS · '+(category||'FOOTBALL À 11')+' · TABLEAU TACTIQUE',48,48);
+ if(!pitchOnly){ctx.fillStyle=exportClubColor();ctx.font='bold 22px Arial';ctx.fillText(clubDisplayNameUpper()+' · '+(category||'FOOTBALL À 11')+' · TABLEAU TACTIQUE',48,48);
  ctx.fillStyle='#18345b';ctx.font='bold 36px Arial';ctx.fillText(snapshot.sequenceTitle?.trim()||s.title,48,100,1250);}
  const maxW=pitchOnly?W:1250,maxH=pitchOnly?H:860;const aspect=landscape?840/680:680/840;const w=Math.min(maxW,maxH*aspect),h=w/aspect;
  const x=(pitchOnly?0:48)+(maxW-w)/2,y=pitchOnly?(H-h)/2:148;
@@ -30,13 +32,13 @@ function renderMedia(canvas,snapshot,landscape,category=state.category,{pitchOnl
   const a=Math.atan2(by-ay,bx-ax);ctx.beginPath();ctx.moveTo(bx-13*Math.cos(a-.45),by-13*Math.sin(a-.45));ctx.lineTo(bx,by);ctx.lineTo(bx-13*Math.cos(a+.45),by-13*Math.sin(a+.45));ctx.stroke();ctx.restore();
  });
  snapshot.tokens.filter(p=>p.side!=='away'||snapshot.showOpponents!==false).forEach(p=>{
-  const [cx,cy]=xy(p.x,p.y);ctx.beginPath();ctx.arc(cx,cy,23,0,Math.PI*2);ctx.fillStyle=p.side==='own'?'#2855a2':'#c83f4f';ctx.fill();ctx.strokeStyle='#fff';ctx.lineWidth=3;ctx.stroke();ctx.fillStyle='#fff';ctx.textAlign='center';ctx.textBaseline='middle';ctx.font='bold 17px Arial';ctx.fillText(p.label.length<=4?p.label:p.label.slice(0,4),cx,cy);
+  const [cx,cy]=xy(p.x,p.y);ctx.beginPath();ctx.arc(cx,cy,23,0,Math.PI*2);ctx.fillStyle=p.side==='own'?exportClubColor():'#c83f4f';ctx.fill();ctx.strokeStyle='#fff';ctx.lineWidth=3;ctx.stroke();ctx.fillStyle='#fff';ctx.textAlign='center';ctx.textBaseline='middle';ctx.font='bold 17px Arial';ctx.fillText(p.label.length<=4?p.label:p.label.slice(0,4),cx,cy);
   if(p.label.length>4){ctx.font='15px Arial';ctx.fillStyle='#102819';const tw=ctx.measureText(p.label).width;ctx.fillRect(cx-tw/2-5,cy+27,tw+10,23);ctx.fillStyle='#fff';ctx.fillText(p.label,cx,cy+38);}
  });
  const [ballX,ballY]=xy(snapshot.ball.x,snapshot.ball.y);ctx.beginPath();ctx.arc(ballX,ballY,12,0,Math.PI*2);ctx.fillStyle='#fff';ctx.fill();ctx.strokeStyle='#142c22';ctx.lineWidth=2;ctx.stroke();ctx.beginPath();ctx.arc(ballX,ballY,4,0,Math.PI*2);ctx.fillStyle='#142c22';ctx.fill();
  if(pitchOnly)return;
  ctx.textAlign='left';ctx.textBaseline='alphabetic';const tx=1360,tw=510;
- ctx.fillStyle='#2855a2';ctx.font='bold 20px Arial';ctx.fillText(s.free?'TABLEAU LIBRE · 11 CONTRE 11':'ÉTAPE '+(snapshot.step+1)+' / '+s.steps.length,tx,190);
+ ctx.fillStyle=exportClubColor();ctx.font='bold 20px Arial';ctx.fillText(s.free?'TABLEAU LIBRE · 11 CONTRE 11':'ÉTAPE '+(snapshot.step+1)+' / '+s.steps.length,tx,190);
  ctx.fillStyle='#18345b';ctx.font='bold 30px Arial';let ty=wrapMediaText(ctx,s.steps[snapshot.step][0],tx,245,tw,40);
  ctx.font='24px Arial';ty=wrapMediaText(ctx,s.steps[snapshot.step][1],tx,ty+28,tw,36);
  ctx.fillStyle='#667892';ctx.font='20px Arial';wrapMediaText(ctx,s.goal,tx,ty+45,tw,30);

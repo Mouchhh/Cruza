@@ -1,5 +1,8 @@
 // Entry follows server authorization; showing the button is never the access control.
 (() => {
+ // Entrée « Responsable » masquée pour le moment : passer à true pour la réafficher (rien d'autre à changer).
+ const MANAGER_ENTRY_ENABLED=false;
+ if(!MANAGER_ENTRY_ENABLED)return;
  const nav=document.querySelector('.app-navigation');if(!nav)return;
  const button=document.createElement('button');button.id='view-management';button.type='button';button.hidden=true;button.textContent='Responsable';button.setAttribute('aria-label','Ouvrir l’espace Responsable');nav.append(button);
  const demo=!window.CLUB_CLOUD_CONFIG?.url&&new URLSearchParams(location.search).get('mode')==='local';
