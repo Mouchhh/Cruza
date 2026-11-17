@@ -1,0 +1,6 @@
+// Fictional league table for the AS Andouillé visual preview, no network request.
+function renderHomeSportcorico(card){
+ card.append(el('strong','home-live-value','3e · 12 pts'),el('p','home-live-caption','Classement fictif · démonstration'));
+ const table=el('table'),wrap=el('div','andouille-ranking'),head=el('thead'),tr=el('tr');for(const value of ['Pl.','Équipe','Pts','Forme'])tr.append(el('th','',value));head.append(tr);table.append(head);
+ const body=el('tbody');[['1','Équipe démo A','16',['V','V','N','V','V']],['2','Équipe démo B','14',['V','N','V','D','V']],['3','AS Andouillé','12',['V','D','N','V','V']],['4','Équipe démo C','10',['D','V','N','V','D']]].forEach(([rank,name,points,form])=>{const r=el('tr');if(rank==='3')r.className='andouille-own';r.append(el('td','',rank));const c=el('td','');if(rank==='3'){const img=el('img');img.src='logo-as-andouille.png';img.alt='';c.append(img);}c.append(document.createTextNode(name));r.append(c,el('td','',points));const f=el('td','andouille-form');for(const v of form)f.append(el('span','result-'+v,v));r.append(f);body.append(r);});table.append(body);wrap.append(table);card.append(wrap,el('small','home-live-caption','Données fictives pour cet aperçu.'));
+}

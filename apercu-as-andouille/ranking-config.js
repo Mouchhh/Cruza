@@ -1,0 +1,1 @@
+window.CLUB_RANKING_GATEWAY='';
