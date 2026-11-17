@@ -643,8 +643,25 @@
     dialog.showModal();
     queryInput.focus();
   }
-  // Plusieurs essais : la session et les autres fenêtres du site peuvent arriver après le premier test.
-  const check = () => [600, 2500, 6000, 12000].forEach((delay) => setTimeout(open, delay));
+  // Test répété : la session, les mises à jour et les autres fenêtres du site peuvent arriver (ou rester ouvertes) après le premier essai.
+  // On réessaie toutes les 3 secondes pendant 3 minutes, et à chaque retour sur l'onglet, jusqu'à ce que la fenêtre soit passée.
+  let polling = null;
+  const check = () => {
+    setTimeout(open, 600);
+    if (polling) return;
+    let tries = 0;
+    polling = setInterval(() => {
+      if (shown || ++tries > 60) {
+        clearInterval(polling);
+        polling = null;
+        return;
+      }
+      open();
+    }, 3000);
+  };
+  document.addEventListener("visibilitychange", () => {
+    if (!document.hidden) open();
+  });
   document.addEventListener("DOMContentLoaded", check);
   document.addEventListener("club-session-ready", check);
 })();
