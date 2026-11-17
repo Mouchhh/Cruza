@@ -26,11 +26,11 @@ function renderHomeWidgets(){
  const last=s.scored[0];form.append(el('p','',last?'Dernier match : '+last.info.goalsFor+' – '+last.info.goalsAgainst+' · '+last.info.opponent:sc?'Dernier match : '+sc.last.goalsFor+' – '+sc.last.goalsAgainst+' · '+sc.last.opponent:'Les résultats apparaîtront après validation des bilans.'));
  const label=e=>homeDayLabel(e.date,s.now.day)+(e.time?' · '+e.time:'')+' · '+e.title;
  form.append(el('p','home-live-caption',s.match?'Prochain rendez-vous : '+label(s.match):'Aucun prochain match planifié'));
- const training=card('Agenda & séance','home-live-training'),event=s.training;
- training.append(el('strong','home-live-value',event?homeDayLabel(event.date,s.now.day):'À planifier'));
- training.append(el('h3','','Ce qui est prévu'),el('p','',event?[event.title,event.session?.themes?.join(' · '),event.time].filter(Boolean).join(' · '):'Aucune prochaine séance dans l’agenda.'));
+ const training=card('Agenda & séance','home-live-training'),event=s.training,nextMatch=!event&&s.match?s.match:null;
+ training.append(el('strong','home-live-value',event?homeDayLabel(event.date,s.now.day):nextMatch?homeDayLabel(nextMatch.date,s.now.day):'À planifier'));
+ training.append(el('h3','',nextMatch?'Prochain match':'Ce qui est prévu'),el('p','',event?[event.title,event.session?.themes?.join(' · '),event.time].filter(Boolean).join(' · '):nextMatch?[nextMatch.title,nextMatch.time].filter(Boolean).join(' · '):'Aucune prochaine séance dans l’agenda.'));
  training.append(el('h3','','Conseil issu du dernier bilan'),el('p','',s.recommendation||'Renseignez une priorité dans votre prochain bilan pour retrouver ici votre axe de travail.'));
- const open=el('button','home-live-open',event?'Ouvrir / Préparer la séance →':'Ouvrir l’agenda →');open.type='button';open.onclick=()=>{if(event&&typeof trainingAgendaOpen==='function'){trainingAgendaOpen(event);return;}if(event?.session){loadTraining(event.session);if(currentTraining.id===event.session.id)workspaceNavigation.run('view-training',()=>trainingWizard.go(3));}else if(event?.open)event.open();else workspaceNavigation.run('view-coach-agenda',()=>workspaceFlows.agenda.go(1));};training.append(open);return s;
+ const open=el('button','home-live-open',event?'Ouvrir / Préparer la séance →':nextMatch?'Préparer le match →':'Ouvrir l’agenda →');open.type='button';open.onclick=()=>{if(nextMatch?.open){nextMatch.open();return;}if(event&&typeof trainingAgendaOpen==='function'){trainingAgendaOpen(event);return;}if(event?.session){loadTraining(event.session);if(currentTraining.id===event.session.id)workspaceNavigation.run('view-training',()=>trainingWizard.go(3));}else if(event?.open)event.open();else workspaceNavigation.run('view-coach-agenda',()=>workspaceFlows.agenda.go(1));};training.append(open);return s;
 }
 document.addEventListener('DOMContentLoaded',()=>{
  const root=el('section');root.id='home-live-widgets';root.setAttribute('aria-label','Tableau de bord de mon équipe');document.querySelector('.home-hero').after(root);

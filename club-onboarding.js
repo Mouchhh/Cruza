@@ -76,29 +76,173 @@
     }
   }
   const LOGO_HOSTS = ["s3.pub2.infomaniak.cloud", "www.sportcorico.com", "sportcorico.com"];
-  // Équipe choisie : configure l'équipe active (nom, lien Sportcorico) et ajoute ses matchs à l'agenda.
+  // Équipe choisie : créée comme une vraie équipe du compte (profil identique à celui du formulaire « choisissons vos équipes »),
+  // avec son lien Sportcorico ; ses matchs sont ajoutés à l'agenda de cette équipe.
   async function applyTeam(team, clubName, gateway) {
     const response = await fetch(gateway + "/api/sportcorico?url=" + encodeURIComponent(team.url) + (team.split ? "&competition=" + encodeURIComponent(team.split) : ""), { cache: "no-store", credentials: "omit", signal: AbortSignal.timeout(60000) });
     if (!response.ok) throw new Error("unavailable");
     const data = await response.json(),
       // La catégorie du championnat fait foi (ex. « U19 1 » qui joue en poule U18 → U18).
       age = /\bU\s?(\d{2})\b/i.exec(data.competition || team.competition || "") || /\bU\s?(\d{2})\b/i.exec(team.name),
+      category = age ? "U" + age[1] : /senior/i.test(team.name) ? "Seniors" : String(team.name).split(/\s+/)[0].slice(0, 30),
+      number = Math.min(20, Math.max(1, Number(/(\d+)\s*$/.exec(String(team.name).replace(/\bU\s?\d{2}\b/i, ""))?.[1]) || 1)),
+      gender = /f[ée]min/i.test(team.name + " " + (data.competition || "")) ? "Féminin" : "Masculin",
+      season = /(\d{4})\D+(\d{4})/.exec(data.season || ""),
       entry = {
-        id: activeCoachTeam.id,
-        label: (age ? String(team.name).replace(/\bU\s?\d{2}\b/i, "U" + age[1]) : String(team.name)).slice(0, 60),
-        category: age ? "U" + age[1] : /senior/i.test(team.name) ? "Seniors" : String(team.name).split(/\s+/)[0].slice(0, 30),
-        team: String(team.split && age ? clubName + " U" + age[1] : data.teamName || clubName + " " + team.name).slice(0, 50),
+        id: "team-" + crypto.randomUUID(),
+        label: (category + (gender === "Féminin" ? " Féminines" : "") + (number > 1 ? " · Équipe " + number : "")).slice(0, 60),
+        category,
+        team: String(clubName).slice(0, 50),
         sportcoricoURL: coachTeamSportcoricoURL(team.url),
         ...(team.split ? { sportcoricoCompetition: String(team.split).slice(0, 120) } : {}),
+        fffProfile: {
+          version: 1,
+          gender,
+          format: age && Number(age[1]) <= 13 ? "Football à 8" : "Football à 11",
+          number,
+          season: season ? season[1] + "-" + season[2] : new Date().getFullYear() + "-" + (new Date().getFullYear() + 1),
+          level: String(data.competition || "").slice(0, 80),
+          sourceURL: "",
+          officialName: String(data.teamName || "").slice(0, 150),
+        },
       };
-    if (!coachTeamValid(entry) || !entry.sportcoricoURL) throw new Error("invalid");
+    if (!coachTeamValid(entry) || !entry.sportcoricoURL || (typeof coachFFFProfileValid === "function" && !coachFFFProfileValid(entry))) throw new Error("invalid");
+    window.sportcoricoSync?.storeFor(entry.id, data);
     const stored = JSON.parse(localStorage.getItem(coachTeamManifestKey) || "[]"),
       merged = new Map([...coachTeams, ...(Array.isArray(stored) ? stored.filter(coachTeamValid) : [])].map((t) => [t.id, t]));
     merged.set(entry.id, entry);
     localStorage.setItem(coachTeamManifestKey, JSON.stringify([...merged.values()]));
-    window.sportcoricoSync?.store(data, true);
+    // Compte connecté : l'équipe est aussi gardée dans le compte (retrouvée sur un autre appareil, sans reconfiguration).
+    if (typeof clubNetworkBound === "function" && clubNetworkBound() && typeof coachFFFMetadataKey === "string") {
+      try {
+        const user = await clubNetworkRequest("/auth/v1/user"),
+          saved = Array.isArray(user.user_metadata?.[coachFFFMetadataKey]) ? user.user_metadata[coachFFFMetadataKey].filter(coachFFFProfileValid) : [];
+        await clubNetworkRequest("/auth/v1/user", { method: "PUT", body: { data: { [coachFFFMetadataKey]: [...saved, entry].slice(-100), stade_active_team_v1: entry.id } } });
+      } catch {
+        /* L'équipe reste enregistrée sur cet appareil. */
+      }
+    }
     return entry;
   }
+  // Club retenu à la première connexion : permet de proposer ses autres équipes dans « Ajouter une équipe ».
+  const CLUB_KEY = "vestiaire-club-sportcorico";
+  const gatewayBase = () => String(window.CLUB_RANKING_GATEWAY || window.CLUB_CANVA_GATEWAY || "").replace(/\/$/, "");
+  const savedClub = () => {
+    try {
+      const club = JSON.parse(coachStorageGet(CLUB_KEY) || "null");
+      return club && /^[a-z0-9-]{2,100}$/.test(club.slug) && typeof club.name === "string" ? club : null;
+    } catch {
+      return null;
+    }
+  };
+  const rememberClub = (club) => {
+    try {
+      if (club && /^[a-z0-9-]{2,100}$/.test(club.slug)) coachStorageSet(CLUB_KEY, JSON.stringify({ slug: club.slug, name: String(club.name).slice(0, 70) }));
+    } catch {
+      /* Facultatif. */
+    }
+  };
+  async function relay(path) {
+    const response = await fetch(gatewayBase() + path, { cache: "no-store", credentials: "omit", signal: AbortSignal.timeout(60000) });
+    if (!response.ok) throw new Error("unavailable");
+    return response.json();
+  }
+  // Liste « Choisir dans mon club » à poser dans une fenêtre (Ajouter une équipe) : un clic crée l'équipe et ouvre son interface.
+  function mountPicker(container, closeDialog) {
+    if (!gatewayBase()) return;
+    const box = text("section", "club-picker"),
+      status = text("p", "club-onboarding-status"),
+      list = text("div", "club-onboarding-found");
+    box.append(text("h3", "", "Choisir dans mon club"), list, status);
+    container.append(box);
+    const add = async (club, team) => {
+      status.style.color = "";
+      status.textContent = "Ajout de l’équipe et de ses matchs…";
+      try {
+        if (typeof flushCoachWorkspace === "function" && !flushCoachWorkspace()) throw new Error("busy");
+        const entry = await applyTeam(team, club.name, gatewayBase());
+        closeDialog?.();
+        coachTeamRememberView(entry.id);
+        sessionStorage.setItem(coachTeamSelectionKey, entry.id);
+        history.replaceState(null, "", location.href);
+        location.reload();
+      } catch {
+        status.style.color = "#b3261e";
+        status.textContent = "Équipe non ajoutée : réessayez, ou remplissez les champs ci-dessous.";
+      }
+    };
+    const showTeams = async (club) => {
+      list.replaceChildren();
+      status.textContent = "";
+      try {
+        const data = await relay("/api/sportcorico-teams?slug=" + encodeURIComponent(club.slug)),
+          taken = (team) => coachTeams.some((t) => t.sportcoricoURL === team.url && (t.sportcoricoCompetition || "") === (team.split || "")),
+          teams = (Array.isArray(data.teams) ? data.teams : []).filter((team) => team && typeof team.name === "string" && typeof team.url === "string" && !taken(team));
+        if (!teams.length) {
+          status.textContent = "Toutes les équipes de ce club sont déjà ajoutées.";
+          return;
+        }
+        list.append(text("p", "club-onboarding-help", club.name + " : touchez l’équipe à ajouter"));
+        for (const team of teams) {
+          const button = text("button", "club-onboarding-club"),
+            labels = text("span", "club-onboarding-club-text");
+          button.type = "button";
+          labels.append(text("span", "", team.name), text("small", "", team.competition || ""));
+          button.append(labels);
+          button.onclick = () => add(club, team);
+          list.append(button);
+        }
+      } catch {
+        status.style.color = "#b3261e";
+        status.textContent = "Équipes du club indisponibles pour le moment. Remplissez les champs ci-dessous.";
+      }
+    };
+    const club = savedClub();
+    if (club) {
+      showTeams(club);
+      return;
+    }
+    // Club jamais choisi : recherche par nom, comme à la première connexion.
+    const query = document.createElement("input"),
+      go = text("button", "export", "Rechercher mon club");
+    query.type = "text";
+    query.maxLength = 60;
+    query.placeholder = "Nom de votre club";
+    query.setAttribute("aria-label", "Nom de votre club");
+    go.type = "button";
+    list.append(query, go);
+    const search = async () => {
+      status.textContent = "";
+      if (query.value.trim().length < 2) return;
+      try {
+        const data = await relay("/api/sportcorico-search?q=" + encodeURIComponent(query.value.trim())),
+          clubs = (Array.isArray(data.clubs) ? data.clubs : []).filter((c) => c && typeof c.name === "string" && /^[a-z0-9-]{2,100}$/.test(c.slug || ""));
+        list.replaceChildren(query, go);
+        for (const found of clubs) {
+          const button = text("button", "club-onboarding-club");
+          button.type = "button";
+          button.append(text("span", "club-onboarding-club-text", found.name));
+          button.onclick = () => {
+            rememberClub(found);
+            showTeams(found);
+          };
+          list.append(button);
+        }
+        if (!clubs.length) status.textContent = "Aucun club trouvé.";
+      } catch {
+        status.style.color = "#b3261e";
+        status.textContent = "Recherche indisponible pour le moment.";
+      }
+    };
+    go.onclick = search;
+    query.addEventListener("keydown", (event) => {
+      if (event.key === "Enter") {
+        event.preventDefault();
+        search();
+      }
+    });
+  }
+  window.clubSportcorico = { mountPicker };
   function notifyTeamFailed() {
     try {
       if (typeof notify === "function") notify("Club enregistré. L’équipe n’a pas pu être récupérée : vous pourrez la régler dans Mon équipe.");
@@ -329,6 +473,7 @@
         coachStorageSet(coachClubDetailsKey, JSON.stringify(value));
         clubTheme.apply(value);
         window.clubNameRefresh?.();
+        rememberClub(selectedClub);
       } catch {
         status.textContent = "Enregistrement impossible : vérifiez le nom du club.";
         save.disabled = false;

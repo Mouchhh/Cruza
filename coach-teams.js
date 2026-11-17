@@ -535,15 +535,22 @@ function coachTeamDelete(id) {
     }
     dialog.dataset.saved = "true";
     dialog.close();
-    if (id === activeCoachTeam.id) {
-      const next = coachTeams.find((t) => t.id !== "unassigned") || coachTeams[0] || { id: "unassigned" };
-      try {
-        coachTeamRememberView(next.id);
-        sessionStorage.setItem(coachTeamSelectionKey, next.id);
-      } catch {}
-      history.replaceState(null, "", location.href);
-      location.reload();
-    } else notify("Équipe « " + team.label + " » supprimée.");
+    // Compte connecté : l'équipe est aussi retirée du compte, sinon elle serait remise à chaque ouverture.
+    const forgotten = Promise.race([
+      Promise.resolve(typeof coachFFFForget === "function" ? coachFFFForget(id) : null).catch(() => {}),
+      new Promise((resolve) => setTimeout(resolve, 4000)),
+    ]);
+    forgotten.then(() => {
+      if (id === activeCoachTeam.id) {
+        const next = coachTeams.find((t) => t.id !== "unassigned") || coachTeams[0] || { id: "unassigned" };
+        try {
+          coachTeamRememberView(next.id);
+          sessionStorage.setItem(coachTeamSelectionKey, next.id);
+        } catch {}
+        history.replaceState(null, "", location.href);
+        location.reload();
+      } else notify("Équipe « " + team.label + " » supprimée.");
+    });
   };
   dialog.append(form);
   dialog.addEventListener(
@@ -576,6 +583,8 @@ function coachTeamAddDialog(edit = false, targetTeam = activeCoachTeam) {
   close.onclick = () => dialog.close();
   heading.append(title, close);
   form.append(heading);
+  // Ajout d'une équipe : d'abord la liste des équipes du club (Sportcorico), sinon les champs à la main.
+  if (!edit) window.clubSportcorico?.mountPicker(form, () => dialog.close());
   const field = (label, max) => {
     const wrap = el("label", "report-field", label),
       input = el("input");

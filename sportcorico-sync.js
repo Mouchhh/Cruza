@@ -58,6 +58,21 @@
       return 0;
     }
   }
+  // Écrit les matchs dans l'agenda d'une équipe précise (même si ce n'est pas l'équipe ouverte).
+  function storeFor(teamId, data) {
+    try {
+      if (typeof agendaPasteValid !== "function" || !Array.isArray(data?.games) || !/^team-[a-z0-9-]{1,80}$/.test(teamId)) return 0;
+      const key = coachStorageKey("vestiaire-pasted-fixtures") + ":team:" + teamId,
+        old = JSON.parse(localStorage.getItem(key) || "null"),
+        map = new Map((Array.isArray(old?.fixtures) ? old.fixtures : []).map((f) => [f.key, f]));
+      let changed = 0;
+      for (const fixture of fixtures(data)) if (agendaPasteValid(fixture) && map.size < 1000) { map.set(fixture.key, fixture); changed++; }
+      if (changed) localStorage.setItem(key, JSON.stringify({ version: 1, fixtures: [...map.values()] }));
+      return changed;
+    } catch {
+      return 0;
+    }
+  }
   // Les 5 derniers résultats de l'équipe (le plus récent d'abord), calculés à partir des scores.
   function form(data) {
     if (!Array.isArray(data?.games)) return null;
@@ -75,5 +90,5 @@
       last: results[0],
     };
   }
-  window.sportcoricoSync = { fixtures, store, form };
+  window.sportcoricoSync = { fixtures, store, storeFor, form };
 })();

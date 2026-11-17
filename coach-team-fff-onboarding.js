@@ -29,6 +29,16 @@ function coachFFFApplyProfiles(profiles){
  if(merged.size>100)throw Error('100 équipes maximum.');
  coachTeams=[...merged.values()];localStorage.setItem(coachTeamManifestKey,JSON.stringify(coachTeams));coachTeamsRefreshSelector();
 }
+// Retire une équipe supprimée du compte (sinon elle serait remise à la prochaine ouverture ou sur un autre appareil).
+async function coachFFFForget(id){
+ if(typeof clubNetworkBound!=='function'||!clubNetworkBound())return;
+ try{
+  const user=await clubNetworkRequest('/auth/v1/user'),all=Array.isArray(user.user_metadata?.[coachFFFMetadataKey])?user.user_metadata[coachFFFMetadataKey]:[],rest=all.filter(p=>p?.id!==id);
+  if(rest.length===all.length)return;
+  const data={[coachFFFMetadataKey]:rest};if(user.user_metadata?.stade_active_team_v1===id)data.stade_active_team_v1=rest.find(coachFFFProfileValid)?.id||'';
+  await clubNetworkRequest('/auth/v1/user',{method:'PUT',body:{data}});
+ }catch{/* La suppression locale reste valable ; le compte sera nettoyé à une prochaine suppression. */}
+}
 async function coachFFFEnsure(){
  if(!clubNetworkBound())return false;
  if(coachFFFProfileValid(activeCoachTeam))return true;
