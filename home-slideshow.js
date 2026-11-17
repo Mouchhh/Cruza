@@ -20,7 +20,7 @@ homeSlideMotion.addEventListener('change',event=>{homeSlidePaused=event.matches;
 document.addEventListener('visibilitychange',updateHomeSlideTimer);
 new MutationObserver(updateHomeSlideTimer).observe(document.body,{attributes:true,attributeFilter:['class']});
 async function initializeHomeSlides(){
- const configured=[],seen=new Set(); // Fond photo retiré de l'accueil (les photos d'origine du club ne s'affichent plus).
+ const configured=Array.isArray(window.CLUB_HOME_SLIDES)?window.CLUB_HOME_SLIDES:[],seen=new Set();
  const candidates=configured.filter(photo=>{if(!photo||typeof photo.src!=='string'||!/^assets\/(?:[a-zA-Z0-9_-]+\/)*[a-zA-Z0-9_-]+\.(?:jpe?g|png|webp)$/i.test(photo.src)||seen.has(photo.src))return false;seen.add(photo.src);return true;}).slice(0,12);
  const loaded=await Promise.all(candidates.map(async photo=>{const img=new Image();img.alt='';img.decoding='async';img.src=photo.src;try{await img.decode();return img;}catch{return null;}}));
  homeSlideImages=loaded.filter(Boolean);if(!homeSlideImages.length)return;

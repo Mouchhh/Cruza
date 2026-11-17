@@ -1,0 +1,31 @@
+
+@import url('../apercu-educateur/preview-tools.css');
+@media screen{
+ html{--smfc-blue:#d90821;--smfc-navy:#19191d;--smfc-ink:#242326;--smfc-canvas:#f8f7f7;--smfc-cream:#f7ecec;--smfc-line:#e9e1e2}
+ html.andouille-preview body.task-navigation.responsive-navigation #workspace-navigation{background:#19191d!important;border-color:#303036!important}
+ html.andouille-preview body.task-navigation.responsive-navigation #workspace-navigation>button{color:#c9c7cb!important}
+ html.andouille-preview body.task-navigation.responsive-navigation #workspace-navigation>button[aria-current=page]{background:#d90821!important;color:#fff!important;box-shadow:inset 3px 0 #fff!important}
+ html.andouille-preview body.home-mode .home-hero{background:linear-gradient(105deg,#211e23,#531820)!important;border:0!important;border-radius:16px;min-height:230px;padding:28px!important;overflow:hidden}
+ html.andouille-preview body.home-mode .home-hero::before{content:'';position:absolute;inset:0;background-image:url('andouille-field.svg');background-size:auto 100%;background-repeat:no-repeat;background-position:right center;opacity:.3;z-index:0}
+ html.andouille-preview body.home-mode .home-hero>*{position:relative;z-index:1}
+ html.andouille-preview body.home-mode #home-live-widgets .home-live-training{background:#fff2f3!important}
+ html.andouille-preview body.home-mode #home-live-widgets .home-live-value{color:#bc0a20!important}
+ html.andouille-preview body.home-mode #home-live-widgets .home-live-ranking{background:#fff!important;border-top:3px solid #d90821!important}
+ html.andouille-preview body #home-photo-banner{display:none!important}
+ html.andouille-preview body .home-photo-banner{display:none!important}
+ html.andouille-preview body #visual-preview-banner{background:#30262b;border-color:#58404b}
+ html.andouille-preview body .brand .club-logo,html.andouille-preview body .home-crest{content:url('logo-as-andouille.png')}
+ html.andouille-preview body .cruza-lockup img{content:url('../assets/cruza-logo.svg')}
+ .andouille-ranking{margin:18px 0 14px;overflow:auto;border:1px solid #eadde0;border-radius:10px}
+ .andouille-ranking table{width:100%;border-collapse:collapse;font:11px/1.5 SMFCArchivo,Arial,sans-serif;white-space:nowrap}
+ .andouille-ranking th{background:#faf4f5;color:#705b63;padding:9px 7px;text-align:left;font-size:10px}
+ .andouille-ranking td{padding:12px 7px;border-top:1px solid #f0e6e9;color:#3e3439}
+ .andouille-ranking .andouille-own td{background:#fff0f2;font-weight:750;color:#ae0c23}
+ .andouille-ranking img{width:22px;height:22px;vertical-align:middle;margin-right:5px}
+ .andouille-ranking .andouille-form span{display:inline-grid;place-items:center;width:14px;height:15px;border-radius:4px;color:white;font:700 8px Arial;margin:1px}
+ .andouille-ranking .result-V{background:#19805c}.andouille-ranking .result-N{background:#b57c17}.andouille-ranking .result-D{background:#da3e50}
+}
+@media screen and (max-width:700px){html.andouille-preview body.home-mode .home-hero{min-height:130px!important;padding:16px!important}.andouille-ranking{display:none}html.andouille-preview body .home-live-ranking>.home-live-caption{display:none}}
+
+@media screen{html.andouille-preview body.home-mode #home-page-0>.home-photo-banner{display:none!important}html.andouille-preview body.home-mode #home-live-widgets small.home-live-caption{color:#6d6067!important}}
+@media screen and (max-width:700px){html.andouille-preview body.task-navigation.responsive-navigation>header{position:sticky!important;top:36px!important}}

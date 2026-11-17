@@ -79,7 +79,7 @@ function coachAccountSaveSection(section, value) {
   if (!coachAccountValid(next)) throw Error("Réglages invalides.");
   coachStorageSet(coachAccountKey, JSON.stringify(next));
   coachAccountApply();
-  if (section === "profile") renderClubHomeStats();
+  if (section === "profile") {renderClubHomeStats();document.dispatchEvent(new CustomEvent("coach-private-changed",{detail:{kind:"settings",key:"profile"}}));}
   return next;
 }
 async function coachAccountPhoto(file) {
