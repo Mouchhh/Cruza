@@ -221,3 +221,13 @@
  html body.home-mode .home-hero #home-last-saved{color:#e1eafa}
 }
 @media screen and (max-width:700px){html body.home-mode.home-has-slides .home-hero{min-height:210px}}
+
+@media screen{
+ #home-live-widgets .home-sportcorico-table{max-height:275px;overflow:auto;margin-top:14px;border:1px solid var(--smfc-line,#e2e6ee);border-radius:9px}
+ #home-live-widgets .home-sportcorico-table table{width:100%;border-collapse:collapse;table-layout:fixed;font:11px/1.4 SMFCArchivo,Arial,sans-serif}
+ #home-live-widgets .home-sportcorico-table th,#home-live-widgets .home-sportcorico-table td{padding:8px 5px;border-bottom:1px solid #e2e6ee;text-align:center;color:#173151;background:white}
+ #home-live-widgets .home-sportcorico-table th{position:sticky;top:0;background:#eef3fb;z-index:1}
+ #home-live-widgets .home-sportcorico-table th:nth-child(2),#home-live-widgets .home-sportcorico-table td:nth-child(2){width:55%;text-align:left;overflow-wrap:anywhere}
+ #home-live-widgets .home-sportcorico-own td{background:#e7effc;font-weight:750;color:#0b2e8a}
+ #home-live-widgets .home-live-ranking a.home-live-open{display:inline-block;text-decoration:none}
+}

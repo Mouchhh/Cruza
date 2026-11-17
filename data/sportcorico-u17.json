@@ -1,0 +1,94 @@
+{
+  "version": 1,
+  "sourceURL": "https://www.sportcorico.com/clubs/st-mayennais-fc/mayenne-stade-fc-17",
+  "teamSlug": "mayenne-stade-fc-17",
+  "teamId": 606690,
+  "teamName": "St. Mayennais FC U17 2",
+  "category": "U17",
+  "season": "2026 - 2027",
+  "competition": "U17 Division 1",
+  "pool": "Groupe Unique",
+  "rows": [
+    {
+      "rank": 1,
+      "points": 16,
+      "games_played": 7,
+      "difference": 13,
+      "team": "GJ Pays de L'ernee - Juvigne St Pierre des Landes 1",
+      "team_id": 697553
+    },
+    {
+      "rank": 2,
+      "points": 15,
+      "games_played": 7,
+      "difference": 9,
+      "team": "US Changeenne 2",
+      "team_id": 436598
+    },
+    {
+      "rank": 3,
+      "points": 13,
+      "games_played": 6,
+      "difference": 27,
+      "team": "GJ Haut-anjou 1",
+      "team_id": 436617
+    },
+    {
+      "rank": 4,
+      "points": 13,
+      "games_played": 6,
+      "difference": 23,
+      "team": "US Meral Cosse le Vivien 1",
+      "team_id": 436980
+    },
+    {
+      "rank": 5,
+      "points": 12,
+      "games_played": 7,
+      "difference": 9,
+      "team": "US St Berthevin les Laval 1",
+      "team_id": 437048
+    },
+    {
+      "rank": 6,
+      "points": 12,
+      "games_played": 7,
+      "difference": 3,
+      "team": "GJ Pays de Chateau-gontier 2",
+      "team_id": 758330
+    },
+    {
+      "rank": 7,
+      "points": 10,
+      "games_played": 7,
+      "difference": 4,
+      "team": "St. Mayennais FC 2",
+      "team_id": 606690
+    },
+    {
+      "rank": 8,
+      "points": 4,
+      "games_played": 7,
+      "difference": -30,
+      "team": "AS Contest St Baudelle 1",
+      "team_id": 606643
+    },
+    {
+      "rank": 9,
+      "points": 3,
+      "games_played": 7,
+      "difference": -33,
+      "team": "US Lavalloise 1",
+      "team_id": 436823
+    },
+    {
+      "rank": 10,
+      "points": 0,
+      "games_played": 7,
+      "difference": -25,
+      "team": "AS du Bourny 1",
+      "team_id": 436831
+    }
+  ],
+  "fetchedAt": "2026-11-17T19:11:59.011613+00:00"
+}
