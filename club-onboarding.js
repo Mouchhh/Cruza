@@ -46,6 +46,45 @@
       bitmap.close();
     }
   }
+  // Couleurs dominantes d'un logo (on ignore blanc, noir et gris).
+  async function logoColors(blob) {
+    const bitmap = await createImageBitmap(blob);
+    try {
+      const canvas = document.createElement("canvas");
+      canvas.width = canvas.height = 48;
+      const ctx = canvas.getContext("2d", { willReadFrequently: true });
+      ctx.drawImage(bitmap, 0, 0, 48, 48);
+      const data = ctx.getImageData(0, 0, 48, 48).data,
+        buckets = new Map();
+      for (let i = 0; i < data.length; i += 4) {
+        const r = data[i], g = data[i + 1], b = data[i + 2];
+        if (data[i + 3] < 128) continue;
+        const max = Math.max(r, g, b), min = Math.min(r, g, b);
+        if (max > 235 || max < 40 || (max - min) / max < 0.3) continue;
+        const key = (r >> 5) * 64 + (g >> 5) * 8 + (b >> 5),
+          item = buckets.get(key) || { n: 0, r: 0, g: 0, b: 0 };
+        item.n++; item.r += r; item.g += g; item.b += b;
+        buckets.set(key, item);
+      }
+      const list = [...buckets.values()].sort((a, b) => b.n - a.n).map((x) => [x.r / x.n, x.g / x.n, x.b / x.n]);
+      const hex = (c) => "#" + c.map((v) => Math.round(v).toString(16).padStart(2, "0")).join("");
+      const first = list[0],
+        second = list.find((c) => first && Math.hypot(c[0] - first[0], c[1] - first[1], c[2] - first[2]) > 110);
+      return { primary: first ? hex(first) : "", secondary: second ? hex(second) : "" };
+    } finally {
+      bitmap.close();
+    }
+  }
+  const LOGO_HOSTS = ["s3.pub2.infomaniak.cloud", "www.sportcorico.com", "sportcorico.com"];
+  function sportcoricoLink(value) {
+    try {
+      const url = new URL(value.trim());
+      return url.protocol === "https:" && /^(www\.)?sportcorico\.com$/.test(url.hostname) && url.pathname.startsWith("/clubs/") && !url.username ? url.href : "";
+    } catch {
+      return "";
+    }
+  }
+  const cleanTeamName = (value) => String(value || "").replace(/\s+\d+$/, "").trim();
   function open() {
     if (!needed()) return;
     shown = true;
@@ -107,7 +146,81 @@
     save.type = "submit";
     skip.type = "button";
     actions.append(save, skip);
-    form.append(title, intro, field("Nom du club", name), colors, logoWrap, preview, status, actions);
+    const linkInput = document.createElement("input");
+    linkInput.type = "text";
+    linkInput.inputMode = "url";
+    linkInput.placeholder = "https://www.sportcorico.com/clubs/…";
+    const find = text("button", "export", "Récupérer mon club"),
+      linkRow = text("div", "club-onboarding-linkrow"),
+      help = text("p", "club-onboarding-help"),
+      found = text("div", "club-onboarding-found");
+    find.type = "button";
+    linkRow.append(field("Lien Sportcorico de votre équipe (le plus simple)", linkInput), find);
+    help.append("Pas de lien ? ");
+    const helpLink = document.createElement("a");
+    helpLink.href = "https://www.sportcorico.com";
+    helpLink.target = "_blank";
+    helpLink.rel = "noopener noreferrer";
+    helpLink.textContent = "Trouvez votre équipe sur Sportcorico ↗";
+    help.append(helpLink, " puis copiez l’adresse de la page.");
+    async function pick(row) {
+      status.textContent = "";
+      name.value = cleanTeamName(row.team).slice(0, 70);
+      const logoUrl = typeof row.logo === "string" ? row.logo : "";
+      try {
+        const u = new URL(logoUrl);
+        if (u.protocol !== "https:" || !LOGO_HOSTS.includes(u.hostname)) return;
+        const blob = await (await fetch(u.href, { credentials: "omit", referrerPolicy: "no-referrer" })).blob();
+        logoValue = await shrinkLogo(blob);
+        preview.src = logoValue;
+        preview.hidden = false;
+        const colorsFound = await logoColors(blob);
+        if (colorsFound.primary) primary.value = colorsFound.primary;
+        if (colorsFound.secondary) secondary.value = colorsFound.secondary;
+      } catch {
+        status.textContent = "Nom récupéré, mais pas le logo : vous pouvez l’ajouter ci-dessous.";
+      }
+    }
+    find.onclick = async () => {
+      status.textContent = "";
+      found.replaceChildren();
+      const source = sportcoricoLink(linkInput.value),
+        gateway = window.CLUB_RANKING_GATEWAY || window.CLUB_CANVA_GATEWAY;
+      if (!source) {
+        status.textContent = "Collez l’adresse d’une page équipe Sportcorico (sportcorico.com/clubs/…).";
+        return;
+      }
+      if (!gateway) {
+        status.textContent = "Récupération indisponible ici : renseignez le club à la main.";
+        return;
+      }
+      find.disabled = true;
+      find.textContent = "Recherche…";
+      try {
+        const response = await fetch(gateway.replace(/\/$/, "") + "/api/sportcorico?url=" + encodeURIComponent(source), { cache: "no-store", credentials: "omit", signal: AbortSignal.timeout(60000) });
+        if (!response.ok) throw new Error("unavailable");
+        const data = await response.json(),
+          rows = Array.isArray(data.rows) ? data.rows.filter((row) => row && typeof row.team === "string") : [];
+        if (!rows.length) throw new Error("empty");
+        const own = rows.find((row) => row.team_id === data.teamId) || rows[0];
+        await pick(own);
+        if (rows.length > 1) {
+          found.append(text("p", "club-onboarding-help", "Ce n’est pas votre club ? Touchez le bon :"));
+          for (const row of rows) {
+            const button = text("button", "club-onboarding-club", cleanTeamName(row.team));
+            button.type = "button";
+            button.onclick = () => pick(row);
+            found.append(button);
+          }
+        }
+      } catch {
+        status.textContent = "Impossible de lire ce lien pour l’instant. Vérifiez l’adresse ou renseignez le club à la main.";
+      } finally {
+        find.disabled = false;
+        find.textContent = "Récupérer mon club";
+      }
+    };
+    form.append(title, intro, linkRow, help, found, field("Nom du club", name), colors, logoWrap, preview, status, actions);
     dialog.append(form);
     document.body.append(dialog);
     const finish = () => {

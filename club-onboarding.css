@@ -17,6 +17,13 @@ dialog.club-onboarding::backdrop{background:#0b1d3a99}
 .club-onboarding-actions .primary{border:1px solid #2855a2;background:#2855a2;color:#fff}
 .club-onboarding-actions .export{border:1px solid #cfd8e6;background:#fff;color:#2855a2}
 .club-onboarding :focus-visible{outline:3px solid #7ea2dd;outline-offset:2px}
+.club-onboarding-linkrow{display:flex;flex-direction:column;gap:8px}
+.club-onboarding-linkrow button{min-height:44px;border:1px solid #cfd8e6;border-radius:12px;background:#fff;color:#2855a2;font-size:15px;font-weight:700;cursor:pointer}
+.club-onboarding-help{margin:0;font-size:13px;line-height:1.5;color:#53617b}
+.club-onboarding-help a{color:#2855a2;font-weight:700}
+.club-onboarding-found{display:flex;flex-wrap:wrap;gap:6px}
+.club-onboarding-found .club-onboarding-help{flex:1 1 100%}
+.club-onboarding-club{min-height:36px;padding:0 12px;border:1px solid #cfd8e6;border-radius:999px;background:#fff;color:#1b2a41;font-size:13px;cursor:pointer}
 @media print{dialog.club-onboarding{display:none}}
 /* Le site transforme toutes les fenêtres en feuilles plein écran : ici, une carte centrée. */
 html body dialog.club-onboarding.workspace-sheet{position:fixed!important;inset:auto!important;top:50%!important;left:50%!important;transform:translate(-50%,-50%)!important;width:min(480px,calc(100vw - 24px))!important;height:auto!important;max-height:calc(100dvh - 24px)!important;border-radius:18px!important;background:#fff!important;box-shadow:0 0 0 100vmax #0b1d3a99,0 24px 80px #0b1d3a55!important;padding:0!important}
