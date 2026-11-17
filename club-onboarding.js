@@ -213,13 +213,17 @@
       status.textContent = "Ajout de l’équipe et de ses matchs…";
       try {
         if (typeof flushCoachWorkspace === "function" && !flushCoachWorkspace()) throw new Error("busy");
-        let hasDetails = false;
+        let hasDetails = false,
+          hasLogo = false;
         try {
-          hasDetails = !!coachStorageGet(coachClubDetailsKey);
+          const raw = coachStorageGet(coachClubDetailsKey);
+          hasDetails = !!raw;
+          hasLogo = !!(raw && JSON.parse(raw)?.logo);
         } catch {
           hasDetails = false;
         }
-        if (identityPending || !hasDetails) await applyClubIdentity(club);
+        // Club réglé sans logo (ancien compte) : le logo, le nom et les couleurs du club choisi sont appliqués.
+        if (identityPending || !hasDetails || !hasLogo) await applyClubIdentity(club);
         const entry = await applyTeam(team, club.name, gatewayBase());
         closeDialog?.();
         coachTeamRememberView(entry.id);
