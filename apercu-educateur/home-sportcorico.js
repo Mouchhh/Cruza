@@ -15,9 +15,13 @@ function renderHomeSportcorico(card){
   const wrap=el('div','home-sportcorico-table'),table=el('table');table.setAttribute('aria-label','Classement '+data.competition);
   const head=el('thead'),hr=el('tr');for(const label of ['Pl.','Équipe','J','Pts','Diff.']){const th=el('th','',label);th.scope='col';hr.append(th);}head.append(hr);table.append(head);
   const body=el('tbody');for(const r of data.rows){const row=el('tr');if(r.team_id===data.teamId){row.className='home-sportcorico-own';row.setAttribute('aria-current','true');}for(const value of [r.rank,r.team,r.games_played,r.points,r.difference>0?'+'+r.difference:r.difference])row.append(el('td','',String(value)));body.append(row);}table.append(body);wrap.append(table);card.append(wrap);
+  const expand=el('button','home-sportcorico-expand home-live-open','Voir le tableau');expand.type='button';expand.onclick=()=>{
+   document.querySelector('.home-sportcorico-dialog')?.remove();const dialog=el('dialog','home-sportcorico-dialog'),close=el('button','home-live-open','Fermer');close.type='button';close.onclick=()=>dialog.close();
+   dialog.append(el('h2','',data.competition+' · '+data.season),wrap.cloneNode(true),el('p','','Sportcorico · '+new Date(data.fetchedAt).toLocaleString('fr-FR',{timeZone:'Europe/Paris'})),close);const source=el('a','','Source Sportcorico ↗');source.href=homeSportcoricoSource;source.target='_blank';source.rel='noopener noreferrer';dialog.append(source);document.body.append(dialog);dialog.addEventListener('close',()=>dialog.remove());dialog.showModal();
+  };card.append(expand);
   const age=Date.now()-Date.parse(data.fetchedAt),stamp=new Intl.DateTimeFormat('fr-FR',{timeZone:'Europe/Paris',day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit'}).format(new Date(data.fetchedAt));
-  card.append(el('p','home-live-caption','Source : Sportcorico · récupéré le '+stamp+(age>2*60*60*1000?' · mise à jour en retard.':'.')));
-  if(homeSportcoricoError)card.append(el('p','home-live-caption','Actualisation indisponible · dernier classement conservé.'));
+  card.append(el('small','home-sportcorico-stamp','Sportcorico · '+stamp+(age>2*60*60*1000?' · mise à jour en retard.':'.')));
+  if(homeSportcoricoError)card.append(el('small','home-sportcorico-stamp','Actualisation indisponible · dernier classement conservé.'));
  }else card.append(el('p','',homeSportcoricoError?'Classement momentanément indisponible. Consultez la source.':'Chargement du classement…'));
  const link=el('a','home-live-open','Voir sur Sportcorico ↗');link.href=homeSportcoricoSource;link.target='_blank';link.rel='noopener noreferrer';card.append(link);
 }

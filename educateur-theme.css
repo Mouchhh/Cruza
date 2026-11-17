@@ -223,11 +223,26 @@
 @media screen and (max-width:700px){html body.home-mode.home-has-slides .home-hero{min-height:210px}}
 
 @media screen{
- #home-live-widgets .home-sportcorico-table{max-height:275px;overflow:auto;margin-top:14px;border:1px solid var(--smfc-line,#e2e6ee);border-radius:9px}
- #home-live-widgets .home-sportcorico-table table{width:100%;border-collapse:collapse;table-layout:fixed;font:11px/1.4 SMFCArchivo,Arial,sans-serif}
- #home-live-widgets .home-sportcorico-table th,#home-live-widgets .home-sportcorico-table td{padding:8px 5px;border-bottom:1px solid #e2e6ee;text-align:center;color:#173151;background:white}
- #home-live-widgets .home-sportcorico-table th{position:sticky;top:0;background:#eef3fb;z-index:1}
- #home-live-widgets .home-sportcorico-table th:nth-child(2),#home-live-widgets .home-sportcorico-table td:nth-child(2){width:55%;text-align:left;overflow-wrap:anywhere}
+ :is(#home-live-widgets,.home-sportcorico-dialog) .home-sportcorico-table{max-height:275px;overflow:auto;margin-top:14px;border:1px solid var(--smfc-line,#e2e6ee);border-radius:9px}
+ :is(#home-live-widgets,.home-sportcorico-dialog) .home-sportcorico-table table{width:100%;border-collapse:collapse;table-layout:fixed;font:11px/1.4 SMFCArchivo,Arial,sans-serif}
+ :is(#home-live-widgets,.home-sportcorico-dialog) .home-sportcorico-table th,:is(#home-live-widgets,.home-sportcorico-dialog) .home-sportcorico-table td{padding:8px 5px;border-bottom:1px solid #e2e6ee;text-align:center;color:#173151;background:white}
+ :is(#home-live-widgets,.home-sportcorico-dialog) .home-sportcorico-table th{position:sticky;top:0;background:#eef3fb;z-index:1}
+ :is(#home-live-widgets,.home-sportcorico-dialog) .home-sportcorico-table th:nth-child(2),:is(#home-live-widgets,.home-sportcorico-dialog) .home-sportcorico-table td:nth-child(2){width:55%;text-align:left;overflow-wrap:anywhere}
  #home-live-widgets .home-sportcorico-own td{background:#e7effc;font-weight:750;color:#0b2e8a}
  #home-live-widgets .home-live-ranking a.home-live-open{display:inline-block;text-decoration:none}
+}
+
+@media screen{
+ .home-sportcorico-expand{display:none}
+ .home-sportcorico-stamp{display:block;flex:1 1 100%;font-size:10px;line-height:1.4;color:var(--smfc-muted,#53617b);margin-top:6px}
+ .home-sportcorico-dialog{width:min(650px,94vw);max-height:90dvh;padding:20px;box-sizing:border-box;border:1px solid #e2e6ee;border-radius:14px;background:#fff;color:#173151}
+ .home-sportcorico-dialog .home-sportcorico-table{max-height:60dvh;overflow:auto}
+ .home-sportcorico-dialog a{display:inline-block;margin:12px}
+}
+@media screen and (max-width:700px){
+ html body.home-mode #home-page-0 #home-live-widgets .home-live-ranking>.home-sportcorico-table{display:none}
+ html body.home-mode #home-page-0 #home-live-widgets .home-live-ranking>.home-sportcorico-expand{display:inline-block!important}
+ html body.home-mode #home-page-0 #home-live-widgets .home-live-ranking>a.home-live-open{display:none!important}
+ html body.home-mode #home-page-0 #home-live-widgets .home-live-ranking{order:1}
+ html body.home-mode #home-page-0 #home-live-widgets .home-live-ranking .home-sportcorico-stamp{margin:0;font-size:9px}
 }
