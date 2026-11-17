@@ -41,6 +41,10 @@ function coachTeamCategoryId(category) {
     hash = Math.imul(hash ^ char.charCodeAt(0), 16777619);
   return "category-" + (hash >>> 0).toString(36);
 }
+function coachTeamSportcoricoURL(value){
+ if(!String(value||'').trim())return '';
+ try{const url=new URL(String(value).trim());if(url.protocol!=='https:'||!['sportcorico.com','www.sportcorico.com'].includes(url.hostname)||url.username||url.password||url.port||!/^\/clubs\/[a-z0-9-]+\/[a-z0-9-]+\/?$/.test(url.pathname))return null;return 'https://www.sportcorico.com'+url.pathname.replace(/\/$/,'');}catch{return null;}
+}
 function coachTeamValid(team) {
   return (
     team &&
@@ -52,7 +56,8 @@ function coachTeamValid(team) {
     typeof team.category === "string" &&
     team.category.length <= 30 &&
     typeof team.team === "string" &&
-    team.team.length <= 50
+    team.team.length <= 50 &&
+    (team.sportcoricoURL === undefined || typeof team.sportcoricoURL === "string" && coachTeamSportcoricoURL(team.sportcoricoURL) === team.sportcoricoURL)
   );
 }
 function coachTeamFromCategory(category, team = "") {
@@ -590,6 +595,9 @@ function coachTeamAddDialog(edit = false, targetTeam = activeCoachTeam) {
         : editedTeam.label;
     category.value = editedTeam.category;
   }
+  const sportcorico=field('Lien Sportcorico de cette équipe (facultatif)',500);
+  sportcorico.type='url';sportcorico.required=false;sportcorico.placeholder='https://www.sportcorico.com/clubs/.../...';sportcorico.value=edit?(editedTeam.sportcoricoURL??(typeof homeSportcoricoSourceURL==='function'&&editedTeam.id===activeCoachTeam.id?homeSportcoricoSourceURL():'')):'';
+  form.append(el('p','hint','Copiez la page de votre équipe sur Sportcorico. Ce lien est propre à cette équipe et peut être modifié ici.'));
   const hint = el(
       "p",
       "hint",
@@ -616,11 +624,14 @@ function coachTeamAddDialog(edit = false, targetTeam = activeCoachTeam) {
   form.onsubmit = (e) => {
     e.preventDefault();
     if (!form.reportValidity()) return;
+    const sportcoricoURL=coachTeamSportcoricoURL(sportcorico.value);
+    if(sportcoricoURL===null){status.textContent='Collez un lien d’équipe Sportcorico : https://www.sportcorico.com/clubs/club/equipe';return;}
     const entry = {
       id: edit ? editedTeam.id : "team-" + crypto.randomUUID(),
       label: label.value.trim(),
       category: category.value.trim(),
       team: team.value.trim(),
+      sportcoricoURL,
     };
     if (!coachTeamValid(entry) || !entry.category || !entry.team) {
       status.textContent = "Renseignez les trois champs.";

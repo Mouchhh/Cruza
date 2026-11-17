@@ -226,3 +226,5 @@
  html body.home-mode .home-hero #home-last-saved{color:#e1eafa}
 }
 @media screen and (max-width:700px){html body.home-mode.home-has-slides .home-hero{min-height:210px}}
+
+@media screen{html body #home-live-widgets .home-sportcorico-configure{background:transparent;border:0;color:var(--smfc-blue,#0b2e8a);padding:6px 0;min-height:32px;font-size:11px;text-decoration:underline}}

@@ -9,3 +9,15 @@ Source publique fournie : https://www.sportcorico.com/clubs/st-mayennais-fc/maye
 L’interface relit le fichier toutes les cinq minutes pendant l’affichage de l’accueil et au retour dans la fenêtre, sans écrire dans le stockage local. La récupération amont reste horaire : ce n’est pas du temps réel seconde par seconde. La date et l’heure sont toujours affichées en heure de Paris ; un avertissement indique si les données datent de plus de deux heures. En cas d’erreur, le tableau déjà reçu reste affiché, accompagné de son état. Le lien Sportcorico permet de consulter directement la source.
 
 Validation : extraction sur la page réellement reçue le 17 novembre 2026 ; dix lignes, bonne équipe et saison ; rejet d’une mauvaise équipe et d’une page de maintenance ; contrôles navigateur 1440, 390 et 320 pixels, intégrité des dix lignes, surbrillance du club, données invalides refusées et conservation du dernier tableau si la récupération échoue. Aucun changement Supabase requis.
+
+## Configuration autonome par équipe
+
+Le bouton **Configurer le classement** du widget ouvre **Configurer mon équipe**. Le champ facultatif **Lien Sportcorico de cette équipe** accepte une page HTTPS `/clubs/club/equipe` de Sportcorico et retire les paramètres de suivi. Il existe aussi à la création d’une équipe. Lien vide : classement désactivé pour cette équipe. Les liens sont enregistrés dans le manifeste des équipes du profil de ce navigateur, comme les autres réglages d’équipe ; cette modification n’ajoute pas de synchronisation des réglages entre appareils.
+
+L’équipe active choisit sa propre source. Les réponses dont la source ou le slug ne correspond pas sont refusées ; un autre classement ne sert jamais de remplacement. Le tableau U17 historique conserve sa récupération horaire existante. Pour les autres sources, l’interface appelle le lecteur public `/api/sportcorico` du service Render existant, cache serveur quinze minutes et nouvelle lecture toutes les cinq minutes sur l’accueil. Les classements sont publics et aucune session Canva ou clé Supabase n’est envoyée par ce lecteur. La configuration publique `ranking-config.js` est distincte de Canva, y compris dans la version neutre.
+
+### Activation du lecteur sur Render
+
+Déployer le commit contenant `canva-gateway/sportcorico.mjs`, la route dans `server.mjs` et le Dockerfile mis à jour sur le service **CANVA EDUCATEUR SMFC**. Aucun nouveau service, variable secrète ou migration Supabase. Le domaine du site doit déjà figurer dans `ALLOWED_ORIGINS` (même origine que Canva). Tant que l’ancien serveur tourne, la configuration du lien et l’accès à Sportcorico fonctionnent, mais les nouveaux tableaux ne peuvent pas se charger automatiquement. Au contrôle initial, l’ancienne route répondait 401 : le lecteur n’y était donc pas encore déployé.
+
+Tests : changement d’équipe U17/U15 par le formulaire réel, stockage séparé, paramètres de suivi supprimés, persistance après rechargement, retour au classement U17 ; dix tests serveur, incluant les imports Canva existants, restrictions d’URL, liaison au slug exact, cache et refus des origines non autorisées.

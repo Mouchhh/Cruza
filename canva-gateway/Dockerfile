@@ -1,7 +1,7 @@
 FROM node:24-bookworm-slim
 ENV NODE_ENV=production DATA_DIR=/data PORT=3001
 WORKDIR /app
-COPY --chmod=644 server.mjs package.json ./
+COPY --chmod=644 server.mjs sportcorico.mjs package.json ./
 RUN mkdir -p /data && chown node:node /data
 USER node
 EXPOSE 3001
