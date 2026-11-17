@@ -6,6 +6,19 @@ function homeSportcoricoSourceURL(){
  return true&&/^U17$/i.test(String(activeCoachTeam.category||'').trim())&&/mayennais|mayenne/i.test(activeCoachTeam.team||'')?homeSportcoricoDefaultSource:'';
 }
 function homeSportcoricoSettings(card){const configure=el('button','home-sportcorico-configure','Configurer le classement');configure.type='button';configure.onclick=()=>coachTeamAddDialog(true);card.append(configure);}
+function homeSportcoricoLogo(value){
+ try{const u=new URL(value);return typeof value==='string'&&value.length<=1000&&u.protocol==='https:'&&['s3.pub2.infomaniak.cloud','www.sportcorico.com','sportcorico.com'].includes(u.hostname)&&!u.username&&!u.password&&!u.port?u.href:'';}catch{return '';}
+}
+function homeSportcoricoTeamCell(row){
+ const cell=el('td','home-sportcorico-club'),identity=el('span','home-sportcorico-identity'),badge=el('span','home-sportcorico-badge');badge.setAttribute('aria-hidden','true');badge.append(el('span','',row.team.replace(/[^A-Za-zÀ-ÿ0-9 ]/g,'').split(/\s+/).filter(Boolean).map(w=>w[0]).slice(0,2).join('')));
+ const logo=homeSportcoricoLogo(row.logo);if(logo){const img=el('img','home-sportcorico-logo');img.alt='';img.loading='lazy';img.referrerPolicy='no-referrer';img.width=26;img.height=26;img.src=logo;badge.append(img);}
+ identity.append(badge,el('span','home-sportcorico-name',row.team));cell.append(identity);
+ const form=el('span','home-sportcorico-form');const results=Array.isArray(row.form)?row.form.slice(0,5):[],labels={V:'Victoire',N:'Match nul',D:'Défaite','?':'Résultat non renseigné'};
+ form.setAttribute('aria-label',results.length?'Derniers résultats : '+results.map(v=>labels[v]||labels['?']).join(', '):'Derniers résultats non disponibles');
+ if(results.length)for(const value of results){const v=['V','N','D'].includes(value)?value:'?',dot=el('span','home-sportcorico-result result-'+v,v==='?'?'–':v);dot.title=labels[v];dot.setAttribute('aria-hidden','true');form.append(dot);}else form.append(el('span','home-sportcorico-empty','Forme non disponible'));
+ cell.append(form);return cell;
+}
+document.addEventListener('error',event=>{if(event.target?.matches?.('img.home-sportcorico-logo'))event.target.remove();},true);
 function homeSportcoricoValid(data,source=homeSportcoricoSourceURL()){
  return data?.version===1&&data.sourceURL===source&&data.teamSlug===source.split('/').at(-1)&&Number.isInteger(data.teamId)&&typeof data.category==='string'&&Number.isFinite(Date.parse(data.fetchedAt))&&['season','competition','pool'].every(k=>typeof data[k]==='string'&&data[k].length<=200)&&Array.isArray(data.rows)&&data.rows.length>=2&&data.rows.length<=80&&new Set(data.rows.map(r=>r.rank)).size===data.rows.length&&new Set(data.rows.map(r=>r.team_id)).size===data.rows.length&&data.rows.some(r=>r.team_id===data.teamId)&&data.rows.every(r=>r&&typeof r.team==='string'&&r.team.length>0&&r.team.length<=200&&['rank','points','games_played','difference','team_id'].every(k=>Number.isInteger(r[k])&&Math.abs(r[k])<1000000)&&r.rank>0&&r.rank<=100&&r.games_played>=0&&r.games_played<=200);
 }
@@ -19,10 +32,10 @@ function renderHomeSportcorico(card){
   card.append(el('p','home-live-caption',data.competition+' · '+data.pool+' · '+data.season));
   const wrap=el('div','home-sportcorico-table'),table=el('table');table.setAttribute('aria-label','Classement '+data.competition);
   const head=el('thead'),hr=el('tr');for(const label of ['Pl.','Équipe','J','Pts','Diff.']){const th=el('th','',label);th.scope='col';hr.append(th);}head.append(hr);table.append(head);
-  const body=el('tbody');for(const r of data.rows){const row=el('tr');if(r.team_id===data.teamId){row.className='home-sportcorico-own';row.setAttribute('aria-current','true');}for(const value of [r.rank,r.team,r.games_played,r.points,r.difference>0?'+'+r.difference:r.difference])row.append(el('td','',String(value)));body.append(row);}table.append(body);wrap.append(table);card.append(wrap);
+  const body=el('tbody');for(const r of data.rows){const row=el('tr');if(r.team_id===data.teamId){row.className='home-sportcorico-own';row.setAttribute('aria-current','true');}const rank=el('td','home-sportcorico-rank',String(r.rank));if(r.rank<=3)rank.classList.add('home-sportcorico-top');row.append(rank,homeSportcoricoTeamCell(r));for(const value of [r.games_played,r.points,r.difference>0?'+'+r.difference:r.difference])row.append(el('td','',String(value)));body.append(row);}table.append(body);wrap.append(table);card.append(wrap,el('small','home-sportcorico-legend','Forme : V victoire · N nul · D défaite · ordre Sportcorico'));
   const expand=el('button','home-sportcorico-expand home-live-open','Voir le tableau');expand.type='button';expand.onclick=()=>{
    document.querySelector('.home-sportcorico-dialog')?.remove();const dialog=el('dialog','home-sportcorico-dialog'),close=el('button','home-live-open','Fermer');close.type='button';close.onclick=()=>dialog.close();
-   dialog.append(el('h2','',data.competition+' · '+data.season),wrap.cloneNode(true),el('p','','Sportcorico · '+new Date(data.fetchedAt).toLocaleString('fr-FR',{timeZone:'Europe/Paris'})),close);const source=el('a','','Source Sportcorico ↗');source.href=homeSportcoricoSourceURL();source.target='_blank';source.rel='noopener noreferrer';dialog.append(source);document.body.append(dialog);dialog.addEventListener('close',()=>dialog.remove());dialog.showModal();
+   dialog.append(el('h2','',data.competition+' · '+data.season),wrap.cloneNode(true),el('small','home-sportcorico-legend','V victoire · N nul · D défaite · ordre Sportcorico'),el('p','','Sportcorico · '+new Date(data.fetchedAt).toLocaleString('fr-FR',{timeZone:'Europe/Paris'})),close);const source=el('a','','Source Sportcorico ↗');source.href=homeSportcoricoSourceURL();source.target='_blank';source.rel='noopener noreferrer';dialog.append(source);document.body.append(dialog);dialog.addEventListener('close',()=>dialog.remove());dialog.showModal();
   };card.append(expand);
   const age=Date.now()-Date.parse(data.fetchedAt),stamp=new Intl.DateTimeFormat('fr-FR',{timeZone:'Europe/Paris',day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit'}).format(new Date(data.fetchedAt));
   card.append(el('small','home-sportcorico-stamp','Sportcorico · '+stamp+(age>2*60*60*1000?' · mise à jour en retard.':'.')));

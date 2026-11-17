@@ -1,5 +1,6 @@
 """Fetch the public U17 table. Fail closed and preserve the last valid snapshot."""
 import json, re, urllib.request
+from urllib.parse import urlparse
 from datetime import datetime, timezone
 from pathlib import Path
 
@@ -47,6 +48,11 @@ def parse_page(html):
             raise ValueError('Sportcorico: non-numeric table')
         if not 1 <= row['rank'] <= 100 or not 0 <= row['games_played'] <= 200 or not isinstance(row['team'], str) or not 1 <= len(row['team']) <= 200:
             raise ValueError('Sportcorico: invalid row')
+        logo = line.get('logo', '')
+        parsed_logo = urlparse(logo) if isinstance(logo, str) else None
+        row['logo'] = logo if parsed_logo and parsed_logo.scheme == 'https' and parsed_logo.hostname in ('s3.pub2.infomaniak.cloud', 'www.sportcorico.com', 'sportcorico.com') and not parsed_logo.username and not parsed_logo.password and not parsed_logo.port and len(logo) <= 1000 else ''
+        form = line.get('shape_of_the_moment')
+        row['form'] = [v if v in ('V', 'N', 'D') else '?' for v in form[:5]] if isinstance(form, list) else []
         rows.append(row)
     if not 2 <= len(rows) <= 80 or len({r['rank'] for r in rows}) != len(rows) or len({r['team_id'] for r in rows}) != len(rows):
         raise ValueError('Sportcorico: invalid table')

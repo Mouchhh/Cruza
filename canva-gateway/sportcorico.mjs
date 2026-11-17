@@ -2,6 +2,9 @@
 export function sportcoricoSource(value){
  try{const u=new URL(value);if(u.protocol!=='https:'||!['sportcorico.com','www.sportcorico.com'].includes(u.hostname)||u.port||u.username||u.password||!/^\/clubs\/[a-z0-9-]+\/[a-z0-9-]+\/?$/.test(u.pathname))throw Error();return 'https://www.sportcorico.com'+u.pathname.replace(/\/$/,'');}catch{throw Object.assign(Error('Lien Sportcorico invalide.'),{status:400});}
 }
+export function sportcoricoLogo(value){
+ try{const u=new URL(value);return typeof value==='string'&&value.length<=1000&&u.protocol==='https:'&&['s3.pub2.infomaniak.cloud','www.sportcorico.com','sportcorico.com'].includes(u.hostname)&&!u.username&&!u.password&&!u.port?u.href:'';}catch{return '';}
+}
 export function parseSportcorico(html,sourceURL){
  sourceURL=sportcoricoSource(sourceURL);
  const match=html.match(/<script\b[^>]*\bid="__NUXT_DATA__"[^>]*>([\s\S]*?)<\/script>/);
@@ -19,6 +22,7 @@ export function parseSportcorico(html,sourceURL){
  if(tables?.length!==1)throw Error('Aucun championnat unique trouvé pour cette équipe.');
  const t=tables[0],rows=t.lines.map(r=>Object.fromEntries(['rank','points','games_played','difference','team','team_id'].map(k=>[k,r[k]])));
  if(rows.length<2||rows.length>80||new Set(rows.map(r=>r.rank)).size!==rows.length||new Set(rows.map(r=>r.team_id)).size!==rows.length||rows.some(r=>typeof r.team!=='string'||!r.team||r.team.length>200||!['rank','points','games_played','difference','team_id'].every(k=>Number.isInteger(r[k])&&Math.abs(r[k])<1000000)||r.rank<1||r.rank>100||r.games_played<0||r.games_played>200))throw Error('Tableau Sportcorico invalide.');
+ for(let i=0;i<rows.length;i++){rows[i].logo=sportcoricoLogo(t.lines[i].logo);rows[i].form=Array.isArray(t.lines[i].shape_of_the_moment)?t.lines[i].shape_of_the_moment.slice(0,5).map(v=>['V','N','D'].includes(v)?v:'?'):[];}
  const meta=[entry.current_season?.label,t.championship_name,t.pool_name,team.category?.name];if(meta.some(v=>typeof v!=='string'||v.length>200))throw Error('Championnat non reconnu.');
  return {version:1,sourceURL,teamSlug:slug,teamId:team.id,teamName:team.club_name+' '+team.name_generated,category:meta[3],season:meta[0],competition:meta[1],pool:meta[2],rows:rows.sort((a,b)=>a.rank-b.rank)};
 }

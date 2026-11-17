@@ -15,7 +15,15 @@
       "games_played": 7,
       "difference": 13,
       "team": "GJ Pays de L'ernee - Juvigne St Pierre des Landes 1",
-      "team_id": 697553
+      "team_id": 697553,
+      "logo": "https://s3.pub2.infomaniak.cloud/object/v1/AUTH_7caca171fcb14ede88bd14eb36f90e50/sportcorico-media/logos/logo-gj-pays-de-lernee-564801.jpg",
+      "form": [
+        "V",
+        "N",
+        "V",
+        "V",
+        "D"
+      ]
     },
     {
       "rank": 2,
@@ -23,7 +31,15 @@
       "games_played": 7,
       "difference": 9,
       "team": "US Changeenne 2",
-      "team_id": 436598
+      "team_id": 436598,
+      "logo": "https://s3.pub2.infomaniak.cloud/object/v1/AUTH_7caca171fcb14ede88bd14eb36f90e50/sportcorico-media/logos/logo-change-us-522949.jpg",
+      "form": [
+        "D",
+        "V",
+        "V",
+        "V",
+        "V"
+      ]
     },
     {
       "rank": 3,
@@ -31,7 +47,15 @@
       "games_played": 6,
       "difference": 27,
       "team": "GJ Haut-anjou 1",
-      "team_id": 436617
+      "team_id": 436617,
+      "logo": "https://s3.pub2.infomaniak.cloud/object/v1/AUTH_7caca171fcb14ede88bd14eb36f90e50/sportcorico-media/logos/logo-gj-haut-anjou-582573.jpg",
+      "form": [
+        "V",
+        "V",
+        "V",
+        "V",
+        "D"
+      ]
     },
     {
       "rank": 4,
@@ -39,7 +63,15 @@
       "games_played": 6,
       "difference": 23,
       "team": "US Meral Cosse le Vivien 1",
-      "team_id": 436980
+      "team_id": 436980,
+      "logo": "https://s3.pub2.infomaniak.cloud/object/v1/AUTH_7caca171fcb14ede88bd14eb36f90e50/sportcorico-media/logos/logo-meral-cosse-us-547612.jpg",
+      "form": [
+        "D",
+        "V",
+        "D",
+        "N",
+        "V"
+      ]
     },
     {
       "rank": 5,
@@ -47,7 +79,15 @@
       "games_played": 7,
       "difference": 9,
       "team": "US St Berthevin les Laval 1",
-      "team_id": 437048
+      "team_id": 437048,
+      "logo": "https://s3.pub2.infomaniak.cloud/object/v1/AUTH_7caca171fcb14ede88bd14eb36f90e50/sportcorico-media/logos/logo-st-berthevin-us-502235.jpg",
+      "form": [
+        "D",
+        "D",
+        "V",
+        "V",
+        "V"
+      ]
     },
     {
       "rank": 6,
@@ -55,7 +95,15 @@
       "games_played": 7,
       "difference": 3,
       "team": "GJ Pays de Chateau-gontier 2",
-      "team_id": 758330
+      "team_id": 758330,
+      "logo": "https://s3.pub2.infomaniak.cloud/object/v1/AUTH_7caca171fcb14ede88bd14eb36f90e50/sportcorico-media/logos/logo-gj-chateau-gonpays-582577.jpg",
+      "form": [
+        "V",
+        "V",
+        "D",
+        "V",
+        "D"
+      ]
     },
     {
       "rank": 7,
@@ -63,7 +111,15 @@
       "games_played": 7,
       "difference": 4,
       "team": "St. Mayennais FC 2",
-      "team_id": 606690
+      "team_id": 606690,
+      "logo": "https://s3.pub2.infomaniak.cloud/object/v1/AUTH_7caca171fcb14ede88bd14eb36f90e50/sportcorico-media/logos/logo-mayenne-stade-fc-548126.jpg",
+      "form": [
+        "V",
+        "D",
+        "V",
+        "D",
+        "V"
+      ]
     },
     {
       "rank": 8,
@@ -71,7 +127,15 @@
       "games_played": 7,
       "difference": -30,
       "team": "AS Contest St Baudelle 1",
-      "team_id": 606643
+      "team_id": 606643,
+      "logo": "https://s3.pub2.infomaniak.cloud/object/v1/AUTH_7caca171fcb14ede88bd14eb36f90e50/sportcorico-media/logos/logo-contest-st-baud-as-528774.jpg",
+      "form": [
+        "D",
+        "N",
+        "D",
+        "D",
+        "V"
+      ]
     },
     {
       "rank": 9,
@@ -79,7 +143,15 @@
       "games_played": 7,
       "difference": -33,
       "team": "US Lavalloise 1",
-      "team_id": 436823
+      "team_id": 436823,
+      "logo": "https://s3.pub2.infomaniak.cloud/object/v1/AUTH_7caca171fcb14ede88bd14eb36f90e50/sportcorico-media/logos/logo-laval-us-500040.jpg",
+      "form": [
+        "V",
+        "D",
+        "D",
+        "D",
+        "D"
+      ]
     },
     {
       "rank": 10,
@@ -87,8 +159,16 @@
       "games_played": 7,
       "difference": -25,
       "team": "AS du Bourny 1",
-      "team_id": 436831
+      "team_id": 436831,
+      "logo": "https://s3.pub2.infomaniak.cloud/object/v1/AUTH_7caca171fcb14ede88bd14eb36f90e50/sportcorico-media/logos/logo-laval-bourny-as-531444.jpg",
+      "form": [
+        "D",
+        "D",
+        "N",
+        "D",
+        "D"
+      ]
     }
   ],
-  "fetchedAt": "2026-11-17T19:11:59.011613+00:00"
+  "fetchedAt": "2026-11-17T19:35:24.875821+00:00"
 }
