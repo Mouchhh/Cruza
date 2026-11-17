@@ -257,6 +257,7 @@ function coachAccountRenderClub({
     }
     try {
       coachStorageSet(coachClubDetailsKey, JSON.stringify(value));
+      document.dispatchEvent(new CustomEvent("coach-private-changed",{detail:{kind:"settings",key:"club"}}));
       dirty.delete("club");
       clubTheme.apply(value);
       window.clubNameRefresh?.();

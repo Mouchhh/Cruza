@@ -4,6 +4,7 @@ const coachTeamManifestKey = coachTeamBaseKey("vestiaire-teams");
 const coachTeamSelectionKey = coachTeamBaseKey("vestiaire-active-team");
 const coachTeamSharedKeys = new Set([
   "vestiaire-coach-account",
+  "vestiaire-private-sync",
   "vestiaire-personal-exercises",
   "vestiaire-personal-canva",
 ]);

@@ -87,6 +87,7 @@
       };
     });
     await list();
+    for(const row of rows.slice(0,stored))document.dispatchEvent(new CustomEvent("coach-private-changed",{detail:{kind:"photo",key:row.id}}));
     return { added: stored, skipped: files.length - stored };
   }
   async function rename(id, name) {
@@ -95,10 +96,12 @@
     if (!row) return;
     await tx("readwrite", (s) => s.put({ ...row, coach: owner, name: String(name).trim().slice(0, 60) || "Photo" }));
     await list();
+    document.dispatchEvent(new CustomEvent("coach-private-changed",{detail:{kind:"photo",key:id}}));
   }
   async function remove(id) {
     await tx("readwrite", (s) => s.delete(coach() + ":" + id));
     await list();
+    document.dispatchEvent(new CustomEvent("coach-private-changed",{detail:{kind:"photo",key:id,deleted:true}}));
   }
   window.clubPhotoLibrary = {
     list,
@@ -106,6 +109,16 @@
     rename,
     remove,
     max: MAX,
+    applyRemote: async (id,payload,deleted=false)=>{
+      const owner=coach();
+      if(!/^[0-9a-f-]{36}$/.test(id))throw Error('Identifiant de photo invalide');
+      if(deleted)await tx('readwrite',s=>s.delete(owner+':'+id));
+      else{
+        if(!payload||typeof payload.name!=='string'||payload.name.length>60||typeof payload.data!=='string'||payload.data.length>1950000||!/^data:image\/jpeg;base64,[a-zA-Z0-9+/=]+$/.test(payload.data)||!Number.isFinite(Date.parse(payload.createdAt)))throw Error('Photo du compte invalide');
+        await tx('readwrite',s=>s.put({key:owner+':'+id,id,coach:owner,name:payload.name,data:payload.data,createdAt:payload.createdAt}));
+      }
+      if(owner===coach())await list();
+    },
     cached: () => (loadedFor === coach() ? cache : []),
   };
   list().catch(() => {});
@@ -129,7 +142,7 @@
       label.append(input);
       section.append(
         el("h3", "", "Bibliothèque photos"),
-        el("p", "hint", "Ces photos sont proposées dans vos causeries (photos des slides). Enregistrées tout de suite sur cet appareil, " + MAX + " maximum."),
+        el("p", "hint", "Ces photos sont proposées dans vos causeries. Elles sont conservées sur cet appareil puis synchronisées avec votre compte lorsque le service privé est activé, " + MAX + " maximum."),
         label,
         status,
         grid,
