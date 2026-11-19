@@ -88,3 +88,10 @@
  html body.home-mode #home-page-0 #home-live-widgets .home-live-ranking{display:flex;flex-direction:column}
  html body.home-mode #home-page-0 #home-live-widgets .home-live-ranking .home-sportcorico-table{max-height:300px!important;flex:0 1 auto;min-height:0}
 }
+
+/* Classement de l'accueil (ordinateur) : plus de pastilles de forme sous chaque équipe — des lignes plus fines, plus de place. */
+@media screen and (min-width:701px){
+ html body.home-mode #home-page-0 #home-live-widgets .home-live-ranking .home-sportcorico-form{display:none!important}
+ html body.home-mode #home-page-0 #home-live-widgets .home-live-ranking .home-sportcorico-table td{padding-block:6px!important}
+ html body.home-mode #home-page-0 #home-live-widgets .home-live-ranking .home-sportcorico-table{max-height:340px!important}
+}

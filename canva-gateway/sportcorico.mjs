@@ -14,7 +14,8 @@ export function parseGames(list,teamId){
   if(!g||!Number.isInteger(g.id)||![g.home_team_id,g.outside_team_id].includes(teamId))return [];
   const date=/^(\d{4}-\d{2}-\d{2})/.exec(String(g.event_date||''))?.[1],time=/^([01]\d|2[0-3]):[0-5]\d$/.test(g.planned_time||'')?g.planned_time:'',home=text(g.home_team_name,150),away=text(g.outside_team_name,150);
   if(!date||!home||!away||g.exempt)return [];
-  const played=g.status==='Terminé'&&score(g.home_score)!==null&&score(g.outside_score)!==null;
+  // Un match avec un score est joué, même si Sportcorico le laisse marqué « À venir » (statut parfois en retard sur le score).
+  const played=score(g.home_score)!==null&&score(g.outside_score)!==null;
   return [{id:g.id,date,time,home,away,homeId:g.home_team_id,awayId:g.outside_team_id,competition:text(g.championship_name,150),status:played?'played':'planned',...(played?{homeScore:g.home_score,awayScore:g.outside_score}:{})}];
  }).sort((a,b)=>(a.date+a.time).localeCompare(b.date+b.time));
 }
