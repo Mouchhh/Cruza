@@ -60,11 +60,15 @@
     if (onHome && wanted()) {
       banner ||= build();
       if (banner.parentElement !== document.body) document.body.append(banner);
-      document.body.classList.add("home-photo-banner-on");
+      if (!document.body.classList.contains("home-photo-banner-on")) {
+        document.body.classList.add("home-photo-banner-on");
+      }
     } else {
       banner?.remove();
       banner = null;
-      document.body.classList.remove("home-photo-banner-on");
+      if (document.body.classList.contains("home-photo-banner-on")) {
+        document.body.classList.remove("home-photo-banner-on");
+      }
     }
   }
   function load() {
