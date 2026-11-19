@@ -31,8 +31,24 @@
     const page = document.title.split(" · ")[0].trim();
     crumb.textContent = page ? page : "";
   }
+  // Profil : « Coach principal · données existantes » devient « Coach principal » (le détail reste dans l'infobulle).
+  function shortenProfile() {
+    const trigger = document.querySelector("body>header #coach-profile-trigger");
+    if (!trigger) return;
+    for (const span of trigger.querySelectorAll("span")) {
+      const full = span.textContent || "";
+      if (full.includes(" · ") && !span.querySelector("*")) {
+        span.title = full;
+        span.textContent = full.split(" · ")[0];
+      }
+    }
+  }
   document.addEventListener("DOMContentLoaded", () => {
     build();
+    shortenProfile();
+    // Le menu du profil est construit après ce script et ré-écrit quand le coach change : on surveille tout le bandeau.
+    const header = document.querySelector("body>header");
+    if (header) new MutationObserver(shortenProfile).observe(header, { childList: true, characterData: true, subtree: true });
     const title = document.querySelector("title");
     if (title) new MutationObserver(updateCrumb).observe(title, { childList: true, characterData: true, subtree: true });
   });
