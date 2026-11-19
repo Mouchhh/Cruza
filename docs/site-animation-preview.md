@@ -1,4 +1,4 @@
-# Le site actuel, avec des animations uniquement
+# Aperçu assemblé : accueil et semaine validés, outils actuels animés
 
 Lien : https://mouchhh.github.io/Cruza/apercu-site-anime/index.html?mode=local
 
@@ -6,7 +6,16 @@ Lien : https://mouchhh.github.io/Cruza/apercu-site-anime/index.html?mode=local
 
 Copie des pages, feuilles de style, scripts métier, ressources publiques et données publiques du site au commit `31b7756`. Le manifeste SHA-256 `site-animation-preview-source.json` enregistre les fichiers de référence. La vidéo de référence et les autres aperçus ne sont pas utilisés pour reconstruire ou redessiner l’interface.
 
-Les textes, formulaires, menus, positions, couleurs, tableaux, bibliothèques et outils existants restent ceux du site. Aucun élément métier n’est remplacé par une nouvelle maquette.
+Les formulaires, bibliothèques, menus et outils des autres onglets restent ceux du site. À la demande de l’utilisateur, deux présentations sont désormais remplacées dans cet aperçu : l’accueil et la vue d’ensemble de l’agenda. Leur direction visuelle reprend l’aperçu « évolution » précédemment validé. Le vrai site n’est pas modifié.
+
+## Deux pages reprises de l’aperçu précédent
+
+- **Accueil** : grand visuel du club, action de préparation / reprise, fil agenda–causerie–bilan, prochains rendez-vous, indicateurs et retour vers les séances. Le classement reste accessible dans une fenêtre utilisant son lecteur existant.
+- **Agenda** : semaine sur sept jours, navigation entre semaines, choix de date et filtres par type. Un clic ouvre le rendez-vous dans son outil habituel. L’onglet Agenda ouvre cette vue semaine par défaut ; le calendrier complet d’origine reste accessible.
+- Les données sont lues dans `agendaCalendarAllEvents`, `homeWidgetsSnapshot`, les bibliothèques et les contrôleurs existants. Aucun événement, joueur ou pourcentage de l’ancien scénario fictif n’est injecté.
+- Les liens de préparation et de bilan passent par `agendaEventCauserie` et `agendaEventReport`. La création d’une séance passe par `agendaCalendarPrepare` ; les règles d’archivage et de remplacement des brouillons restent celles du produit.
+- Le code des deux pages est isolé dans `preview-selected-pages.js` et sa feuille de style. Les éléments de présentation d’origine restent dans le DOM, masqués uniquement dans ces deux vues.
+- Pour comparer avec la copie fidèle à animations seules : ajouter `&layout=original` à l’URL. Ce mode est aussi utilisé par le test d’intégrité existant.
 
 ## Animations ajoutées
 
@@ -40,3 +49,5 @@ python3 tests/original-site-motion-browser.py
 ```
 
 Le test vérifie la fidélité des sources, l’état final des pages, les changements de vue et de sous-onglets, l’animation effective, la conservation des positions lorsque les animations sont coupées, le mouvement réduit, l’isolation du stockage et l’absence d’appels de données externes. Les vérifications navigateur utilisent Chromium ; elles ne remplacent pas des essais sur appareils physiques.
+
+Pour les deux pages assemblées : `python3 tests/selected-home-agenda-browser.py`. Ce test couvre les liens aux outils existants, le contexte du match, les semaines et filtres, l’accès au calendrier d’origine, le classement et les deux vues à quatre largeurs.

@@ -17,7 +17,7 @@
   function stop(){cancelAnimationFrame(frame);frame=0;for(const a of animations)a.cancel();animations.clear();}
   function run(node,frames,options){if(!on()||!visible(node)||typeof node.animate!=='function')return;const a=node.animate(frames,{duration:550,easing:'cubic-bezier(.16,.8,.2,1)',...options});animations.add(a);a.finished.catch(()=>{}).finally(()=>{animations.delete(a);a.cancel();});return a;}
   function candidates(root,panel){
-    const specific=[...root.querySelectorAll('.home-hero,.home-live-card,.home-section-card,.resource-card,.coach-resource-card,.report-panel,.training-card,.manager-card,.metric,.metrics>.card,.overview-grid>.card')].filter(visible);
+    const specific=[...root.querySelectorAll('.evo-hero,.evo-card,.evo-stat,.evo-day,.home-hero,.home-live-card,.home-section-card,.resource-card,.coach-resource-card,.report-panel,.training-card,.manager-card,.metric,.metrics>.card,.overview-grid>.card')].filter(visible);
     const all=specific.length?specific:[...(panel||root).children].filter(visible);
     return all.filter(node=>{const rect=node.getBoundingClientRect();return rect.height>24&&rect.width>50&&!['SCRIPT','STYLE','DIALOG'].includes(node.tagName);}).slice(0,9);
   }
@@ -54,7 +54,7 @@
       try{
         // Use the application's own router: it preserves draft guards and avoids
         // treating a deferred click as an unrelated programmatic navigation.
-        if(button.matches('#workspace-navigation>button,.app-navigation>button')&&button.id&&window.workspaceNavigation&&button.id!=='workspace-settings-entry')window.workspaceNavigation.run(button.id);
+        if(button.matches('#workspace-navigation>button,.app-navigation>button')&&button.id&&window.workspaceNavigation&&button.id!=='workspace-settings-entry')window.workspaceNavigation.run(button.id,window.selectedPagesPreview?.afterMainNavigation?.(button.id));
         else button.click();
       }finally{forwarding=false;}
       // View-transition capture suppresses rendering: never await requestAnimationFrame here.
@@ -83,7 +83,7 @@
     const controls=document.createElement('aside');controls.id='original-motion-controls';controls.setAttribute('aria-label','Commandes de l’aperçu des animations');
     controls.innerHTML='<strong>APERÇU ANIMATIONS</strong><label><input id="original-motion-enabled" type="checkbox" checked>Animations</label><button id="original-motion-replay" type="button">Rejouer</button><button id="original-motion-help" type="button" aria-label="À propos de cet aperçu">?</button><a href="../" target="_blank" rel="noopener">Vrai site ↗</a>';
     const info=document.createElement('dialog');info.id='original-motion-info';info.setAttribute('aria-labelledby','original-motion-title');
-    info.innerHTML='<h2 id="original-motion-title">Le vrai site, avec du mouvement.</h2><p>Cet aperçu reprend les pages, les textes, les outils et la disposition du site actuel. Seule la couche d’animation est ajoutée.</p><ul><li>Transition de sortie et d’entrée entre les onglets.</li><li>Apparition progressive des éléments de chaque page.</li><li>Réaction discrète au clic.</li><li>Animations désactivables et respect du mouvement réduit.</li></ul><p>Les comptes et les données privées ne sont pas connectés. Les essais restent dans un stockage séparé sur cet appareil. L’espace Responsable utilise sa démonstration existante.</p><button type="button" id="original-motion-close">Fermer</button>';
+    info.innerHTML='<h2 id="original-motion-title">Le vrai site, avec du mouvement.</h2><p>L’accueil et la vue semaine reprennent les présentations validées de l’aperçu précédent. Les autres écrans, formulaires et outils restent ceux du site actuel, avec les animations ajoutées.</p><ul><li>Transition de sortie et d’entrée entre les onglets.</li><li>Apparition progressive des éléments de chaque page.</li><li>Réaction discrète au clic.</li><li>Animations désactivables et respect du mouvement réduit.</li></ul><p>Les comptes et les données privées ne sont pas connectés. Les essais restent dans un stockage séparé sur cet appareil. L’espace Responsable utilise sa démonstration existante.</p><button type="button" id="original-motion-close">Fermer</button>';
     document.body.append(controls,info);
     document.getElementById('original-motion-enabled').onchange=event=>changeMode(event.target.checked);
     document.getElementById('original-motion-replay').onclick=()=>entry();

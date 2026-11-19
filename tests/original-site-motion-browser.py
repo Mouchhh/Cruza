@@ -2,11 +2,12 @@
 import hashlib
 import json
 import os
+import re
 from pathlib import Path
 from playwright.sync_api import sync_playwright
 
 ROOT=Path(__file__).resolve().parents[1]
-BASE=os.environ.get('CRUZA_ORIGINAL_MOTION_URL','http://127.0.0.1:3190/apercu-site-anime/index.html?mode=local')
+BASE=os.environ.get('CRUZA_ORIGINAL_MOTION_URL','http://127.0.0.1:3190/apercu-site-anime/index.html?mode=local&layout=original')
 OUT=Path('/tmp/original-site-motion-checks');OUT.mkdir(exist_ok=True)
 manifest=json.loads((ROOT/'docs/site-animation-preview-source.json').read_text())
 adapted={'club-cloud-config.js','canva-config.js','ranking-config.js','whatsapp-config.js','pwa-register.js'}
@@ -17,7 +18,9 @@ for name,sha in manifest['sha256'].items():
     identical+=1
 original=(ROOT/'index.html').read_text().split('<body>',1)[1]
 copy=(ROOT/'apercu-site-anime/index.html').read_text().split('<body>',1)[1]
-assert original==copy.replace('src="preview-animation-engine.js','src="navigation-motion.js')
+normalized=copy.replace('<script src="preview-selected-pages.js?v=selected-1"></script>','')
+normalized=re.sub(r'src="preview-animation-engine.js[^\"]*"',re.search(r'src="navigation-motion.js[^\"]*"',original).group(0),normalized)
+assert original==normalized
 
 with sync_playwright() as p:
     browser=p.chromium.launch(executable_path='/usr/bin/chromium',args=['--no-sandbox'])
