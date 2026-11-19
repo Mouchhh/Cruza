@@ -50,7 +50,7 @@ async function coachFFFReconcile(){
  try{
   const user=await clubNetworkRequest('/auth/v1/user'),all=Array.isArray(user.user_metadata?.[coachFFFMetadataKey])?user.user_metadata[coachFFFMetadataKey]:[],tomb=coachFFFTombstones(user),before=tomb.size;
   for(const id of coachTeamRemoved)if(id!=='unassigned')tomb.add(id);
-  let known=false;for(const id of tomb)if(!coachTeamRemoved.has(id)){coachTeamRemoved.add(id);known=true;}
+  let known=false;for(const id of tomb)if(id!=='unassigned'&&!coachTeamRemoved.has(id)){coachTeamRemoved.add(id);known=true;}
   if(known)try{localStorage.setItem(coachTeamRemovedKey,JSON.stringify([...coachTeamRemoved].slice(-500)));}catch{}
   const rest=all.filter(p=>p&&!tomb.has(p.id));
   if(tomb.size===before&&rest.length===all.length)return;
