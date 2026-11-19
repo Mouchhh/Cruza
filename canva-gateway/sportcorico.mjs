@@ -16,7 +16,7 @@ export function parseGames(list,teamId){
   if(!date||!home||!away||g.exempt)return [];
   // Un match avec un score est joué, même si Sportcorico le laisse marqué « À venir » (statut parfois en retard sur le score).
   const played=score(g.home_score)!==null&&score(g.outside_score)!==null;
-  return [{id:g.id,date,time,home,away,homeId:g.home_team_id,awayId:g.outside_team_id,competition:text(g.championship_name,150),status:played?'played':'planned',...(played?{homeScore:g.home_score,awayScore:g.outside_score}:{})}];
+  return [{id:g.id,date,time,home,away,homeId:g.home_team_id,awayId:g.outside_team_id,homeLogo:sportcoricoLogo(g.home_logo),awayLogo:sportcoricoLogo(g.outside_logo),competition:text(g.championship_name,150),status:played?'played':'planned',...(played?{homeScore:g.home_score,awayScore:g.outside_score}:{})}];
  }).sort((a,b)=>(a.date+a.time).localeCompare(b.date+b.time));
 }
 // Une équipe peut jouer plusieurs championnats (ex. U15 1 joue aussi « U14 Division 1 ») : on les sépare par catégorie d'âge.

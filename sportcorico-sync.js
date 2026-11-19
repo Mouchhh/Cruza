@@ -29,6 +29,7 @@
         team,
         opponent: ownHome ? game.away : game.home,
         ...(Number.isInteger(ownHome ? game.awayId : game.homeId) ? { opponentId: ownHome ? game.awayId : game.homeId } : {}),
+        ...((ownHome ? game.awayLogo : game.homeLogo) ? { opponentLogo: ownHome ? game.awayLogo : game.homeLogo } : {}),
       };
     if (game.status === "played") fixture.score = { home: game.homeScore, away: game.awayScore };
     return fixture;

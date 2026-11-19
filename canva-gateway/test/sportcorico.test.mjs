@@ -41,8 +41,9 @@ test('club search keeps football clubs with an allowed logo only',()=>{
 });
 
 test('team games keep only this team, valid dates and scores',()=>{
- const game=(id,extra)=>({id,home_team_id:1,outside_team_id:2,home_team_name:'A',outside_team_name:'B',event_date:'2026-10-10 17:00',planned_time:'17:00',championship_name:'U17 D1',status:'Terminé',home_score:2,outside_score:1,...extra});
+ const game=(id,extra)=>({id,home_team_id:1,outside_team_id:2,home_team_name:'A',outside_team_name:'B',home_logo:'https://s3.pub2.infomaniak.cloud/x/a.jpg',outside_logo:'https://evil.example/b.jpg',event_date:'2026-10-10 17:00',planned_time:'17:00',championship_name:'U17 D1',status:'Terminé',home_score:2,outside_score:1,...extra});
  const games=parseGames([game(1,{}),game(6,{status:'À venir'}),game(2,{status:'À venir',home_score:null,outside_score:null}),game(3,{home_team_id:8,outside_team_id:9}),game(4,{event_date:'bad'}),game(5,{exempt:true})],1);
+ assert.equal(games[0].homeLogo,'https://s3.pub2.infomaniak.cloud/x/a.jpg');assert.equal(games[0].awayLogo,'');
  assert.deepEqual(games.map(g=>[g.id,g.status,g.homeScore]),[[1,'played',2],[6,'played',2],[2,'planned',undefined]]);
 });
 test('club teams are read from the public club page',()=>{

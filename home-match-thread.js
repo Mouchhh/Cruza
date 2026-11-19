@@ -23,6 +23,10 @@
   }
   function opponentLogo(event) {
     try {
+      if (event.fff?.opponentLogo && typeof homeSportcoricoLogo === "function") {
+        const direct = homeSportcoricoLogo(event.fff.opponentLogo);
+        if (direct) return direct;
+      }
       const data = typeof homeSportcoricoData !== "undefined" ? homeSportcoricoData : null;
       if (!data?.rows || typeof homeSportcoricoLogo !== "function") return "";
       const f = event.fff;
@@ -47,7 +51,20 @@
       img.alt = "";
       img.referrerPolicy = "no-referrer";
       img.src = src;
-      img.onerror = fallback;
+      img.onerror = async () => {
+        // Image bloquée par le navigateur (ex. Opera) : le relais la renvoie à notre place.
+        const base = String(window.CLUB_RANKING_GATEWAY || window.CLUB_CANVA_GATEWAY || "").replace(/\/$/, "");
+        if (!base || img.dataset.viaRelay) return fallback();
+        img.dataset.viaRelay = "1";
+        try {
+          const response = await fetch(base + "/api/sportcorico-logo?url=" + encodeURIComponent(src), { credentials: "omit", cache: "force-cache" });
+          const data = response.ok ? await response.json() : null;
+          if (data?.base64 && /^image\/(png|jpeg|webp|gif)$/.test(data.type)) img.src = "data:" + data.type + ";base64," + data.base64;
+          else fallback();
+        } catch {
+          fallback();
+        }
+      };
       wrap.append(img);
     } else fallback();
     return wrap;
