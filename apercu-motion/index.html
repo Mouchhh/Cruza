@@ -1,0 +1,24 @@
+<!doctype html>
+<html lang="fr" data-theme="club">
+<head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="robots" content="noindex,nofollow">
+  <meta name="theme-color" content="#0d1421"><title>CRUZA · Motion playground</title>
+  <link rel="icon" href="../assets/cruza-logo.svg"><link rel="stylesheet" href="motion.css">
+</head>
+<body>
+  <a class="skip" href="#screen">Aller à la démonstration</a>
+  <div class="ambient ambient-a" aria-hidden="true"></div><div class="ambient ambient-b" aria-hidden="true"></div><div class="grain" aria-hidden="true"></div>
+  <div class="studio">
+    <header class="studio-header"><a class="studio-brand" href="#overview">cruza<span>●</span><small>MOTION LAB / 01</small></a><div class="lab-badge"><i></i> PROTOTYPE INTERACTIF</div></header>
+    <section class="intro"><div><p class="kicker">LE MOUVEMENT AU SERVICE DU JEU</p><h1>La même interface.<br><em>Une autre sensation.</em></h1></div><p class="intro-copy">Ouvre un onglet. Change les données.<br>Tout s’enchaîne, rien ne disparaît d’un coup.</p></section>
+    <section class="control-bar" aria-label="Commandes de démonstration"><div class="control-group"><button id="replay" class="studio-button"><span aria-hidden="true">↻</span> Rejouer l’ouverture</button><button id="tour" class="studio-button"><span class="play-symbol" aria-hidden="true"></span><span id="tour-label">Visite animée</span></button></div><div class="control-group"><label class="motion-switch"><input id="glass-toggle" type="checkbox" checked><span>Verre dépoli</span></label><label class="motion-switch"><input id="motion-toggle" type="checkbox" checked><span>Animations</span></label><div class="theme-controls" aria-label="Palette de démonstration"><button class="swatch club selected" data-theme="club" aria-label="Palette Stade Mayennais" aria-pressed="true"></button><button class="swatch coral" data-theme="coral" aria-label="Palette Corail" aria-pressed="false"></button><button class="swatch forest" data-theme="forest" aria-label="Palette Forêt" aria-pressed="false"></button><button class="swatch violet" data-theme="violet" aria-label="Palette Violet" aria-pressed="false"></button></div></div></section>
+    <div class="scene" id="scene"><div class="app-shell glass" id="app-shell">
+      <aside class="app-sidebar"><div class="app-wordmark">cruza<span>●</span><small>LE JEU, EN COMMUN.</small></div><div class="club-label"><img src="../assets/club-logo.jpg" alt="Écusson du Stade Mayennais"><div>Stade Mayennais<small>Saison 2026 — 2027</small></div><span class="club-chevron">⌄</span></div><div class="sidebar-caption">ESPACE ÉDUCATEUR</div><nav id="app-nav" aria-label="Rubriques de démonstration"><div class="nav-marker" aria-hidden="true"></div></nav><div class="sidebar-foot"><div class="team-tag"><span class="status-dot"></span> U17 · Football à 11</div><div class="educator"><span class="avatar">EM</span><div>Enzo Mouchet<small>Éducateur</small></div><span>⌄</span></div></div></aside>
+      <div class="app-workspace"><header class="app-header"><div class="app-breadcrumb">Mon espace <span>/</span> <strong id="section-name">Vue d’ensemble</strong></div><div class="header-tools"><span class="demo-pill">DONNÉES FICTIVES</span><button id="search-button" aria-label="Rechercher dans l’aperçu"></button><button id="notification-button" aria-label="Notifications de démonstration"></button><span class="avatar small">EM</span></div></header><main id="screen" tabindex="-1"></main><div class="app-status"><span><i></i> Démonstration locale · aucun compte connecté</span><span id="motion-caption">01 / UNE ENTRÉE PROGRESSIVE</span></div></div>
+    </div></div>
+    <footer class="studio-footer"><span><b>À ESSAYER</b> Les 9 onglets · les périodes du graphique · les couleurs · la messagerie</span><button id="details-button">Les animations de cet aperçu <span>+</span></button></footer>
+  </div>
+  <dialog id="dialog" aria-labelledby="dialog-title"><div id="dialog-body"></div></dialog><div id="toast" role="status" aria-live="polite"></div>
+  <script src="motion.js"></script>
+</body>
+</html>

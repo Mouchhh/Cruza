@@ -1,0 +1,174 @@
+{
+  "version": 1,
+  "sourceURL": "https://www.sportcorico.com/clubs/st-mayennais-fc/mayenne-stade-fc-17",
+  "teamSlug": "mayenne-stade-fc-17",
+  "teamId": 606690,
+  "teamName": "St. Mayennais FC U17 2",
+  "category": "U17",
+  "season": "2026 - 2027",
+  "competition": "U17 Division 1",
+  "pool": "Groupe Unique",
+  "rows": [
+    {
+      "rank": 1,
+      "points": 16,
+      "games_played": 7,
+      "difference": 13,
+      "team": "GJ Pays de L'ernee - Juvigne St Pierre des Landes 1",
+      "team_id": 697553,
+      "logo": "https://s3.pub2.infomaniak.cloud/object/v1/AUTH_7caca171fcb14ede88bd14eb36f90e50/sportcorico-media/logos/logo-gj-pays-de-lernee-564801.jpg",
+      "form": [
+        "V",
+        "N",
+        "V",
+        "V",
+        "D"
+      ]
+    },
+    {
+      "rank": 2,
+      "points": 16,
+      "games_played": 7,
+      "difference": 28,
+      "team": "GJ Haut-anjou 1",
+      "team_id": 436617,
+      "logo": "https://s3.pub2.infomaniak.cloud/object/v1/AUTH_7caca171fcb14ede88bd14eb36f90e50/sportcorico-media/logos/logo-gj-haut-anjou-582573.jpg",
+      "form": [
+        "V",
+        "V",
+        "V",
+        "D",
+        "V"
+      ]
+    },
+    {
+      "rank": 3,
+      "points": 15,
+      "games_played": 7,
+      "difference": 9,
+      "team": "US Changeenne 2",
+      "team_id": 436598,
+      "logo": "https://s3.pub2.infomaniak.cloud/object/v1/AUTH_7caca171fcb14ede88bd14eb36f90e50/sportcorico-media/logos/logo-change-us-522949.jpg",
+      "form": [
+        "D",
+        "V",
+        "V",
+        "V",
+        "V"
+      ]
+    },
+    {
+      "rank": 4,
+      "points": 13,
+      "games_played": 7,
+      "difference": 22,
+      "team": "US Meral Cosse le Vivien 1",
+      "team_id": 436980,
+      "logo": "https://s3.pub2.infomaniak.cloud/object/v1/AUTH_7caca171fcb14ede88bd14eb36f90e50/sportcorico-media/logos/logo-meral-cosse-us-547612.jpg",
+      "form": [
+        "V",
+        "D",
+        "N",
+        "V",
+        "D"
+      ]
+    },
+    {
+      "rank": 5,
+      "points": 12,
+      "games_played": 7,
+      "difference": 9,
+      "team": "US St Berthevin les Laval 1",
+      "team_id": 437048,
+      "logo": "https://s3.pub2.infomaniak.cloud/object/v1/AUTH_7caca171fcb14ede88bd14eb36f90e50/sportcorico-media/logos/logo-st-berthevin-us-502235.jpg",
+      "form": [
+        "D",
+        "D",
+        "V",
+        "V",
+        "V"
+      ]
+    },
+    {
+      "rank": 6,
+      "points": 12,
+      "games_played": 7,
+      "difference": 3,
+      "team": "GJ Pays de Chateau-gontier 2",
+      "team_id": 758330,
+      "logo": "https://s3.pub2.infomaniak.cloud/object/v1/AUTH_7caca171fcb14ede88bd14eb36f90e50/sportcorico-media/logos/logo-gj-chateau-gonpays-582577.jpg",
+      "form": [
+        "V",
+        "V",
+        "D",
+        "V",
+        "D"
+      ]
+    },
+    {
+      "rank": 7,
+      "points": 10,
+      "games_played": 7,
+      "difference": 4,
+      "team": "St. Mayennais FC 2",
+      "team_id": 606690,
+      "logo": "https://s3.pub2.infomaniak.cloud/object/v1/AUTH_7caca171fcb14ede88bd14eb36f90e50/sportcorico-media/logos/logo-mayenne-stade-fc-548126.jpg",
+      "form": [
+        "V",
+        "D",
+        "V",
+        "D",
+        "V"
+      ]
+    },
+    {
+      "rank": 8,
+      "points": 4,
+      "games_played": 7,
+      "difference": -30,
+      "team": "AS Contest St Baudelle 1",
+      "team_id": 606643,
+      "logo": "https://s3.pub2.infomaniak.cloud/object/v1/AUTH_7caca171fcb14ede88bd14eb36f90e50/sportcorico-media/logos/logo-contest-st-baud-as-528774.jpg",
+      "form": [
+        "D",
+        "N",
+        "D",
+        "D",
+        "V"
+      ]
+    },
+    {
+      "rank": 9,
+      "points": 3,
+      "games_played": 7,
+      "difference": -33,
+      "team": "US Lavalloise 1",
+      "team_id": 436823,
+      "logo": "https://s3.pub2.infomaniak.cloud/object/v1/AUTH_7caca171fcb14ede88bd14eb36f90e50/sportcorico-media/logos/logo-laval-us-500040.jpg",
+      "form": [
+        "V",
+        "D",
+        "D",
+        "D",
+        "D"
+      ]
+    },
+    {
+      "rank": 10,
+      "points": 0,
+      "games_played": 7,
+      "difference": -25,
+      "team": "AS du Bourny 1",
+      "team_id": 436831,
+      "logo": "https://s3.pub2.infomaniak.cloud/object/v1/AUTH_7caca171fcb14ede88bd14eb36f90e50/sportcorico-media/logos/logo-laval-bourny-as-531444.jpg",
+      "form": [
+        "D",
+        "D",
+        "N",
+        "D",
+        "D"
+      ]
+    }
+  ],
+  "fetchedAt": "2026-11-19T09:26:08.216495+00:00"
+}

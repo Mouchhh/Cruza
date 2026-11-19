@@ -27,6 +27,22 @@
     },
     {
       "rank": 2,
+      "points": 16,
+      "games_played": 7,
+      "difference": 28,
+      "team": "GJ Haut-anjou 1",
+      "team_id": 436617,
+      "logo": "https://s3.pub2.infomaniak.cloud/object/v1/AUTH_7caca171fcb14ede88bd14eb36f90e50/sportcorico-media/logos/logo-gj-haut-anjou-582573.jpg",
+      "form": [
+        "V",
+        "V",
+        "V",
+        "D",
+        "V"
+      ]
+    },
+    {
+      "rank": 3,
       "points": 15,
       "games_played": 7,
       "difference": 9,
@@ -42,35 +58,19 @@
       ]
     },
     {
-      "rank": 3,
-      "points": 13,
-      "games_played": 6,
-      "difference": 27,
-      "team": "GJ Haut-anjou 1",
-      "team_id": 436617,
-      "logo": "https://s3.pub2.infomaniak.cloud/object/v1/AUTH_7caca171fcb14ede88bd14eb36f90e50/sportcorico-media/logos/logo-gj-haut-anjou-582573.jpg",
-      "form": [
-        "V",
-        "V",
-        "V",
-        "V",
-        "D"
-      ]
-    },
-    {
       "rank": 4,
       "points": 13,
-      "games_played": 6,
-      "difference": 23,
+      "games_played": 7,
+      "difference": 22,
       "team": "US Meral Cosse le Vivien 1",
       "team_id": 436980,
       "logo": "https://s3.pub2.infomaniak.cloud/object/v1/AUTH_7caca171fcb14ede88bd14eb36f90e50/sportcorico-media/logos/logo-meral-cosse-us-547612.jpg",
       "form": [
-        "D",
         "V",
         "D",
         "N",
-        "V"
+        "V",
+        "D"
       ]
     },
     {
@@ -170,5 +170,5 @@
       ]
     }
   ],
-  "fetchedAt": "2026-11-17T19:35:24.875821+00:00"
+  "fetchedAt": "2026-11-19T09:26:08.216495+00:00"
 }

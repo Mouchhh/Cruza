@@ -1,0 +1,17 @@
+/* Une fiche de travail lisible ; la grille BMF n'est pas reproduite. */
+.exercise-essentials{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;margin:16px 0;color:#203c59}
+.exercise-essentials>section{min-width:0;padding:16px;border:1px solid #dce5ee;border-radius:12px;background:#fff}
+.exercise-essentials h4{margin:0 0 8px;font-size:14px;color:#1f5486}
+.exercise-essentials p{font-size:13px;line-height:1.65;margin:8px 0;overflow-wrap:anywhere}
+.exercise-essentials .exercise-score,.exercise-essentials .exercise-question{color:#526a80}
+.exercise-essentials>.exercise-invariant{grid-column:1/-1;margin:0;padding:12px 16px;border-left:3px solid #3982ae;background:#f0f6fb;border-radius:4px}
+.exercise-outside{padding:10px;background:#fff5dd;border-radius:8px;color:#6a4c13}
+.exercise-correction{border-top:1px solid #e4ebf2;padding-top:8px}
+@media(max-width:700px){.exercise-essentials{grid-template-columns:minmax(0,1fr);gap:8px}.exercise-essentials>section{padding:12px}.exercise-essentials p{font-size:14px}}
+@media print{.exercise-essentials{display:block}.exercise-essentials>section{break-inside:avoid;padding:8px;margin-bottom:8px}.exercise-essentials p{font-size:10pt}.exercise-essentials h4{font-size:11pt}.exercise-invariant{break-inside:avoid}}
+.bible-bmf-filter{display:flex;flex-direction:column;gap:7px;min-width:0;font-size:12px;font-weight:650;color:#31516e}.bible-bmf-filter select{width:100%;min-width:0;font-size:14px}.exercise-classification{color:#255d86;font-size:12px;line-height:1.6;background:#edf5fb;border-radius:7px;padding:8px 10px;margin:10px 0}.bible-main-filters{align-items:end}.bible-search-options .bible-phase-shortcuts{margin-top:12px}.bible-card .exercise-classification{font-size:11px}
+@media(max-width:700px){.bible-bmf-filter select,#training-bmf-category{font-size:16px}}
+.exercise-five-roles{margin-top:12px;border-top:1px solid #dce5ef;padding-top:6px}.exercise-five-roles>summary{cursor:pointer;min-height:44px;display:list-item;align-content:center;color:#31567f;font-weight:650}.exercise-five-roles ul{padding-left:20px;line-height:1.65;font-size:13px}.exercise-five-roles li{margin-bottom:6px}.exercise-five-decision,.exercise-five-reset{padding:10px;border-left:3px solid #3982ae;background:#f0f6fb;border-radius:4px}
+@media print{.exercise-five-roles>ul{display:block!important}.exercise-five-roles>summary{min-height:0}.exercise-five-roles{break-inside:avoid}}
+.bible-group-roster{margin:14px 0;padding:12px;background:#f4f8fc;border:1px solid #dce5ef;border-radius:10px;min-width:0}.bible-group-roster[hidden]{display:none!important}.bible-group-roster h4{margin:0 0 8px}.bible-group-rows{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:10px}.bible-group-row{min-width:0;margin:0;border:1px solid #cbd9e8;border-radius:8px;padding:12px;display:grid;grid-template-columns:1fr 1fr;gap:10px}.bible-group-row legend{font-weight:650;color:#31567f;font-size:13px}.bible-group-row input{width:100%;box-sizing:border-box;min-width:0}.bible-group-status{font-size:13px;line-height:1.6;color:#31567f}.bible-criteria-grid input[readonly]{background:#edf2f7;color:#52687e}
+@media(max-width:650px){.bible-group-rows{grid-template-columns:minmax(0,1fr)}.bible-group-row input{font-size:16px;min-height:44px}}

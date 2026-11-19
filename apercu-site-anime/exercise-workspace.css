@@ -1,0 +1,113 @@
+/* Atelier inspiré de la référence vidéo : le terrain reste au centre du travail. */
+@media screen {
+ #custom-training-dialog{width:1480px;max-width:calc(100vw - 24px);max-height:96dvh}
+ #custom-training-form>*{min-width:0}
+ #custom-training-form .exercise-editor{background:#182638;color:#edf3fa;padding:20px;gap:14px}
+ #custom-training-form .exercise-editor h3{color:#f1f5fb}
+ #custom-training-form .exercise-editor>.hint{color:#bdcbdb;font-size:12px;max-width:none}
+ #custom-training-form .exercise-editor>.section-heading{align-items:center}
+ #custom-training-form .exercise-editor>.section-heading label{color:#d3deec}
+ #custom-training-form .exercise-editor>.exercise-board-actions:not(.studio-animation) label{color:#d3deec}
+ #custom-training-form .studio-board-layout{grid-template-columns:220px minmax(0,1fr) 224px;gap:14px;align-items:start}
+ #custom-training-form .studio-stage{align-self:start;justify-self:center;width:min(100%,calc(min(54dvh,calc(96dvh - 360px)) * .625));min-width:0;padding:6px;background:#111e2d;border:1px solid #344357;border-radius:12px}
+ #custom-training-form .studio-stage>canvas{width:100%;margin:0;border-radius:6px;box-shadow:none;aspect-ratio:8/5;touch-action:none}
+ #custom-training-form .studio-tools{padding:10px 6px;background:#233247;border-color:#3c4a60;border-radius:12px}
+ #custom-training-form .studio-tools summary{cursor:pointer;min-height:32px;color:#d3deec;line-height:1.5;font-size:11px;margin:0 4px 10px}
+ #custom-training-form .studio-tools #exercise-palette{margin-top:12px}
+ #custom-training-form .studio-tools .exercise-equipment-button{min-height:64px;min-width:0}
+ #custom-training-form .studio-tools .exercise-equipment-button canvas{width:46px!important;height:34px!important}
+ #custom-training-form .studio-tools .exercise-equipment-button span{color:#e1e9f3;font-size:10px;overflow-wrap:anywhere}
+ #custom-training-form .studio-tools .exercise-equipment-button:hover{background:#354c69!important}
+ #custom-training-form .studio-inspector{margin:0;padding:14px;background:#f6f8fb;border-color:#dbe3ee;min-width:0;border-radius:12px}
+ #custom-training-form .studio-inspector summary{font-size:12px;color:#2d4666;line-height:1.5;min-height:28px}
+ #custom-training-form .studio-inspector>.custom-training-grid{grid-template-columns:1fr 1fr;gap:12px;margin-top:14px}
+ #custom-training-form .studio-inspector>.custom-training-grid>label:first-child{grid-column:1/-1}
+ #custom-training-form .studio-inspector label{min-width:0}
+ #custom-training-form .studio-inspector input,#custom-training-form .studio-inspector select{width:100%;min-width:0;padding:9px 8px}
+ #custom-training-form .studio-inspector .exercise-rotation-presets{gap:6px;margin-top:14px}
+ #custom-training-form .studio-inspector .exercise-rotation-presets>span{flex-basis:100%;color:#526984}
+ #custom-training-form .exercise-editor button:not(.exercise-equipment-button){min-height:40px}
+ #custom-training-form .studio-animation{background:#f6f8fb;border:0;border-radius:12px;padding:14px;align-items:end}
+ #custom-training-form .studio-animation label{max-width:170px}
+ #custom-training-form .studio-footer{padding:12px 24px}
+ @media(min-width:1100px){
+  #custom-training-form .studio-tools{max-height:65dvh;overflow-y:auto;scrollbar-width:thin}
+ }
+ @media(max-width:1099px){
+  #custom-training-form .studio-board-layout{grid-template-columns:180px minmax(0,1fr)}
+  #custom-training-form .studio-inspector{grid-column:1;grid-row:2}
+  #custom-training-form .studio-inspector>.custom-training-grid{grid-template-columns:repeat(4,minmax(0,1fr))}
+  #custom-training-form .studio-inspector>.custom-training-grid>label:first-child{grid-column:1/-1}
+ }
+ @media(max-width:700px){
+  #custom-training-dialog{max-width:calc(100vw - 12px);max-height:97dvh;border-radius:14px}
+  #custom-training-form .studio-tabs{padding-inline:8px;gap:2px}
+  #custom-training-form .studio-tab{flex:1;justify-content:center;padding:10px 6px!important;gap:5px;font-size:11px!important;min-width:0}
+  #custom-training-form .exercise-editor{padding:12px;gap:12px}
+  #custom-training-form .studio-board-layout{grid-template-columns:minmax(0,1fr);gap:10px}
+  #custom-training-form .studio-tools{padding:8px;grid-row:1}
+  #custom-training-form .studio-tools summary{margin-bottom:5px}
+  #custom-training-form .studio-tools summary::after{content:none}
+  #custom-training-form .studio-tools .exercise-equipment-button{flex:0 0 66px;min-height:64px}
+  #custom-training-form .studio-stage{padding:4px;grid-row:3;width:min(100%,calc(58dvh * .625))}
+  #custom-training-form .studio-inspector{grid-column:1;grid-row:2;padding:12px}
+  #custom-training-form .studio-inspector>.custom-training-grid{grid-template-columns:1fr 1fr}
+  #custom-training-form input,#custom-training-form select,#custom-training-form textarea{font-size:16px}
+  #custom-training-form .exercise-editor button:not(.exercise-equipment-button){min-height:44px}
+  #custom-training-form .studio-animation{padding:12px;gap:10px}
+  #custom-training-form .studio-animation label{max-width:none;flex:1 1 120px;min-width:0}
+  #custom-training-form .studio-footer{padding:12px}
+ }
+}
+
+/* Priorité à la surface de travail, notamment sur les portables de 13–15 pouces. */
+@media screen {
+ #custom-training-form:not([data-studio-mode=sheet])>.section-heading{padding:4px 16px 0}
+ #custom-training-form:not([data-studio-mode=sheet]) .studio-kicker{display:none}
+ #custom-training-form:not([data-studio-mode=sheet]) .studio-intro{margin:0}
+ #custom-training-form:not([data-studio-mode=sheet]) h2{font-size:19px;margin:0}
+ #custom-training-form:not([data-studio-mode=sheet]) .studio-tabs{padding:2px 16px 8px}
+ #custom-training-form:not([data-studio-mode=sheet]) .studio-tab{padding:8px 12px!important}
+ #custom-training-form .exercise-editor{padding:10px 16px;gap:10px}
+ #custom-training-form .exercise-editor>.hint{display:none}
+ #custom-training-form .studio-toolbar{display:flex;align-items:center;flex-wrap:wrap;gap:8px;position:relative;z-index:4}
+ #custom-training-form .studio-toolbar>label{color:#d3deec;margin-left:auto;white-space:nowrap}
+ #custom-training-form .studio-toolbar>.exercise-board-actions{gap:6px}
+ #custom-training-form .studio-toolbar label{color:#d3deec;font-size:11px}
+ #custom-training-form .studio-toolbar details{position:relative;padding:0;border-radius:8px;max-height:none;overflow:visible;flex-shrink:0}
+ #custom-training-form .studio-toolbar summary{margin:0;padding:10px 12px;min-height:40px;font-size:12px;cursor:pointer;box-sizing:border-box}
+ #custom-training-form .studio-tools #exercise-palette,#custom-training-form .studio-inspector-body{position:absolute;top:calc(100% + 6px);left:0;z-index:5;max-height:55dvh;overflow:auto;box-sizing:border-box;box-shadow:0 12px 30px #0005;border:1px solid #65758b;border-radius:10px;margin:0;padding:12px}
+ #custom-training-form .studio-tools #exercise-palette{width:300px;display:grid;grid-template-columns:repeat(4,minmax(0,1fr));background:#233247}
+ #custom-training-form .studio-inspector-body{width:320px;background:#f6f8fb;color:#19314c}
+ #custom-training-form .studio-inspector-body .custom-training-grid{grid-template-columns:1fr 1fr;gap:10px}
+ #custom-training-form .studio-inspector-body .custom-training-grid>label:first-child{grid-column:1/-1}
+ #custom-training-form .studio-inspector-body label{color:#526984}
+ #custom-training-form .studio-board-layout{display:block}
+ #custom-training-form .studio-stage{width:min(100%,calc((100dvh - 248px) * 1.6));max-width:1280px;margin-inline:auto;padding:5px}
+ #custom-training-form .studio-footer{padding:8px 16px}
+ #custom-training-form .studio-footer>button{padding:10px 20px}
+ @media(max-width:1000px){
+  #custom-training-form .studio-stage{width:min(100%,calc((100dvh - 270px) * 1.6))}
+  #custom-training-form .studio-toolbar>label{margin-left:0}
+ }
+ @media(max-width:700px){
+  #custom-training-form .exercise-editor{padding:10px;gap:10px}
+  #custom-training-form .studio-toolbar{gap:6px}
+  #custom-training-form .studio-toolbar details{position:static}
+  #custom-training-form .studio-tools #exercise-palette,#custom-training-form .studio-inspector-body{left:0;top:46px;width:min(100%,340px);max-height:50dvh}
+  #custom-training-form .studio-tools #exercise-palette{display:grid;grid-template-columns:repeat(4,minmax(0,1fr))}
+  #custom-training-form .studio-toolbar summary{padding:10px;font-size:11px}
+  #custom-training-form .studio-stage{width:100%;max-width:none;padding:4px}
+  #custom-training-form .studio-footer{padding:8px 10px}
+ }
+}
+
+@media screen {
+ #custom-training-form .studio-toolbar details{border:1px solid #9ab6dd;background:#f3f7fe}
+ #custom-training-form .studio-toolbar summary{display:flex;align-items:center;justify-content:space-between;gap:20px;min-width:132px;min-height:44px;color:#173f73;font-size:14px;font-weight:700;list-style:none}
+ #custom-training-form .studio-toolbar summary::-webkit-details-marker{display:none}
+ #custom-training-form .studio-toolbar summary::after{content:'⌄';display:inline-block;font-size:22px;line-height:1;color:#235fc1}
+ #custom-training-form .studio-toolbar details[open]{border-color:#8ab6ff;background:#dceaff;box-shadow:0 0 0 2px #8ab6ff55}
+ #custom-training-form .studio-toolbar details[open] summary::after{content:'⌃'}
+ #custom-training-form .studio-toolbar summary:focus-visible{outline:3px solid #8ab6ff;outline-offset:3px;border-radius:8px}
+}

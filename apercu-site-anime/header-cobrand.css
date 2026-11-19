@@ -1,0 +1,17 @@
+/* En-tête : logo Cruza × logo et nom du club — même police, mêmes tailles, sans sous-titre. */
+html body>header .cruza-lockup,html body>header .brand>span:not(.club-monogram){font-family:SMFCUnbounded,SMFCArchivo,Arial,sans-serif!important;font-size:15px!important;font-weight:600!important;letter-spacing:-.2px!important;text-transform:none!important;line-height:1.1!important}
+html body>header .cruza-lockup{display:flex;align-items:center;gap:10px;flex:0 0 auto;text-decoration:none;color:#0a2d8a}
+html body>header .cruza-lockup img{width:38px;height:38px;border-radius:10px;display:block}
+html body>header .brand-times{flex:0 0 auto;margin:0 16px;color:#b3bfd1;font-size:20px;font-weight:300;line-height:1}
+html body>header .brand{gap:10px!important;align-items:center}
+html body>header .brand .club-logo{width:38px!important;height:38px!important;object-fit:contain}
+html body>header .brand small{display:none!important}
+@media screen and (max-width:700px){
+ html body>header .cruza-lockup{gap:0}
+ html body>header .cruza-lockup span{display:none}
+ html body>header .cruza-lockup img{width:30px;height:30px}
+ html body>header .brand-times{margin:0 7px;font-size:17px}
+}
+@media print{html body>header .cruza-lockup,html body>header .brand-times{display:none}}
+/* Diaporama de fond autorisé ; les anciens contrôles et la galerie restent masqués. */
+html body #home-slideshow-controls,html body .home-club-life{display:none!important}
