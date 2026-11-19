@@ -1,0 +1,110 @@
+/* Accueil : fil du match (plus large) + classement + forme sur une ligne. */
+@media screen and (min-width:1101px){
+ body.home-mode #home-page-0>#home-live-widgets{grid-template-columns:minmax(0,1.55fr) minmax(0,1fr) minmax(0,1fr)}
+}
+@media screen and (max-width:1100px){
+ body.home-mode #home-page-0>#home-live-widgets .home-live-thread{grid-column:1/-1}
+}
+#home-live-widgets .home-live-thread{display:flex;flex-direction:column;gap:14px}
+.home-thread-head{display:flex;align-items:center;justify-content:space-between;gap:10px}
+.home-thread-head h2{margin:0!important}
+.home-thread-link{font-size:11px;font-weight:700;color:#2f7a55;background:#e8f4ee;border-radius:8px;padding:5px 10px;white-space:nowrap}
+.home-thread-match{display:grid;grid-template-columns:minmax(0,1fr) auto minmax(0,1fr);align-items:center;gap:12px}
+.home-thread-side{display:flex;align-items:center;gap:10px;min-width:0}
+.home-thread-side.right{justify-content:flex-end;text-align:right}
+.home-thread-names{display:flex;flex-direction:column;min-width:0}
+.home-thread-names strong{font-size:15px;line-height:1.25;color:#17305a;overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow-wrap:break-word}
+.home-thread-names small,.home-thread-centre small{font-size:12px;color:#6b7c92;line-height:1.35}
+.home-thread-badge{flex:0 0 46px;width:46px;height:46px;border-radius:50%;display:grid;place-items:center;overflow:hidden;background:#fff}
+.home-thread-badge img{width:100%;height:100%;object-fit:contain}
+.home-thread-badge.other{border:2px solid #7fa38f;color:#52775f}
+.home-thread-initials{font-weight:800;font-size:14px;letter-spacing:.02em;color:#52775f}
+.home-thread-centre{display:flex;flex-direction:column;align-items:center;text-align:center;gap:2px}
+.home-thread-centre strong{font-size:26px;line-height:1.1;color:#17305a;font-variant-numeric:tabular-nums}
+.home-thread-steps{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px}
+.home-thread-step{border-top:3px solid #e3e8f0;padding-top:7px;display:flex;flex-direction:column;gap:1px;min-width:0}
+.home-thread-step.done{border-top-color:#3c8a62}.home-thread-step.current{border-top-color:#2855a2}
+.home-thread-step b{font-size:12px;color:#33475f;font-weight:700}.home-thread-step.done b{color:#2f7a55}.home-thread-step.current b{color:#2855a2}
+.home-thread-step small{font-size:11px;color:#7b8ca3;line-height:1.3}
+.home-thread-actions{display:flex;flex-wrap:wrap;gap:10px}
+.home-thread-actions .home-live-open{margin:0!important}
+.home-thread-secondary{background:#fff!important;color:#17305a!important;border:1px solid #cfd8e6!important;border-radius:9px;padding:8px 14px;min-height:38px;font-weight:650;cursor:pointer}
+.home-thread-next,.home-thread-empty{margin:0!important;font-size:12.5px;color:#6b7c92!important}
+@media(max-width:650px){
+ .home-thread-match{grid-template-columns:1fr;gap:10px}.home-thread-centre{order:-1}.home-thread-side.right{justify-content:flex-start;text-align:left;flex-direction:row-reverse}
+ .home-thread-steps{grid-template-columns:repeat(2,minmax(0,1fr))}
+}
+/* Téléphone : la mise en page compacte des cartes ne doit pas couper le fil du match (carte en colonne, hauteur libre). */
+@media screen and (max-width:700px){
+ html body #home-live-widgets .home-live-card.home-live-thread{display:flex!important;flex-direction:column!important;flex-wrap:nowrap!important;align-items:stretch!important;align-content:stretch!important;justify-content:flex-start!important;gap:12px;overflow:visible!important;height:auto!important}
+ html body #home-live-widgets .home-live-thread .home-thread-head{flex:0 0 auto}
+ html body #home-live-widgets .home-live-thread .home-thread-head h2{flex:0 1 auto!important;font-size:15px!important;opacity:1!important}
+ html body #home-live-widgets .home-live-thread>p{display:block!important}
+ html body #home-live-widgets .home-live-thread .home-thread-actions .home-live-open{margin:0!important}
+ html body #home-live-widgets .home-live-thread .home-thread-match{grid-template-columns:minmax(0,1fr) auto minmax(0,1fr);gap:8px}
+ html body #home-live-widgets .home-live-thread .home-thread-centre{order:0}
+ html body #home-live-widgets .home-live-thread .home-thread-side.right{flex-direction:row;justify-content:flex-end;text-align:right}
+ html body #home-live-widgets .home-live-thread .home-thread-badge{flex-basis:38px;width:38px;height:38px}
+ html body #home-live-widgets .home-live-thread .home-thread-names strong{font-size:13px}
+ html body #home-live-widgets .home-live-thread .home-thread-centre strong{font-size:20px}
+}
+/* Téléphone, tout sur un écran : le fil du match prend une ligne plus haute, les étapes détaillées sont réservées aux grands écrans. */
+@media screen and (max-width:700px){
+ html body.home-mode #home-page-0 #home-live-widgets:has(.home-live-thread){grid-template-rows:minmax(0,1.55fr) repeat(2,minmax(0,1fr))!important}
+ html body #home-live-widgets .home-live-thread .home-thread-steps,html body #home-live-widgets .home-live-thread .home-thread-next{display:none!important}
+ html body #home-live-widgets .home-live-thread{justify-content:space-between!important}
+ html body #home-live-widgets .home-live-thread .home-thread-actions{display:flex;gap:8px}
+ html body #home-live-widgets .home-live-thread .home-thread-actions button{flex:1 1 0;min-height:36px!important;padding:6px 10px!important;font-size:12.5px!important}
+}
+
+.home-thread-names small{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+
+/* Ordinateur : le contenu occupe toute la hauteur de la carte (au lieu de rester en haut avec du vide dessous). */
+@media screen and (min-width:701px){
+ #home-live-widgets .home-live-thread{justify-content:space-between;gap:16px}
+ .home-thread-match{flex:1 1 auto;align-content:center;padding:6px 0}
+ .home-thread-badge{flex-basis:64px;width:64px;height:64px}
+ .home-thread-initials{font-size:18px}
+ .home-thread-names strong{font-size:17px}
+ .home-thread-names small,.home-thread-centre small{font-size:13px}
+ .home-thread-centre strong{font-size:36px}
+ .home-thread-steps{gap:12px;margin-top:4px}
+ .home-thread-step{padding-top:10px}
+ .home-thread-step b{font-size:13px}.home-thread-step small{font-size:12px}
+ .home-thread-actions{gap:12px}
+ .home-thread-actions .home-live-open,.home-thread-secondary{min-height:44px;padding:10px 20px;font-size:14px}
+ .home-thread-next{padding-top:12px;border-top:1px solid #e9eef5}
+ .home-thread-side{flex-direction:column;text-align:center;gap:8px}
+ .home-thread-side.right{flex-direction:column-reverse;justify-content:center;text-align:center}
+ .home-thread-names{align-items:center;width:100%}
+ .home-thread-names strong{text-align:center}
+ .home-thread-badge{flex-basis:60px;width:60px;height:60px}
+}
+
+.home-live-result.result-empty{background:#fff!important;border:2px dashed #cdd6e2!important;color:#aab6c6!important}
+/* Ordinateur : classement plus lisible — rien sous le tableau (légende, date de mise à jour, liens). */
+@media screen and (min-width:701px){
+ html body.home-mode #home-page-0 #home-live-widgets .home-live-ranking :is(.home-sportcorico-legend,.home-sportcorico-stamp,.home-sportcorico-configure,a.home-live-open,.home-sportcorico-expand){display:none!important}
+ html body.home-mode #home-page-0 #home-live-widgets .home-live-ranking{display:flex;flex-direction:column}
+ html body.home-mode #home-page-0 #home-live-widgets .home-live-ranking .home-sportcorico-table{max-height:300px!important;flex:0 1 auto;min-height:0}
+}
+
+/* Classement de l'accueil (ordinateur) : plus de pastilles de forme sous chaque équipe — des lignes plus fines, plus de place. */
+@media screen and (min-width:701px){
+ html body.home-mode #home-page-0 #home-live-widgets .home-live-ranking .home-sportcorico-form{display:none!important}
+ html body.home-mode #home-page-0 #home-live-widgets .home-live-ranking .home-sportcorico-table td{padding-block:6px!important}
+ html body.home-mode #home-page-0 #home-live-widgets .home-live-ranking .home-sportcorico-table{max-height:340px!important}
+}
+
+/* Téléphone : écusson au-dessus du nom (comme sur ordinateur) pour que les noms d'équipes aient toute la largeur. */
+@media screen and (max-width:700px){
+ html body #home-live-widgets .home-live-thread .home-thread-match{grid-template-columns:minmax(0,1fr) auto minmax(0,1fr);gap:6px;align-items:start}
+ html body #home-live-widgets .home-live-thread .home-thread-side{flex-direction:column;align-items:center;text-align:center;gap:4px}
+ html body #home-live-widgets .home-live-thread .home-thread-side.right{flex-direction:column-reverse;justify-content:flex-start;text-align:center}
+ html body #home-live-widgets .home-live-thread .home-thread-names{align-items:center;width:100%}
+ html body #home-live-widgets .home-live-thread .home-thread-names strong{font-size:12.5px;line-height:1.2;text-align:center}
+ html body #home-live-widgets .home-live-thread .home-thread-names small{display:none}
+ html body #home-live-widgets .home-live-thread .home-thread-centre{justify-content:center;align-self:center}
+ html body #home-live-widgets .home-live-thread .home-thread-centre small:last-child{display:none}
+ html body #home-live-widgets .home-live-thread .home-thread-badge{flex-basis:40px;width:40px;height:40px}
+}

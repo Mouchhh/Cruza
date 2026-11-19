@@ -14,14 +14,20 @@ export function parseGames(list,teamId){
   if(!g||!Number.isInteger(g.id)||![g.home_team_id,g.outside_team_id].includes(teamId))return [];
   const date=/^(\d{4}-\d{2}-\d{2})/.exec(String(g.event_date||''))?.[1],time=/^([01]\d|2[0-3]):[0-5]\d$/.test(g.planned_time||'')?g.planned_time:'',home=text(g.home_team_name,150),away=text(g.outside_team_name,150);
   if(!date||!home||!away||g.exempt)return [];
-  const played=g.status==='Terminé'&&score(g.home_score)!==null&&score(g.outside_score)!==null;
-  return [{id:g.id,date,time,home,away,homeId:g.home_team_id,awayId:g.outside_team_id,competition:text(g.championship_name,150),status:played?'played':'planned',...(played?{homeScore:g.home_score,awayScore:g.outside_score}:{})}];
+  // Un match avec un score est joué, même si Sportcorico le laisse marqué « À venir » (statut parfois en retard sur le score).
+  const played=score(g.home_score)!==null&&score(g.outside_score)!==null;
+  return [{id:g.id,date,time,home,away,homeId:g.home_team_id,awayId:g.outside_team_id,homeLogo:sportcoricoLogo(g.home_logo),awayLogo:sportcoricoLogo(g.outside_logo),competition:text(g.championship_name,150),status:played?'played':'planned',...(played?{homeScore:g.home_score,awayScore:g.outside_score}:{})}];
  }).sort((a,b)=>(a.date+a.time).localeCompare(b.date+b.time));
 }
 // Une équipe peut jouer plusieurs championnats (ex. U15 1 joue aussi « U14 Division 1 ») : on les sépare par catégorie d'âge.
 const normName=v=>String(v||'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase().replace(/\s+/g,' ').trim();
 export function competitionAge(value){const m=/\bU\s?(\d{2})\b/i.exec(String(value||''));return m?Number(m[1]):null;}
 export function sameCompetition(a,b){a=normName(a);b=normName(b);return !!a&&!!b&&(a===b||a.startsWith(b)||b.startsWith(a));}
+// Famille d'un championnat : vétérans, une catégorie d'âge (U17…), ou seniors. Les matchs « Vétérans » ne sont jamais ceux d'une équipe seniors.
+export function competitionKind(value){
+ if(/v[eé]t[eé]ran/i.test(String(value||'')))return 'vet';
+ const age=competitionAge(value);return age!==null?'U'+age:'senior';
+}
 const NOT_A_LEAGUE=/coupe|amic|challenge|tournoi|plateau/i;
 export function parseSportcorico(html,sourceURL,competition=''){
  sourceURL=sportcoricoSource(sourceURL);
@@ -41,7 +47,8 @@ export function parseSportcorico(html,sourceURL,competition=''){
  const t=competition?mine.find(x=>sameCompetition(x.championship_name,competition)):mine.length===1?mine[0]:mine.find(x=>sameCompetition(x.championship_name,mainName))||mine[0];
  if(!t)throw Error('Aucun championnat trouvé pour cette équipe.');
  const others=mine.filter(x=>x!==t),differs=x=>{const a=competitionAge(t.championship_name),b=competitionAge(x.championship_name);return a!==null&&b!==null&&a!==b;};
- const belongs=g=>competition?sameCompetition(g.championship_name,t.championship_name):!others.some(x=>differs(x)&&sameCompetition(g.championship_name,x.championship_name));
+ const mainKind=competitionKind(t.championship_name);
+ const belongs=g=>competition?sameCompetition(g.championship_name,t.championship_name):!(competitionKind(g.championship_name)==='vet'&&mainKind!=='vet')&&!others.some(x=>differs(x)&&sameCompetition(g.championship_name,x.championship_name));
  const rows=t.lines.map(r=>Object.fromEntries(['rank','points','games_played','difference','team','team_id'].map(k=>[k,r[k]])));
  if(rows.length<2||rows.length>80||new Set(rows.map(r=>r.rank)).size!==rows.length||new Set(rows.map(r=>r.team_id)).size!==rows.length||rows.some(r=>typeof r.team!=='string'||!r.team||r.team.length>200||!['rank','points','games_played','difference','team_id'].every(k=>Number.isInteger(r[k])&&Math.abs(r[k])<1000000)||r.rank<1||r.rank>100||r.games_played<0||r.games_played>200))throw Error('Tableau Sportcorico invalide.');
  for(let i=0;i<rows.length;i++){rows[i].logo=sportcoricoLogo(t.lines[i].logo);rows[i].form=Array.isArray(t.lines[i].shape_of_the_moment)?t.lines[i].shape_of_the_moment.slice(0,5).map(v=>['V','N','D'].includes(v)?v:'?'):[];}

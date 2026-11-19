@@ -1,0 +1,31 @@
+/* Agenda — vue semaine : sept colonnes lisibles, filtres par type, « + Préparer » sous chaque jour. */
+.agenda-calendar .agenda-week-bar{display:flex!important;flex-wrap:wrap;align-items:center;gap:10px 14px;margin:6px 0 14px}
+.agenda-calendar .agenda-week-chips{display:flex!important;flex-wrap:wrap;gap:8px}
+.agenda-week-chip{border:1px solid #dfe5ee;background:#fff;color:#4a5f78;border-radius:999px;padding:7px 16px;font-size:13px;font-weight:600;cursor:pointer;min-height:36px}
+.agenda-week-chip[aria-pressed=true]{background:#17305a;border-color:#17305a;color:#fff}
+.agenda-calendar .agenda-week-bar .agenda-week-date{width:auto!important;max-width:170px;margin-left:auto;border:1px solid #dfe5ee;border-radius:10px;padding:7px 10px;font:inherit;font-size:14px;color:#17305a;background:#fff;min-height:36px}
+.agenda-week-full{border:0;background:transparent;color:#2855a2;font-weight:700;font-size:13px;cursor:pointer;padding:6px 2px}
+.agenda-week-grid{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));border:1px solid #e3e8f0;border-radius:16px;background:#fff;overflow:hidden}
+.agenda-week-day{display:flex;flex-direction:column;min-height:260px;padding:14px 8px 10px;border-left:1px solid #e3e8f0;min-width:0}
+.agenda-week-day:first-child{border-left:0}
+.agenda-week-day-head{display:flex;flex-direction:column;align-items:center;gap:2px;margin-bottom:12px}
+.agenda-week-weekday{font-size:10.5px;letter-spacing:.09em;text-transform:uppercase;color:#7b8ca3}
+.agenda-week-number{font-size:22px;color:#17305a;line-height:1.1}
+.agenda-week-day.today{background:#f4f7ff}.agenda-week-day.today .agenda-week-number{color:#2855a2}
+.agenda-week-events{display:flex;flex-direction:column;gap:6px;flex:1}
+.agenda-week-event{display:flex;flex-direction:column;gap:2px;width:100%;min-width:0;text-align:left;border:1px solid transparent;border-radius:8px;padding:6px 7px;font-size:11.5px;line-height:1.35;cursor:pointer}
+.agenda-week-event small{font-size:10.5px;opacity:.85;font-weight:700}
+.agenda-week-event span{display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden;overflow-wrap:anywhere}
+.agenda-week-add{margin-top:8px;border:0;background:transparent;color:#8a9ab0;font-size:11px;cursor:pointer;padding:6px 2px;align-self:center}
+.agenda-week-add:hover{color:#2855a2}
+.agenda-calendar.agenda-week-mode .agenda-calendar-grid,.agenda-calendar.agenda-week-mode .agenda-calendar-legend{display:none}
+@media(max-width:900px){
+ .agenda-week-grid{grid-template-columns:minmax(0,1fr)}
+ .agenda-week-day{flex-direction:row;flex-wrap:wrap;align-items:flex-start;gap:10px;min-height:0;padding:10px 12px;border-left:0;border-top:1px solid #e3e8f0}
+ .agenda-week-day:first-child{border-top:0}
+ .agenda-week-day-head{flex:0 0 48px;margin:0}
+ .agenda-week-events{flex:1 1 150px}
+ .agenda-week-add{margin:0;align-self:center}
+ .agenda-week-date{margin-left:0}
+}
+@media print{.agenda-week-bar{display:none}}

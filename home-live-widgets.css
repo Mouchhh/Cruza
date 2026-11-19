@@ -12,3 +12,18 @@
  @media(max-width:650px){body.home-mode #home-page-0>#home-live-widgets{grid-template-columns:minmax(0,1fr);gap:12px}#home-live-widgets .home-live-card{padding:20px}.home-live-training{grid-column:auto}}
 }
 @media print{#home-live-widgets{display:none!important}}
+
+/* Ordinateur : widgets plus compacts pour que l'accueil et le bandeau tiennent dans l'écran. */
+@media screen and (min-width:1101px){
+ body.home-mode #home-page-0>#home-live-widgets{gap:12px;margin:12px 0 10px}
+ #home-live-widgets .home-live-card{padding:14px 18px}
+ #home-live-widgets h2{font-size:15px;margin:0 0 8px}
+ #home-live-widgets h3{margin:10px 0 3px}
+ #home-live-widgets p{font-size:13px;line-height:1.45;margin:6px 0}
+ #home-live-widgets .home-live-value{font-size:22px;line-height:1.2}
+ #home-live-widgets .home-live-open{margin-top:8px;padding:8px 12px;min-height:38px}
+ #home-live-widgets progress{margin:12px 0}
+ html body.home-mode #home-page-0 #home-live-widgets .home-sportcorico-table{max-height:150px!important;margin-top:8px}
+ html body.home-mode #home-page-0>.home-hero{min-height:0!important;padding:14px 26px!important;margin-bottom:10px!important}
+ html body.home-mode #home-page-0>.home-hero .home-welcome-intro{margin:4px 0 0}
+}

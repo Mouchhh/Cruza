@@ -56,12 +56,21 @@
     for (let i = 0; i < 70 && contrastWithWhite(rgb) < 3.4; i++) rgb = fromHsl(h, s, (l -= 0.01));
     return rgb;
   }
+  function refine(rgb, maxS, minL, maxL) {
+    const [h, sat, l] = toHsl(rgb);
+    return fromHsl(h, Math.min(sat, maxS), Math.min(Math.max(l, minL), maxL));
+  }
   function palette(details) {
     const primary = /^#[0-9a-f]{6}$/i.test(details?.primaryColor || "") ? details.primaryColor : DEFAULTS.primary,
       secondary = /^#[0-9a-f]{6}$/i.test(details?.secondaryColor || "") ? details.secondaryColor : DEFAULTS.secondary,
       custom = primary.toLowerCase() !== DEFAULTS.primary || secondary.toLowerCase() !== DEFAULTS.secondary,
       bright = isBright(parse(primary)),
-      p = bright ? deepen(primary) : readable(primary),
+      // Filtre « classe » : une couleur de club vive devient plus sombre et moins criarde (un rouge pétant → un bordeaux profond).
+      // Les couleurs par défaut du site ne bougent pas ; une couleur claire (jaune…) garde son traitement doré existant.
+      customPrimary = primary.toLowerCase() !== DEFAULTS.primary,
+      customSecondary = secondary.toLowerCase() !== DEFAULTS.secondary,
+      p = bright ? deepen(primary) : customPrimary ? refine(readable(primary), 0.6, 0.18, 0.33) : readable(primary),
+      accent = customSecondary && toHsl(readable(secondary))[2] >= 0.28 ? refine(readable(secondary), 0.72, 0.32, 0.44) : readable(secondary), // un accent déjà sombre (noir…) reste tel quel
       map = new Map();
     for (const h of SOURCES.primary) {
       // Keep the small lightness gaps between the original blues.
@@ -74,7 +83,7 @@
       else map.set(parse(h).join(","), mix(p, [0, 0, 0], t));
     }
     for (const [h, t] of Object.entries(SOURCES.light)) map.set(parse(h).join(","), mix(p, [255, 255, 255], t));
-    for (const h of SOURCES.secondary) map.set(parse(h).join(","), readable(secondary));
+    for (const h of SOURCES.secondary) map.set(parse(h).join(","), accent);
     // Vivid/bright club colour: backgrounds become a soft pastel (with dark text), text and borders keep the deeper tone.
     let bgMap = null;
     const primaryKeys = new Set(SOURCES.primary.map((h) => parse(h).join(",")));
@@ -95,7 +104,7 @@
     };
     map.fallback = navy;
     if (bgMap) bgMap.fallback = navy;
-    return { custom, map, bgMap, primaryKeys, pastel: bgMap ? toHex(bgMap.get(parse(DEFAULTS.primary).join(","))) : null, primary: toHex(p), secondary: toHex(readable(secondary)) };
+    return { custom, map, bgMap, primaryKeys, pastel: bgMap ? toHex(bgMap.get(parse(DEFAULTS.primary).join(","))) : null, primary: toHex(p), secondary: toHex(accent) };
   }
   const COLOR = /#([0-9a-f]{8}|[0-9a-f]{6}|[0-9a-f]{3})\b|rgba?\(\s*(\d{1,3})\s*,\s*(\d{1,3})\s*,\s*(\d{1,3})\s*(?:,\s*([\d.]+%?)\s*)?\)/gi;
   function replaceColors(value, map) {

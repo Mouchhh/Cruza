@@ -7,3 +7,8 @@
 .home-photo-banner :focus-visible{outline:3px solid #fff;outline-offset:2px}
 @media print{.home-photo-banner{display:none}}
 html body.home-mode #home-page-0>.home-photo-banner{display:flex!important}
+
+/* Ordinateur : le bandeau reste visible en bas de l'écran, sans avoir à défiler. */
+@media screen and (min-width:701px){
+ html body.home-mode #home-page-0>.home-photo-banner{position:sticky;bottom:12px;z-index:6;margin-top:10px;box-shadow:0 6px 18px #0b1d3a33}
+}
