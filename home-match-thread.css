@@ -58,3 +58,25 @@
 }
 
 .home-thread-names small{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+
+/* Ordinateur : le contenu occupe toute la hauteur de la carte (au lieu de rester en haut avec du vide dessous). */
+@media screen and (min-width:701px){
+ #home-live-widgets .home-live-thread{justify-content:space-between;gap:16px}
+ .home-thread-match{flex:1 1 auto;align-content:center;padding:6px 0}
+ .home-thread-badge{flex-basis:64px;width:64px;height:64px}
+ .home-thread-initials{font-size:18px}
+ .home-thread-names strong{font-size:17px}
+ .home-thread-names small,.home-thread-centre small{font-size:13px}
+ .home-thread-centre strong{font-size:36px}
+ .home-thread-steps{gap:12px;margin-top:4px}
+ .home-thread-step{padding-top:10px}
+ .home-thread-step b{font-size:13px}.home-thread-step small{font-size:12px}
+ .home-thread-actions{gap:12px}
+ .home-thread-actions .home-live-open,.home-thread-secondary{min-height:44px;padding:10px 20px;font-size:14px}
+ .home-thread-next{padding-top:12px;border-top:1px solid #e9eef5}
+ .home-thread-side{flex-direction:column;text-align:center;gap:8px}
+ .home-thread-side.right{flex-direction:column-reverse;justify-content:center;text-align:center}
+ .home-thread-names{align-items:center;width:100%}
+ .home-thread-names strong{text-align:center}
+ .home-thread-badge{flex-basis:60px;width:60px;height:60px}
+}
