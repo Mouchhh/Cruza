@@ -144,6 +144,16 @@
       thread.append(el("p", "home-thread-next", "Prochaine séance : " + when + (snapshot.training.time ? " · " + snapshot.training.time : "") + " · " + (snapshot.training.title || "séance")));
     }
     training?.remove();
+    // « Forme · 5 derniers matchs » : les résultats pas encore saisis (score absent) apparaissent comme des ronds gris vides.
+    const circles = root.querySelector(".home-live-form .home-live-results");
+    if (circles) {
+      const have = circles.querySelectorAll(".home-live-result").length;
+      for (let i = have; i < 5 && have > 0; i++) {
+        const empty = el("span", "home-live-result result-empty", "·");
+        empty.title = "Résultat pas encore saisi";
+        circles.prepend(empty);
+      }
+    }
     root.prepend(thread);
   }
   const original = renderHomeWidgets;

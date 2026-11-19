@@ -80,3 +80,11 @@
  .home-thread-names strong{text-align:center}
  .home-thread-badge{flex-basis:60px;width:60px;height:60px}
 }
+
+.home-live-result.result-empty{background:#fff!important;border:2px dashed #cdd6e2!important;color:#aab6c6!important}
+/* Ordinateur : classement plus lisible — rien sous le tableau (légende, date de mise à jour, liens). */
+@media screen and (min-width:701px){
+ html body.home-mode #home-page-0 #home-live-widgets .home-live-ranking :is(.home-sportcorico-legend,.home-sportcorico-stamp,.home-sportcorico-configure,a.home-live-open,.home-sportcorico-expand){display:none!important}
+ html body.home-mode #home-page-0 #home-live-widgets .home-live-ranking{display:flex;flex-direction:column}
+ html body.home-mode #home-page-0 #home-live-widgets .home-live-ranking .home-sportcorico-table{max-height:300px!important;flex:0 1 auto;min-height:0}
+}
