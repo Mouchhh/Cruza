@@ -95,3 +95,16 @@
  html body.home-mode #home-page-0 #home-live-widgets .home-live-ranking .home-sportcorico-table td{padding-block:6px!important}
  html body.home-mode #home-page-0 #home-live-widgets .home-live-ranking .home-sportcorico-table{max-height:340px!important}
 }
+
+/* Téléphone : écusson au-dessus du nom (comme sur ordinateur) pour que les noms d'équipes aient toute la largeur. */
+@media screen and (max-width:700px){
+ html body #home-live-widgets .home-live-thread .home-thread-match{grid-template-columns:minmax(0,1fr) auto minmax(0,1fr);gap:6px;align-items:start}
+ html body #home-live-widgets .home-live-thread .home-thread-side{flex-direction:column;align-items:center;text-align:center;gap:4px}
+ html body #home-live-widgets .home-live-thread .home-thread-side.right{flex-direction:column-reverse;justify-content:flex-start;text-align:center}
+ html body #home-live-widgets .home-live-thread .home-thread-names{align-items:center;width:100%}
+ html body #home-live-widgets .home-live-thread .home-thread-names strong{font-size:12.5px;line-height:1.2;text-align:center}
+ html body #home-live-widgets .home-live-thread .home-thread-names small{display:none}
+ html body #home-live-widgets .home-live-thread .home-thread-centre{justify-content:center;align-self:center}
+ html body #home-live-widgets .home-live-thread .home-thread-centre small:last-child{display:none}
+ html body #home-live-widgets .home-live-thread .home-thread-badge{flex-basis:40px;width:40px;height:40px}
+}

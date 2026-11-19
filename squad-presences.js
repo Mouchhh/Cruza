@@ -12,7 +12,10 @@ document.addEventListener("DOMContentLoaded", () => {
   panel.hidden = true;
   squadList.before(panel);
   let active = false,
+    phoneSession = null, // téléphone : id de la séance affichée
     weekStart = mondayOf(agendaCalendarToday());
+  const phoneQuery = window.matchMedia("(max-width: 700px)");
+  phoneQuery.addEventListener?.("change", () => active && paint());
   function mondayOf(day) {
     return agendaCalendarAdd(day, -((new Date(day + "T12:00:00Z").getUTCDay() + 6) % 7));
   }
@@ -77,14 +80,17 @@ document.addEventListener("DOMContentLoaded", () => {
     next.setAttribute("aria-label", "Semaine suivante");
     prev.onclick = () => {
       weekStart = agendaCalendarAdd(weekStart, -7);
+      phoneSession = null;
       paint();
     };
     next.onclick = () => {
       weekStart = agendaCalendarAdd(weekStart, 7);
+      phoneSession = null;
       paint();
     };
     today.onclick = () => {
       weekStart = mondayOf(agendaCalendarToday());
+      phoneSession = null;
       paint();
     };
     head.append(prev, label, next, today);
@@ -97,6 +103,54 @@ document.addEventListener("DOMContentLoaded", () => {
     }
     if (!list.length) {
       panel.append(el("p", "report-panel", "Aucune séance enregistrée cette semaine. Préparez-en une depuis l’agenda."));
+      return;
+    }
+    if (phoneQuery.matches) {
+      // Téléphone : une séance à la fois, puis la liste des joueurs avec P / A.
+      const today = agendaCalendarToday();
+      if (!list.some((x) => x.id === phoneSession)) phoneSession = (list.find((x) => x.date >= today) || list[list.length - 1]).id;
+      const session = list.find((x) => x.id === phoneSession);
+      const chips = el("div", "squad-presences-chips");
+      chips.setAttribute("role", "group");
+      chips.setAttribute("aria-label", "Séance à pointer");
+      for (const item of list) {
+        const chip = el("button", "squad-presences-chip", fmt(item.date, { weekday: "short", day: "numeric" }) + (item.time ? " · " + item.time.replace(":", "h") : ""));
+        chip.type = "button";
+        chip.setAttribute("aria-pressed", String(item.id === phoneSession));
+        chip.onclick = () => {
+          phoneSession = item.id;
+          paint();
+        };
+        chips.append(chip);
+      }
+      panel.append(chips);
+      const present = players.filter((p) => statusOf(session, p) === "present").length,
+        card = el("div", "squad-presences-card"),
+        top = el("div", "squad-presences-cardhead"),
+        all = el("button", "squad-presences-allbtn", "Tous présents");
+      all.type = "button";
+      all.onclick = () => save(session, new Map(players.map((p) => [p.id, "present"])));
+      const titles = el("div", "squad-presences-cardtitle");
+      titles.append(el("strong", "", session.title || "Séance"), el("small", "", present + "/" + players.length + " présents"));
+      top.append(titles, all);
+      card.append(top);
+      for (const player of players) {
+        const row = el("div", "squad-presences-line"),
+          current = statusOf(session, player),
+          buttons = el("div", "squad-presences-cell");
+        row.append(el("span", "squad-presences-name", player.name));
+        for (const [code, status, name] of [["P", "present", "Présent"], ["A", "absent", "Absent"]]) {
+          const button = el("button", "squad-presences-toggle " + status, code);
+          button.type = "button";
+          button.setAttribute("aria-pressed", String(current === status));
+          button.setAttribute("aria-label", name + " · " + player.name);
+          button.onclick = () => save(session, new Map([[player.id, current === status ? "uncertain" : status]]));
+          buttons.append(button);
+        }
+        row.append(buttons);
+        card.append(row);
+      }
+      panel.append(card);
       return;
     }
     const table = el("div", "squad-presences-table");
