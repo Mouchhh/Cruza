@@ -1,9 +1,12 @@
 // Première connexion : une fenêtre pour régler le minimum de l'apparence du site (nom, logo, couleurs).
-// Elle s'affiche tant que le club n'a jamais été configuré sur ce compte, une seule fois ; tout reste modifiable
-// ensuite dans Paramètres → Mon club.
+// Elle ne s'affiche qu'UNE SEULE FOIS par compte : le « déjà fait » est gardé dans le compte (Supabase, métadonnées de
+// l'utilisateur) et recopié dans le navigateur. Elle ne revient donc ni après une reconnexion, ni sur un autre appareil.
+// Tout reste modifiable ensuite dans Paramètres → Mon club. L'adresse terminée par ?onboarding=reset la rouvre à la main.
 (() => {
   const DONE_KEY = "vestiaire-club-onboarding-done";
-  let shown = false;
+  const CLOUD_KEY = "cruza_onboarding_done_v1"; // métadonnée du compte : true = fenêtre déjà passée (enregistrée ou ignorée)
+  let shown = false,
+    opening = false;
   const text = (tag, className, content) => {
     const node = document.createElement(tag);
     if (className) node.className = className;
@@ -17,7 +20,7 @@
   } catch {
     resetAsked = false;
   }
-  function applyReset() {
+  async function applyReset() {
     if (!resetAsked) return;
     resetAsked = false;
     try {
@@ -27,28 +30,89 @@
       url.searchParams.delete("onboarding");
       history.replaceState(history.state, "", url.href);
     } catch {
-      /* Sans stockage, rien à remettre à zéro. */
+      /* Sans stockage, rien à remettre à zéro dans le navigateur. */
+    }
+    await cloudWrite(false); // le compte aussi : sinon la fenêtre resterait « déjà faite »
+  }
+  // --- « Déjà fait » dans le compte ---
+  const bound = () => typeof clubNetworkBound === "function" && typeof clubNetworkRequest === "function" && clubNetworkBound();
+  const userId = () => {
+    try {
+      return clubNetworkSession?.user?.id || "";
+    } catch {
+      return "";
+    }
+  };
+  let cloudRead = null; // { id, promise } : une seule lecture du compte par utilisateur et par page
+  // true = déjà fait sur le compte, false = jamais fait, null = compte injoignable (on ne sait pas)
+  function cloudDone() {
+    if (!bound()) return Promise.resolve(null);
+    const id = userId();
+    if (cloudRead && cloudRead.id === id) return cloudRead.promise;
+    const promise = (async () => {
+      try {
+        const user = await clubNetworkRequest("/auth/v1/user");
+        if (!bound() || userId() !== id) return null;
+        return user?.user_metadata?.[CLOUD_KEY] === true;
+      } catch {
+        return null;
+      }
+    })().then((value) => {
+      if (value === null && cloudRead?.id === id) cloudRead = null; // échec : on réessaiera au prochain passage
+      return value;
+    });
+    cloudRead = { id, promise };
+    return promise;
+  }
+  async function cloudWrite(value) {
+    if (!bound()) return;
+    const id = userId();
+    try {
+      await clubNetworkRequest("/auth/v1/user", { method: "PUT", body: { data: { [CLOUD_KEY]: value } } });
+      if (userId() === id) cloudRead = { id, promise: Promise.resolve(value) };
+    } catch {
+      /* Le navigateur garde l'information ; le compte sera mis à jour une prochaine fois. */
     }
   }
-  function needed() {
-    if (shown || document.querySelector("dialog[open]")) return false;
-    const root = document.documentElement;
-    if (root.classList.contains("club-private-request") && !root.classList.contains("club-authenticated")) return false;
-    applyReset();
+  const localDone = () => {
     try {
-      if (typeof coachStorageGet !== "function" || typeof coachClubDetailsKey === "undefined") return false;
-      // Tous les comptes, anciens compris : la fenêtre s'ouvre une seule fois (jusqu'à « Enregistrer » ou « Passer »).
-      return !coachStorageGet(DONE_KEY);
+      return !!coachStorageGet(DONE_KEY);
     } catch {
       return false;
     }
+  };
+  async function needed() {
+    if (shown || document.querySelector("dialog[open]")) return false;
+    const root = document.documentElement;
+    if (root.classList.contains("club-private-request") && !root.classList.contains("club-authenticated")) return false;
+    await applyReset();
+    if (typeof coachStorageGet !== "function" || typeof coachClubDetailsKey === "undefined") return false;
+    const local = localDone(),
+      cloud = await cloudDone();
+    if (cloud === true) {
+      // Déjà fait sur le compte (autre appareil, ou navigateur vidé) : on le retient ici et on ne rouvre pas.
+      if (!local) markLocalDone();
+      return false;
+    }
+    if (local) {
+      // Déjà fait sur cet appareil mais pas encore noté dans le compte : on l'y inscrit pour les autres appareils.
+      if (cloud === false) cloudWrite(true);
+      return false;
+    }
+    // Compte connecté mais injoignable : on ne sait pas si c'est déjà fait ailleurs, on réessaie plus tard plutôt que de la rouvrir.
+    if (cloud === null && bound()) return false;
+    return !shown && !document.querySelector("dialog[open]");
   }
-  const markDone = () => {
+  const markLocalDone = () => {
     try {
       coachStorageSet(DONE_KEY, "1");
     } catch {
       /* Without storage the window may come back on the next visit. */
     }
+  };
+  const markDone = () => {
+    markLocalDone();
+    cloudWrite(true);
   };
   async function shrinkLogo(file) {
     const bitmap = await createImageBitmap(file);
@@ -373,8 +437,18 @@
       /* Message facultatif. */
     }
   }
-  function open() {
-    if (!needed()) return;
+  async function open() {
+    if (shown || opening) return;
+    opening = true;
+    try {
+      if (!(await needed())) return;
+    } finally {
+      opening = false;
+    }
+    openWindow();
+  }
+  function openWindow() {
+    if (shown) return;
     shown = true;
     const dialog = text("dialog", "club-onboarding"),
       form = text("form", "club-onboarding-form"),
