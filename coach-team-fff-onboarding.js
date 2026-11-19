@@ -1,5 +1,8 @@
 // Initial team setup is stored in the authenticated coach's Supabase metadata.
 const coachFFFMetadataKey='stade_team_profiles_v1';
+// Équipes supprimées, notées dans le compte : elles ne reviennent ni après une reconnexion ni sur un autre appareil.
+const coachFFFRemovedMetaKey='stade_removed_teams_v1';
+const coachFFFTombstones=user=>new Set((Array.isArray(user?.user_metadata?.[coachFFFRemovedMetaKey])?user.user_metadata[coachFFFRemovedMetaKey]:[]).filter(x=>typeof x==='string').slice(-300));
 let coachFFFEnsurePending=null;
 function coachFFFProfileValid(profile){
  return profile&&coachTeamValid(profile)&&profile.id!=='unassigned'&&profile.fffProfile?.version===1&&['Masculin','Féminin','Mixte'].includes(profile.fffProfile.gender)&&['Football à 11','Football à 8','Futsal'].includes(profile.fffProfile.format)&&Number.isInteger(profile.fffProfile.number)&&profile.fffProfile.number>=1&&profile.fffProfile.number<=20&&/^\d{4}-\d{4}$/.test(profile.fffProfile.season)&&typeof profile.fffProfile.level==='string'&&profile.fffProfile.level.length<=80&&(profile.fffProfile.sourceURL===''||agendaFFFURL(profile.fffProfile.sourceURL))&&typeof profile.fffProfile.officialName==='string'&&(!profile.fffProfile.sourceURL||profile.fffProfile.officialName.trim().length>0)&&profile.fffProfile.officialName.length<=150;
@@ -33,12 +36,29 @@ function coachFFFApplyProfiles(profiles){
 async function coachFFFForget(id){
  if(typeof clubNetworkBound!=='function'||!clubNetworkBound())return;
  try{
-  const user=await clubNetworkRequest('/auth/v1/user'),all=Array.isArray(user.user_metadata?.[coachFFFMetadataKey])?user.user_metadata[coachFFFMetadataKey]:[],rest=all.filter(p=>p?.id!==id);
-  if(rest.length===all.length)return;
-  const data={[coachFFFMetadataKey]:rest};if(user.user_metadata?.stade_active_team_v1===id)data.stade_active_team_v1=rest.find(coachFFFProfileValid)?.id||'';
+  const user=await clubNetworkRequest('/auth/v1/user'),all=Array.isArray(user.user_metadata?.[coachFFFMetadataKey])?user.user_metadata[coachFFFMetadataKey]:[],rest=all.filter(p=>p?.id!==id),tomb=coachFFFTombstones(user);tomb.add(id);
+  const data={[coachFFFMetadataKey]:rest,[coachFFFRemovedMetaKey]:[...tomb].slice(-300)};if(user.user_metadata?.stade_active_team_v1===id)data.stade_active_team_v1=rest.find(coachFFFProfileValid)?.id||'';
   await clubNetworkRequest('/auth/v1/user',{method:'PUT',body:{data}});
- }catch{/* La suppression locale reste valable ; le compte sera nettoyé à une prochaine suppression. */}
+ }catch{/* La suppression locale reste valable ; le compte sera mis à jour à la prochaine ouverture. */}
 }
+// À chaque connexion : les équipes déjà supprimées sur cet appareil sont retirées du compte (même celles supprimées avant cette règle),
+// et les suppressions du compte sont reportées ici. Une seule fois par ouverture du site.
+let coachFFFReconciled=false;
+async function coachFFFReconcile(){
+ if(coachFFFReconciled||typeof clubNetworkBound!=='function'||!clubNetworkBound())return;
+ coachFFFReconciled=true;
+ try{
+  const user=await clubNetworkRequest('/auth/v1/user'),all=Array.isArray(user.user_metadata?.[coachFFFMetadataKey])?user.user_metadata[coachFFFMetadataKey]:[],tomb=coachFFFTombstones(user),before=tomb.size;
+  for(const id of coachTeamRemoved)if(id!=='unassigned')tomb.add(id);
+  let known=false;for(const id of tomb)if(id!=='unassigned'&&!coachTeamRemoved.has(id)){coachTeamRemoved.add(id);known=true;}
+  if(known)try{localStorage.setItem(coachTeamRemovedKey,JSON.stringify([...coachTeamRemoved].slice(-500)));}catch{}
+  const rest=all.filter(p=>p&&!tomb.has(p.id));
+  if(tomb.size===before&&rest.length===all.length)return;
+  const data={[coachFFFMetadataKey]:rest,[coachFFFRemovedMetaKey]:[...tomb].slice(-300)};if(tomb.has(user.user_metadata?.stade_active_team_v1))data.stade_active_team_v1=rest.find(coachFFFProfileValid)?.id||'';
+  await clubNetworkRequest('/auth/v1/user',{method:'PUT',body:{data}});
+ }catch{coachFFFReconciled=false;}
+}
+document.addEventListener('club-session-ready',()=>{setTimeout(coachFFFReconcile,1500);});
 async function coachFFFEnsure(){
  if(!clubNetworkBound())return false;
  if(coachFFFProfileValid(activeCoachTeam))return true;
@@ -48,7 +68,7 @@ async function coachFFFEnsure(){
   try{
    const user=await clubNetworkRequest('/auth/v1/user');
    if(!clubNetworkBound()||clubNetworkSession.user.id!==userId||trainingAgendaIdentity()!==owner)return false;
-   const profiles=Array.isArray(user.user_metadata?.[coachFFFMetadataKey])?user.user_metadata[coachFFFMetadataKey].filter(p=>coachFFFProfileValid(p)&&!coachTeamRemoved.has(p.id)):[]; // une équipe supprimée ici n'est jamais ressortie du compte (sinon rechargement sans fin)
+   const profiles=Array.isArray(user.user_metadata?.[coachFFFMetadataKey])?user.user_metadata[coachFFFMetadataKey].filter(p=>coachFFFProfileValid(p)&&!coachTeamRemoved.has(p.id)&&!coachFFFTombstones(user).has(p.id)):[]; // une équipe supprimée ici n'est jamais ressortie du compte (sinon rechargement sans fin)
    if(profiles.length){
     const hadConfiguredTeam=coachTeams.some(coachFFFProfileValid);
     coachFFFApplyProfiles(profiles);

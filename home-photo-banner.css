@@ -8,7 +8,12 @@
 @media print{.home-photo-banner{display:none}}
 html body.home-mode #home-page-0>.home-photo-banner{display:flex!important}
 
-/* Ordinateur : le bandeau reste visible en bas de l'écran, sans avoir à défiler. */
+/* Bandeau indépendant : fixé en bas de l'écran, il reste à la même place quand on défile (il ne fait plus partie des widgets). */
+html body>.home-photo-banner{display:flex!important;position:fixed!important;z-index:60;margin:0!important;box-shadow:0 8px 24px #0b1d3a45;
+ left:12px;right:12px;bottom:calc(var(--navigation-bottom-space,64px) + 10px + env(safe-area-inset-bottom,0px))}
 @media screen and (min-width:701px){
- html body.home-mode #home-page-0>.home-photo-banner{position:sticky;bottom:12px;z-index:6;margin-top:10px;box-shadow:0 6px 18px #0b1d3a33}
+ html body>.home-photo-banner{left:242px;right:24px;bottom:16px}
 }
+/* La page garde de la place en bas pour que le dernier widget ne passe pas sous le bandeau. */
+html body.home-photo-banner-on.home-mode #home-page-0{padding-bottom:96px!important}
+@media print{html body>.home-photo-banner{display:none!important}}

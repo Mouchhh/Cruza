@@ -490,6 +490,7 @@ function coachTeamDelete(id) {
     title,
     el("p", "", "L’équipe et ses " + count + " document(s) enregistrés sur cet appareil (compositions, séances, bilans, brouillons) seront effacés. Cette action est définitive."),
     el("p", "hint", "Les copies déjà partagées avec le club ne sont pas effacées. Votre effectif d’autres équipes, vos exercices et votre compte ne changent pas."),
+    ...(typeof clubNetworkBound === "function" && clubNetworkBound() ? [el("p", "hint", "L’équipe est aussi retirée de votre compte : elle ne reviendra pas quand vous vous reconnectez, ni sur vos autres appareils.")] : []),
     status,
     actions,
   );
@@ -550,7 +551,7 @@ function coachTeamDelete(id) {
         } catch {}
         history.replaceState(null, "", location.href);
         location.reload();
-      } else notify("Équipe « " + team.label + " » supprimée.");
+      } else notify("Équipe « " + team.label + " » supprimée" + (typeof clubNetworkBound === "function" && clubNetworkBound() ? " de votre compte." : "."));
     });
   };
   dialog.append(form);

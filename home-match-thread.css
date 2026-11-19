@@ -108,3 +108,19 @@
  html body #home-live-widgets .home-live-thread .home-thread-centre small:last-child{display:none}
  html body #home-live-widgets .home-live-thread .home-thread-badge{flex-basis:40px;width:40px;height:40px}
 }
+
+/* Téléphone : l'accueil défile normalement. Les cartes prennent leur hauteur naturelle (plus de lignes de hauteur imposée qui coupaient le contenu). */
+@media screen and (max-width:700px){
+ html body.home-mode #home-page-0{height:auto!important;min-height:0!important;display:block!important;padding-bottom:24px}
+ html body.home-mode #home-page-0 #home-live-widgets,html body.home-mode #home-page-0 #home-live-widgets:has(.home-live-thread){flex:none!important;display:grid!important;grid-template-columns:minmax(0,1fr)!important;grid-template-rows:none!important;grid-auto-rows:auto!important;gap:12px!important;margin:12px 0 0!important}
+ html body #home-live-widgets .home-live-card{height:auto!important;min-height:0!important;overflow:visible!important}
+ /* Fil du match : toutes les étapes sont visibles, en deux colonnes. */
+ html body #home-live-widgets .home-live-thread .home-thread-steps{display:grid!important;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+ html body #home-live-widgets .home-live-thread .home-thread-next{display:block!important}
+ html body #home-live-widgets .home-live-thread{gap:14px!important;padding:16px!important}
+ html body #home-live-widgets .home-live-thread .home-thread-names small{display:block;font-size:11.5px}
+ html body #home-live-widgets .home-live-thread .home-thread-centre small:last-child{display:block}
+ /* Classement et forme : plus aérés, éléments sur plusieurs lignes si besoin. */
+ html body #home-live-widgets .home-live-ranking,html body #home-live-widgets .home-live-form{padding:16px!important;gap:6px 12px!important}
+ html body #home-live-widgets .home-live-form .home-live-results{flex:1 1 100%;margin-top:6px}
+}

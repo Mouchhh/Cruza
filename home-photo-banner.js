@@ -55,14 +55,16 @@
     }
   }
   function update() {
-    const widgets = document.getElementById("home-live-widgets");
-    if (!widgets) return;
-    if (wanted()) {
+    // Bandeau indépendant des widgets : posé sur la page elle-même, fixé en bas de l'écran, il ne bouge pas quand on défile.
+    const onHome = document.body.classList.contains("home-mode") && !!document.getElementById("home-live-widgets");
+    if (onHome && wanted()) {
       banner ||= build();
-      if (banner.previousElementSibling !== widgets) widgets.after(banner);
-    } else if (banner) {
-      banner.remove();
+      if (banner.parentElement !== document.body) document.body.append(banner);
+      document.body.classList.add("home-photo-banner-on");
+    } else {
+      banner?.remove();
       banner = null;
+      document.body.classList.remove("home-photo-banner-on");
     }
   }
   function load() {
@@ -76,4 +78,5 @@
   document.addEventListener("DOMContentLoaded", load);
   document.addEventListener("club-session-ready", load);
   setInterval(update, 1500);
+  new MutationObserver(update).observe(document.body, { attributes: true, attributeFilter: ["class"] });
 })();
