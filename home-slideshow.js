@@ -5,8 +5,11 @@ let homeSlidePaused=homeSlideMotion.matches;
 function homeSlideVisible(){return document.body.classList.contains('home-mode')&&!document.hidden;}
 function renderHomeSlide(){
  homeSlideImages.forEach((img,index)=>img.classList.toggle('active',index===homeSlideIndex));
- $('home-slide-position').textContent='Photo '+(homeSlideIndex+1)+' / '+homeSlideImages.length;
- $('home-slide-pause').textContent=homeSlidePaused?'Reprendre le défilement':'Mettre en pause';$('home-slide-pause').setAttribute('aria-pressed',String(homeSlidePaused));
+ $('home-slide-position').textContent=(homeSlideIndex+1)+' / '+homeSlideImages.length;
+ const pause = $('home-slide-pause');
+ pause.textContent = homeSlidePaused ? '▶' : 'Ⅱ';
+ pause.title = homeSlidePaused ? 'Reprendre le défilement' : 'Mettre en pause';
+ pause.setAttribute('aria-pressed', String(homeSlidePaused));
  for(const id of ['home-slide-previous','home-slide-next','home-slide-pause'])$(id).disabled=homeSlideImages.length<2;
 }
 function updateHomeSlideTimer(){

@@ -14,8 +14,31 @@ html body>header .brand small{display:none!important}
 }
 @media print{html body>header .cruza-lockup,html body>header .brand-times{display:none}}
 html body .home-club-life{display:none!important}
-html body.home-mode #home-slideshow-controls:not([hidden]){
- position:static;display:flex;flex-wrap:wrap;justify-content:flex-end;
- max-width:none;margin:0 0 12px;gap:6px;
+@media screen {
+ html body.home-mode.home-has-slides>#home-backdrop::after{
+  background:linear-gradient(105deg,#07182fca 4%,#0a1e3a78 53%,#10223e38),linear-gradient(0deg,#0b1d36b3,transparent 72%)!important;
+ }
+ html body.home-mode.home-has-slides #home-page-0>.home-hero{
+  border-color:#ffffff36;
+  background:linear-gradient(95deg,#071a37a8,#0b234042 63%,#0b234012)!important;
+ }
+ html body.home-mode #home-slideshow-controls:not([hidden]){
+  position:static;display:inline-flex;max-width:100%;min-height:46px;align-items:center;
+  flex-wrap:wrap;gap:2px;margin:9px 0 0;padding:2px;border:1px solid #ffffff48;
+  border-radius:26px;background:#0a1d38d9;color:#fff;
+ }
+ html body.home-mode #home-slideshow-controls button{
+  width:40px;height:40px;min-height:40px;padding:0;border:0;border-radius:50%;
+  background:transparent;color:#fff;font-size:16px;line-height:1;
+ }
+ html body.home-mode #home-slideshow-controls button:hover{background:#ffffff25}
+ html body.home-mode #home-slideshow-controls button:focus-visible{outline:2px solid white;outline-offset:-3px}
+ html body.home-mode #home-slide-position{
+  min-width:34px;text-align:center;color:#e7f0ff;font-size:11px;font-variant-numeric:tabular-nums;
+ }
+ @media(max-width:700px){
+  html body.home-mode.home-has-slides #home-page-0>.home-hero{
+   background:linear-gradient(105deg,#071a37ce,#0b234043)!important;
+  }
+ }
 }
-html body.home-mode #home-slide-position{color:#fff;background:#102744;padding:5px 8px;border-radius:6px}
