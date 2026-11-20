@@ -138,10 +138,6 @@
  html body.home-mode #home-greeting{overflow-wrap:anywhere}
 }
 
-.home-ranking-summary{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;margin:5px 0 8px;flex:1 1 100%;align-self:stretch;width:100%}
-.home-ranking-metric{display:flex;flex-direction:column;gap:2px;padding:8px 10px;border:1px solid #e1e8f1;border-radius:9px;background:#f5f8fc;color:#233d61}
-.home-ranking-metric span{font-size:11px;font-weight:650}
-.home-ranking-metric strong{font-size:clamp(17px,2vw,24px);line-height:1.25;font-variant-numeric:tabular-nums}
-.home-ranking-metric-points{background:#e9f0fc;border-color:#d7e3f7;color:#214fa0}
-.home-sportcorico-table td.home-ranking-points-cell{font-weight:800;font-variant-numeric:tabular-nums;background:#eaf1fc;color:#214fa0}
-.home-sportcorico-table .home-sportcorico-own td.home-ranking-points-cell{background:#d8e6fe;color:#183f87}
+.home-ranking-points{font-weight:800;font-variant-numeric:tabular-nums;color:#214fa0;white-space:nowrap}
+.home-live-ranking .home-live-value .home-ranking-points,
+.home-sportcorico-table .home-sportcorico-own .home-ranking-points{display:inline-block;padding:.12em .45em;border-radius:.4em;background:#dfeafe;color:#183f87}
