@@ -13,5 +13,9 @@ html body>header .brand small{display:none!important}
  html body>header .brand-times{margin:0 7px;font-size:17px}
 }
 @media print{html body>header .cruza-lockup,html body>header .brand-times{display:none}}
-/* Diaporama de fond autorisé ; les anciens contrôles et la galerie restent masqués. */
-html body #home-slideshow-controls,html body .home-club-life{display:none!important}
+html body .home-club-life{display:none!important}
+html body.home-mode #home-slideshow-controls:not([hidden]){
+ position:static;display:flex;flex-wrap:wrap;justify-content:flex-end;
+ max-width:none;margin:0 0 12px;gap:6px;
+}
+html body.home-mode #home-slide-position{color:#fff;background:#102744;padding:5px 8px;border-radius:6px}

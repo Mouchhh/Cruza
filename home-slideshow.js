@@ -19,13 +19,38 @@ $('home-slide-pause').onclick=()=>{homeSlidePaused=!homeSlidePaused;renderHomeSl
 homeSlideMotion.addEventListener('change',event=>{homeSlidePaused=event.matches;renderHomeSlide();updateHomeSlideTimer();});
 document.addEventListener('visibilitychange',updateHomeSlideTimer);
 new MutationObserver(updateHomeSlideTimer).observe(document.body,{attributes:true,attributeFilter:['class']});
+let homeSlideRequest=0,homeSlideSources=[];
 async function initializeHomeSlides(){
  const configured=Array.isArray(window.CLUB_HOME_SLIDES)?window.CLUB_HOME_SLIDES:[],seen=new Set();
  const candidates=configured.filter(photo=>{if(!photo||typeof photo.src!=='string'||!/^assets\/(?:[a-zA-Z0-9_-]+\/)*[a-zA-Z0-9_-]+\.(?:jpe?g|png|webp)$/i.test(photo.src)||seen.has(photo.src))return false;seen.add(photo.src);return true;}).slice(0,12);
- const loaded=await Promise.all(candidates.map(async photo=>{const img=new Image();img.alt='';img.decoding='async';img.src=photo.src;try{await img.decode();return img;}catch{return null;}}));
- homeSlideImages=loaded.filter(Boolean);if(!homeSlideImages.length)return;
- $('home-backdrop').replaceChildren(...homeSlideImages);$('home-backdrop').hidden=false;$('home-slideshow-controls').hidden=false;document.body.classList.add('home-has-slides');
- // Le fond remplace le bloc d'attente des photos de l'accueil.
- document.querySelector('.home-club-life').hidden=true;renderHomeSlide();updateHomeSlideTimer();
+ const library = (window.clubPhotoLibrary?.cached() || [])
+   .map(photo => photo.data)
+   .filter(src => typeof src === 'string' && /^data:image\/jpeg;base64,/.test(src));
+ const sources = [...new Set(library.length ? library : candidates.map(photo => photo.src))];
+ if (sources.length === homeSlideSources.length && sources.every((src, index) => src === homeSlideSources[index])) return;
+ homeSlideSources = sources;
+ const request = ++homeSlideRequest;
+ const previous = homeSlideImages[homeSlideIndex]?.getAttribute('src');
+ if (previous && !sources.includes(previous)) $('home-backdrop').hidden = true;
+ const loaded = await Promise.all(sources.map(async src => {
+   const img = new Image();
+   img.alt = '';
+   img.decoding = 'async';
+   img.src = src;
+   try { await img.decode(); return img; } catch { return null; }
+ }));
+ if (request !== homeSlideRequest) return;
+ homeSlideImages = loaded.filter(Boolean);
+ homeSlideIndex = Math.max(0, homeSlideImages.findIndex(img => img.getAttribute('src') === previous));
+ const hasPhotos = homeSlideImages.length > 0;
+ $('home-backdrop').replaceChildren(...homeSlideImages);
+ $('home-backdrop').hidden = !hasPhotos;
+ $('home-slideshow-controls').hidden = homeSlideImages.length < 2;
+ document.body.classList.toggle('home-has-slides', hasPhotos);
+ document.querySelector('.home-club-life').hidden = hasPhotos;
+ renderHomeSlide();
+ updateHomeSlideTimer();
 }
+document.addEventListener('club-photos-updated', initializeHomeSlides);
+document.addEventListener('club-session-ready', initializeHomeSlides);
 const homeSlidesReady=initializeHomeSlides();
