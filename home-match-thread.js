@@ -21,37 +21,50 @@
     if (f) return f.opponent || (f.home === f.team ? f.away : f.home);
     return String(event.title || "").split(" / ").filter(Boolean).pop() || "Adversaire";
   }
-  // FFF and Sportcorico use different names for this club.
-  const chateauGontierNames = new Set([
-    "gj chateau gon pays",
-    "gj pays de chateau gontier",
-  ]);
+  const clubNameKey = (name) => norm(clean(name))
+    .split(" ")
+    .filter((word) => !["de", "du", "des", "le", "la", "les"].includes(word))
+    .map((word) => word === "gon" ? "gontier" : word)
+    .sort()
+    .join(" ");
+
   function opponentLogo(event) {
-    if (chateauGontierNames.has(norm(clean(opponentOf(event))))) {
-      return "assets/opponents/gj-pays-de-chateau-gontier.jpg";
-    }
-    try {
-      if (event.fff?.opponentLogo && typeof homeSportcoricoLogo === "function") {
-        const direct = homeSportcoricoLogo(event.fff.opponentLogo);
-        if (direct) return direct;
-      }
-      const data = typeof homeSportcoricoData !== "undefined" ? homeSportcoricoData : null;
-      if (!data?.rows || typeof homeSportcoricoLogo !== "function") return "";
-      const f = event.fff;
-      let row = f?.opponentId ? data.rows.find((r) => r.team_id === f.opponentId) : null;
-      if (!row) {
-        const wanted = norm(clean(opponentOf(event)));
-        if (wanted) row = data.rows.find((r) => norm(clean(r.team)) === wanted);
-      }
-      return row ? homeSportcoricoLogo(row.logo) : "";
-    } catch {
-      return "";
-    }
+    const fixture = event.fff || event;
+    if (typeof homeSportcoricoLogo !== "function") return "";
+
+    const direct = homeSportcoricoLogo(fixture.opponentLogo);
+    if (direct) return direct;
+
+    const data = typeof homeSportcoricoData !== "undefined" ? homeSportcoricoData : null;
+    const rows = data && data.sourceURL === homeSportcoricoSourceURL() ? data.rows : [];
+    const opponents = (rows || []).filter((row) => row.team_id !== data.teamId);
+    const id = Number(fixture.opponentId);
+    const identified = opponents.find((row) => row.team_id === id);
+    const identifiedLogo = homeSportcoricoLogo(identified?.logo);
+    if (identifiedLogo) return identifiedLogo;
+
+    const name = norm(opponentOf(event));
+    const exact = opponents.filter((row) => norm(row.team) === name);
+    const key = clubNameKey(opponentOf(event));
+    const matches = exact.length ? exact : opponents.filter((row) => clubNameKey(row.team) === key);
+    const logos = new Set(matches.map((row) => homeSportcoricoLogo(row.logo)).filter(Boolean));
+    if (logos.size === 1) return [...logos][0];
+
+    return key === "chateau gj gontier pays"
+      ? "assets/opponents/gj-pays-de-chateau-gontier.jpg"
+      : "";
   }
   const ownCrest = () => document.querySelector("body>header .brand .club-logo")?.getAttribute("src") || "";
   function badge(src, name, className) {
     const wrap = el("span", "home-thread-badge " + (className || ""));
     const fallback = () => {
+      const local = "assets/opponents/gj-pays-de-chateau-gontier.jpg";
+      const current = wrap.querySelector("img");
+      if (className === "other" && clubNameKey(name) === "chateau gj gontier pays" && current && current.getAttribute("src") !== local) {
+        current.onerror = () => wrap.replaceChildren(el("span", "home-thread-initials", initials(name)));
+        current.src = local;
+        return;
+      }
       wrap.replaceChildren(el("span", "home-thread-initials", initials(name)));
     };
     if (src) {

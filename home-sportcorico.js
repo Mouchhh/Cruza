@@ -28,11 +28,17 @@ function renderHomeSportcorico(card){
  if(!homeSportcoricoConfigured()){card.append(el('strong','home-live-value','Classement de l’équipe'),el('p','','Ajoutez le lien Sportcorico de votre équipe.'));homeSportcoricoSettings(card);return;}
  if(data){
   const own=data.rows.find(r=>r.team_id===data.teamId);
-  card.append(el('strong','home-live-value',own.rank+(own.rank===1?'er':'e')+' · '+own.points+' pts'));
+  const summary = el('div', 'home-ranking-summary');
+  const rankValue = el('div', 'home-ranking-metric');
+  rankValue.append(el('span', '', 'Position'), el('strong', '', own.rank + (own.rank === 1 ? 'er' : 'e') + ' / ' + data.rows.length));
+  const pointsValue = el('div', 'home-ranking-metric home-ranking-metric-points');
+  pointsValue.append(el('span', '', 'Points'), el('strong', '', String(own.points)));
+  summary.append(rankValue, pointsValue);
+  card.append(summary);
   card.append(el('p','home-live-caption',data.competition+' · '+data.pool+' · '+data.season));
   const wrap=el('div','home-sportcorico-table'),table=el('table');table.setAttribute('aria-label','Classement '+data.competition);
   const head=el('thead'),hr=el('tr');for(const label of ['Pl.','Équipe','J','Pts','Diff.']){const th=el('th','',label);th.scope='col';hr.append(th);}head.append(hr);table.append(head);
-  const body=el('tbody');for(const r of data.rows){const row=el('tr');if(r.team_id===data.teamId){row.className='home-sportcorico-own';row.setAttribute('aria-current','true');}const rank=el('td','home-sportcorico-rank',String(r.rank));if(r.rank<=3)rank.classList.add('home-sportcorico-top');row.append(rank,homeSportcoricoTeamCell(r));for(const value of [r.games_played,r.points,r.difference>0?'+'+r.difference:r.difference])row.append(el('td','',String(value)));body.append(row);}table.append(body);wrap.append(table);card.append(wrap,el('small','home-sportcorico-legend','Forme : V victoire · N nul · D défaite · ordre Sportcorico'));
+  const body=el('tbody');for(const r of data.rows){const row=el('tr');if(r.team_id===data.teamId){row.className='home-sportcorico-own';row.setAttribute('aria-current','true');}const rank=el('td','home-sportcorico-rank',String(r.rank));if(r.rank<=3)rank.classList.add('home-sportcorico-top');row.append(rank,homeSportcoricoTeamCell(r));row.append(el('td','',String(r.games_played)),el('td','home-ranking-points-cell',String(r.points)),el('td','',String(r.difference>0?'+'+r.difference:r.difference)));body.append(row);}table.append(body);wrap.append(table);card.append(wrap,el('small','home-sportcorico-legend','Forme : V victoire · N nul · D défaite · ordre Sportcorico'));
   const expand=el('button','home-sportcorico-expand home-live-open','Voir le tableau');expand.type='button';expand.onclick=()=>{
    document.querySelector('.home-sportcorico-dialog')?.remove();const dialog=el('dialog','home-sportcorico-dialog'),close=el('button','home-live-open','Fermer');close.type='button';close.onclick=()=>dialog.close();
    dialog.append(el('h2','',data.competition+' · '+data.season),wrap.cloneNode(true),el('small','home-sportcorico-legend','V victoire · N nul · D défaite · ordre Sportcorico'),el('p','','Sportcorico · '+new Date(data.fetchedAt).toLocaleString('fr-FR',{timeZone:'Europe/Paris'})),close);const source=el('a','','Source Sportcorico ↗');source.href=homeSportcoricoSourceURL();source.target='_blank';source.rel='noopener noreferrer';dialog.append(source);document.body.append(dialog);dialog.addEventListener('close',()=>dialog.remove());dialog.showModal();
