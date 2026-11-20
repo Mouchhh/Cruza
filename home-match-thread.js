@@ -21,7 +21,15 @@
     if (f) return f.opponent || (f.home === f.team ? f.away : f.home);
     return String(event.title || "").split(" / ").filter(Boolean).pop() || "Adversaire";
   }
+  // FFF and Sportcorico use different names for this club.
+  const chateauGontierNames = new Set([
+    "gj chateau gon pays",
+    "gj pays de chateau gontier",
+  ]);
   function opponentLogo(event) {
+    if (chateauGontierNames.has(norm(clean(opponentOf(event))))) {
+      return "assets/opponents/gj-pays-de-chateau-gontier.jpg";
+    }
     try {
       if (event.fff?.opponentLogo && typeof homeSportcoricoLogo === "function") {
         const direct = homeSportcoricoLogo(event.fff.opponentLogo);
