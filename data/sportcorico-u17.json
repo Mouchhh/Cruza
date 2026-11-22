@@ -18,10 +18,10 @@
       "team_id": 697553,
       "logo": "https://s3.pub2.infomaniak.cloud/object/v1/AUTH_7caca171fcb14ede88bd14eb36f90e50/sportcorico-media/logos/logo-gj-pays-de-lernee-564801.jpg",
       "form": [
-        "V",
         "N",
         "V",
         "V",
+        "D",
         "D"
       ]
     },
@@ -36,8 +36,8 @@
       "form": [
         "V",
         "V",
-        "V",
         "D",
+        "V",
         "V"
       ]
     },
@@ -83,10 +83,10 @@
       "logo": "https://s3.pub2.infomaniak.cloud/object/v1/AUTH_7caca171fcb14ede88bd14eb36f90e50/sportcorico-media/logos/logo-st-berthevin-us-502235.jpg",
       "form": [
         "D",
-        "D",
         "V",
         "V",
-        "V"
+        "V",
+        "D"
       ]
     },
     {
@@ -170,5 +170,5 @@
       ]
     }
   ],
-  "fetchedAt": "2026-11-21T21:50:04.153448+00:00"
+  "fetchedAt": "2026-11-22T02:36:07.553370+00:00"
 }
