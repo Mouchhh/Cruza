@@ -126,9 +126,19 @@ function coachAccountRenderClub({
     logoInput = el("input"),
     logoRemove = el("button", "export", "Retirer le logo");
   reset.type = logoRemove.type = "button";
-  reset.onclick = () => {
-    primary.value = clubTheme.defaults.primary;
-    secondary.value = clubTheme.defaults.secondary;
+  reset.onclick = async () => {
+    // Couleurs d'origine = celles du logo du club choisi ; sans logo lisible, celles de Cruza.
+    let found = {};
+    try {
+      if (logoValue && window.clubLogoColors) {
+        const image = new Image();
+        image.src = logoValue;
+        await image.decode();
+        found = await window.clubLogoColors(image);
+      }
+    } catch {}
+    primary.value = found.primary || clubTheme.defaults.primary;
+    secondary.value = found.secondary || clubTheme.defaults.secondary;
     primary.oninput();
     secondary.oninput();
   };

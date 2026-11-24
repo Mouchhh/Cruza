@@ -366,6 +366,7 @@
     else showSearch();
   }
   window.clubSportcorico = { mountPicker };
+  window.clubLogoColors = logoColors; // « Couleurs d’origine » du compte relit le logo du club choisi
   function notifyTeamFailed() {
     try {
       if (typeof notify === "function") notify("Club enregistré. L’équipe n’a pas pu être récupérée : vous pourrez la régler dans Mon équipe.");

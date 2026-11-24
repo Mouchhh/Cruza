@@ -190,6 +190,10 @@ function suppliedSheet(e) {
   style.textContent =
     ":host{display:block;min-width:0;--club-navy:#142d50;--club-blue:#2855a2;--navy:#142d50;--blue:#2855a2;--blue-2:#204581;--blue-soft:#eaf0f9;--line:#dce5ef;--bg:#f2f5f9;--card:#fff;--ink:#203958;--muted:#536a83;--text:system-ui,sans-serif;--display:system-ui,sans-serif;font:15px/1.55 system-ui,sans-serif;color:#203958}.f-card{width:100%;height:750px;max-height:none}@media(max-width:820px){.f-card{height:auto;min-height:0}}";
   shadow.append(style, suppliedExerciseEngine.renderFiche(e));
+  // Les fiches embarquent le logo du Stade Mayennais : on affiche celui du club choisi (celui de l'en-tête du site).
+  const crest = document.querySelector("body>header .brand .club-logo")?.getAttribute("src"),
+    sheetLogo = shadow.querySelector(".f-top img");
+  if (crest && sheetLogo) sheetLogo.src = crest;
   return host;
 }
 function openSuppliedSheet(e) {
