@@ -178,6 +178,8 @@ function trainingBibleExercisePreview(custom) {
 }
 
 document.addEventListener("DOMContentLoaded", () => {
+  // Dictée et assistant IA masqués en attendant l'assistant vocal : passer window.cruzaDictationEnabled à true pour les remettre.
+  if (!window.cruzaDictationEnabled) return;
   const dialog = $("custom-training-dialog");
   const sheet = $("exercise-studio-sheet");
   if (!sheet) return;

@@ -65,6 +65,8 @@ function trainingAIDraft(reply, context) {
 }
 
 document.addEventListener("DOMContentLoaded", () => {
+  // Dictée et assistant IA masqués en attendant l'assistant vocal : passer window.cruzaDictationEnabled à true pour les remettre.
+  if (!window.cruzaDictationEnabled) return;
   const panel = $("training-assistant-az");
   if (!panel) return;
   const chat = el("details", "training-assistant-voice");

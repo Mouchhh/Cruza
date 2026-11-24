@@ -93,3 +93,6 @@ body.training-mode #training-space.training-assistant-open > #training-status { 
 .exercise-voice-preview canvas { width: min(100%, 540px); height: auto; border-radius: 8px; }
 .exercise-voice-preview .exercise-board-actions { flex-wrap: wrap; }
 .exercise-voice-preview > button { justify-self: start; }
+
+/* Dictée masquée en attendant l'assistant vocal : supprimer cette règle pour la remettre. */
+.training-assistant-voice{display:none!important}
