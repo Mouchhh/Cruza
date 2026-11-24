@@ -8,7 +8,7 @@ with sync_playwright() as p:
  assert page.locator('#home-page-0').is_visible()
  assert page.locator('#workspace-navigation>button').all_text_contents()==['Accueil','Match','Séances','Agenda','Bilans','Votre effectif','Club']
  saved=page.evaluate('JSON.stringify(saves)');page.locator('#workspace-squad-entry').click();assert page.locator('#coach-squad-dialog').is_visible();assert page.locator('#coach-squad-title').inner_text()=='Mes joueurs';assert page.locator('#coach-squad-dialog').evaluate("e=>e.tagName==='SECTION'&&!e.closest('dialog')");assert page.locator('#club-home').is_hidden()
- page.locator('#coach-squad-dialog').get_by_role('button',name='Ouvrir l’espace Match',exact=True).click();assert page.evaluate('JSON.stringify(saves)')==saved
+ page.locator('#view-pitch').click();assert page.evaluate('JSON.stringify(saves)')==saved
  page.wait_for_function("!document.body.classList.contains('squad-mode')")
  page.locator('#view-pitch').click();assert page.locator('#terrain-page-0').is_visible();assert not page.locator('.workspace-submenu:not([hidden])').count()
  page.locator('#task-match-causerie').click();page.locator('#match-plan-context').fill('Terrain humide, garder des appuis.');assert page.locator('#personal-canva').is_visible()
@@ -30,7 +30,7 @@ with sync_playwright() as p:
   assert not page.locator('.workspace-tools-trigger').count()
   if w in [390,1366]:page.screenshot(path=f'/tmp/task-navigation-{w}.png')
   page.locator('#workspace-squad-entry').click();d=page.locator('#coach-squad-dialog');assert d.is_visible();box=d.bounding_box();assert box and box['x']>=0 and box['x']+box['width']<=w+1
-  d.get_by_role('button',name='Ouvrir l’espace Match',exact=True).click()
+  page.locator('#view-pitch').click()
  ids=re.findall(r'\bid="([^"]+)"',Path('index.html').read_text());assert page.evaluate('(ids)=>ids.every(id=>document.getElementById(id))',ids)
  assert page.evaluate('(()=>{const ids=[...document.querySelectorAll("[id]")].map(e=>e.id);return ids.length===new Set(ids).size})()')
  assert not errors,errors

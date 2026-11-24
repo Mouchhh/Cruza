@@ -140,6 +140,64 @@
     return [firstName, lastName, license || "", primaryCategory || ""];
   }
 
+  // ---- Photos d'identité du PDF « licences match » ----
+  // Repère chaque image dessinée sur la page avec sa position (mêmes coordonnées que le texte).
+  async function pdfImages(pdf, page) {
+    const { fnArray, argsArray } = await page.getOperatorList(), { OPS } = pdf;
+    const multiply = (m, n) => [m[0] * n[0] + m[2] * n[1], m[1] * n[0] + m[3] * n[1], m[0] * n[2] + m[2] * n[3],
+      m[1] * n[2] + m[3] * n[3], m[0] * n[4] + m[2] * n[5] + m[4], m[1] * n[4] + m[3] * n[5] + m[5]];
+    const images = [], stack = [];
+    let matrix = [1, 0, 0, 1, 0, 0];
+    fnArray.forEach((fn, i) => {
+      const args = argsArray[i];
+      if (fn === OPS.save) stack.push(matrix);
+      else if (fn === OPS.restore) matrix = stack.pop() || matrix;
+      else if (fn === OPS.transform) matrix = multiply(matrix, args);
+      else if (fn === OPS.paintImageXObject || fn === OPS.paintInlineImageXObject) {
+        const [a, , , d, e, f] = matrix;
+        // Les petits pictogrammes (logos, icônes) ne sont pas des photos de joueurs.
+        if (Math.abs(a) < 20 || Math.abs(d) < 20) return;
+        images.push({ ref: args[0], inline: fn === OPS.paintInlineImageXObject,
+          y: Math.min(f, f + d), height: Math.abs(d) });
+      }
+    });
+    return images;
+  }
+
+  async function pdfPhoto(page, image) {
+    let data = image.ref;
+    if (!image.inline) {
+      const store = String(image.ref).startsWith("g_") ? page.commonObjs : page.objs;
+      data = await Promise.race([
+        new Promise(resolve => store.get(image.ref, resolve)),
+        new Promise(resolve => setTimeout(resolve, 3000, null)),
+      ]);
+    }
+    if (!data) return "";
+    let picture = data.bitmap;
+    if (!picture && data.data && (data.kind === 2 || data.kind === 3)) {
+      // kind 2 : RVB, kind 3 : RVBA (ImageKind de pdf.js)
+      const pixels = new Uint8ClampedArray(data.width * data.height * 4);
+      for (let p = 0, q = 0; p < pixels.length; p += 4, q += data.kind === 2 ? 3 : 4) {
+        pixels[p] = data.data[q];
+        pixels[p + 1] = data.data[q + 1];
+        pixels[p + 2] = data.data[q + 2];
+        pixels[p + 3] = data.kind === 2 ? 255 : data.data[q + 3];
+      }
+      picture = document.createElement("canvas");
+      picture.width = data.width;
+      picture.height = data.height;
+      picture.getContext("2d").putImageData(new ImageData(pixels, data.width, data.height), 0, 0);
+    }
+    if (!picture?.width || !picture?.height) return "";
+    // Même format que la photo de la fiche joueur : carré de 180 px, JPEG.
+    const canvas = document.createElement("canvas"), side = Math.min(picture.width, picture.height);
+    canvas.width = canvas.height = 180;
+    // Photo d'identité en hauteur : on garde plutôt le haut, où se trouve le visage.
+    canvas.getContext("2d").drawImage(picture, (picture.width - side) / 2, (picture.height - side) / 4, side, side, 0, 0, 180, 180);
+    return canvas.toDataURL("image/jpeg", 0.72);
+  }
+
   async function readPdf(file) {
     let pdf;
     try {
@@ -154,7 +212,7 @@
       useWasm: false,
       stopAtErrors: true,
     });
-    const rows = [];
+    const rows = [], photos = [];
     let columns, hasPdfText = false;
     try {
       const document = await task.promise;
@@ -165,7 +223,7 @@
         const lines = pdfLines(items);
         hasPdfText ||= lines.length > 0;
         const headers = lines.map(pdfColumns);
-        const firstHeader = headers.findIndex(Boolean);
+        const firstHeader = headers.findIndex(Boolean), pageRows = [];
         // Repeated headers replace the previous page's positions. Continuation pages can reuse them.
         for (let index = Math.max(0, firstHeader); index < lines.length; index++) {
           if (headers[index]) {
@@ -179,7 +237,25 @@
             if (key) cells[key] = [cells[key], item.value].filter(Boolean).join(" ");
           }
           const row = pdfPlayer(cells);
-          if (row) rows.push(row);
+          if (row) {
+            pageRows.push({ index: rows.length, y: lines[index][0].y });
+            rows.push(row);
+          }
+        }
+        // Chaque joueur reçoit la photo posée à la hauteur de sa ligne. Sans photo lisible, l'import continue.
+        try {
+          const images = pageRows.length ? await pdfImages(pdf, page) : [], used = new Set();
+          for (const row of pageRows) {
+            const distance = image => Math.abs(image.y + image.height / 2 - row.y);
+            const image = images
+              .filter(image => !used.has(image) && distance(image) <= Math.max(image.height * 0.75, 12))
+              .sort((a, b) => distance(a) - distance(b))[0];
+            if (!image) continue;
+            used.add(image);
+            photos[row.index] = await pdfPhoto(page, image);
+          }
+        } catch {
+          // shortcut: une photo illisible est ignorée sans message, le joueur garde ses initiales.
         }
         page.cleanup();
       }
@@ -192,7 +268,7 @@
     if (!rows.length) throw Error(hasPdfText
       ? "Aucun joueur reconnu dans ce PDF. Vérifiez que le tableau comporte un nom et un prénom par joueur."
       : "Ce PDF ne contient pas de texte lisible. Utilisez le PDF d’origine dans Footclubs si vous avez une version scannée.");
-    return source(file.name, ["Prénom", "Nom", "N° de licence", "Catégorie"], rows, 1, "Joueur n°");
+    return { ...source(file.name, ["Prénom", "Nom", "N° de licence", "Catégorie"], rows, 1, "Joueur n°"), photos };
   }
 
   // ---- Fenêtre de choix ----
@@ -321,8 +397,12 @@
       const known = I.createMatcher(squadPlayers());
       players = result.players;
       for (const player of players) {
+        const match = known.find(player);
         player.key = String(player.line);
-        player.existing = !!known.find(player);
+        player.existing = !!match;
+        player.photo = current.photos?.[player.line - current.firstLine] || "";
+        // Un joueur déjà présent sans photo récupère celle du PDF ; une photo existante n'est jamais remplacée.
+        player.fillsPhoto = !!(match && player.photo && !match.photo);
       }
       // Si les colonnes changent, on ne garde que les coches qui correspondent encore à un joueur.
       for (const key of [...chosen]) if (!players.some(p => p.key === key && !p.existing)) chosen.delete(key);
@@ -376,12 +456,18 @@
           renderGrid();
         };
         info.append(el("strong", "", player.name), el("small", "", [categoryOf(player), player.position].filter(Boolean).join(" · ")));
-        if (player.existing) info.append(el("small", "squad-pick-badge", "Déjà dans votre effectif"));
+        if (player.existing)
+          info.append(el("small", "squad-pick-badge", "Déjà dans votre effectif" + (player.fillsPhoto ? " · photo à ajouter" : "")));
         card.append(box, squadCardAvatar(player), info);
         return card;
       }));
-      count.textContent = chosen.size ? chosen.size + " joueur" + (chosen.size > 1 ? "s" : "") + " à ajouter" : "Cochez vos joueurs";
-      save.disabled = !chosen.size;
+      const photos = players.filter(p => p.fillsPhoto).length;
+      count.textContent = [
+        chosen.size && chosen.size + " joueur" + (chosen.size > 1 ? "s" : "") + " à ajouter",
+        photos && photos + " photo" + (photos > 1 ? "s" : "") + " à compléter",
+      ].filter(Boolean).join(" · ") || "Cochez vos joueurs";
+      save.textContent = chosen.size || !photos ? "Ajouter à mon effectif" : "Ajouter les photos";
+      save.disabled = !chosen.size && !photos;
     }
 
     search.oninput = renderGrid;
@@ -410,17 +496,25 @@
         primaryCategory: p.category,
         position: p.position,
         positions: p.position ? [p.position] : [],
-        photo: "",
+        photo: p.photo || "",
       }));
-      if (!additions.length || existing.length + additions.length > MAX_PLAYERS) {
-        message.textContent = "";
+      const photoFor = new Map();
+      for (const p of players) {
+        const match = p.photo && known.find(p);
+        if (match && !match.photo) photoFor.set(match, p.photo);
+      }
+      if ((!additions.length && !photoFor.size) || existing.length + additions.length > MAX_PLAYERS) {
         rebuild();
         return notify("Votre effectif a changé : vérifiez la sélection.");
       }
-      if (!squadSave([...existing, ...additions])) return;
+      const updated = existing.map(p => (photoFor.has(p) ? { ...p, photo: photoFor.get(p) } : p));
+      if (!squadSave([...updated, ...additions])) return;
       dialog.close();
       squadRender();
-      notify(additions.length + " joueur" + (additions.length > 1 ? "s ajoutés" : " ajouté") + " à votre effectif.");
+      notify([
+        additions.length && additions.length + " joueur" + (additions.length > 1 ? "s ajoutés" : " ajouté"),
+        photoFor.size && photoFor.size + " photo" + (photoFor.size > 1 ? "s ajoutées" : " ajoutée"),
+      ].filter(Boolean).join(" · ") + ".");
     };
 
     dialog.showModal();
@@ -434,6 +528,6 @@
   button.onclick = open;
   squadNew.replaceWith(button);
   squadNew.className = "export";
-  squadTools.insertBefore(squadNew, squadClose);
+  squadTools.append(squadNew);
   window.squadPick = { open }; // ouvert aussi depuis la composition quand l'effectif est vide
 })();
