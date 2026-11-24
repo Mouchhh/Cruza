@@ -25,9 +25,22 @@
     return parser;
   }
 
+  function playerFrom(first, last, number, category) {
+    const firstName = text(first), lastName = text(last), license = text(number);
+    if (!firstName || !lastName || aliases.firstName.test(normalize(firstName))) return null;
+    return {
+      firstName: firstName.slice(0, 25), lastName: lastName.slice(0, 25),
+      name: (firstName + " " + lastName).slice(0, 25).trimEnd(),
+      license: /^[A-Za-z0-9 -]{1,20}$/.test(license) ? license : "",
+      primaryCategory: text(category).slice(0, 30),
+      photo: "", position: "",
+    };
+  }
+
   async function read(file) {
-    if (!/\.xlsx?$/i.test(file.name) || !file.size || file.size > 8 * 1024 * 1024)
-      throw Error("Choisissez un export Excel Footclubs (.xls ou .xlsx, 8 Mo maximum).");
+    if (!/\.(pdf|xlsx?)$/i.test(file.name) || !file.size || file.size > 8 * 1024 * 1024)
+      throw Error("Choisissez un export Footclubs (.pdf, .xls ou .xlsx, 8 Mo maximum).");
+    if (/\.pdf$/i.test(file.name)) return readPdf(file);
     const xlsx = await loadParser();
     let book;
     try {
@@ -51,22 +64,100 @@
       if (header < 0) continue;
       if (worksheet["!fullref"] && xlsx.utils.decode_range(worksheet["!fullref"]).e.r >= 5000)
         throw Error("Cet export dépasse 5 000 lignes. Filtrez votre équipe dans Footclubs avant de réexporter.");
-      const players = rows.slice(header + 1).flatMap(row => {
-        const firstName = text(row[columns.firstName]);
-        const lastName = text(row[columns.lastName]);
-        if (!firstName || !lastName || aliases.firstName.test(normalize(firstName))) return [];
-        const license = text(row[columns.license]);
-        return [{
-          firstName: firstName.slice(0, 25), lastName: lastName.slice(0, 25),
-          name: (firstName + " " + lastName).slice(0, 25).trimEnd(),
-          license: /^[A-Za-z0-9 -]{1,20}$/.test(license) ? license : "",
-          primaryCategory: text(row[columns.primaryCategory]).slice(0, 30),
-          photo: "", position: "",
-        }];
-      });
+      const players = rows.slice(header + 1).map(row =>
+        playerFrom(row[columns.firstName], row[columns.lastName], row[columns.license], row[columns.primaryCategory])
+      ).filter(Boolean);
       if (players.length) return { sheet, players };
     }
     throw Error("Aucun joueur trouvé. L’export doit comporter les colonnes Nom et Prénom.");
+  }
+
+  function pdfLines(items) {
+    const ordered = items.filter(item => item.str?.trim())
+      .map(item => ({ value: item.str.trim(), x: item.transform[4], y: item.transform[5], width: item.width }))
+      .sort((a, b) => b.y - a.y);
+    const lines = [];
+    for (const item of ordered) {
+      const line = lines.at(-1);
+      if (line && Math.abs(line[0].y - item.y) <= 2) line.push(item);
+      else lines.push([item]);
+    }
+    return lines.map(line => line.sort((a, b) => a.x - b.x));
+  }
+
+  function pdfColumns(line) {
+    const headings = [];
+    for (const item of line) {
+      const previous = headings.at(-1);
+      const end = item.x + item.width;
+      if (previous && item.x - previous.end < 7) {
+        previous.value += " " + item.value;
+        previous.end = end;
+      } else {
+        headings.push({ ...item, end });
+      }
+    }
+    for (const heading of headings) {
+      heading.key = Object.keys(aliases).find(key => aliases[key].test(normalize(heading.value)));
+    }
+    return ["firstName", "lastName"].every(key => headings.some(heading => heading.key === key)) ? headings : null;
+  }
+
+  async function readPdf(file) {
+    let pdf;
+    try {
+      pdf = await import("./vendor/pdfjs/build/pdf.min.mjs");
+    } catch {
+      throw Error("Le lecteur PDF n’a pas pu être chargé. Réessayez.");
+    }
+    pdf.GlobalWorkerOptions.workerSrc = new URL("vendor/pdfjs/build/pdf.worker.min.mjs", document.baseURI).href;
+    const task = pdf.getDocument({
+      data: await file.arrayBuffer(),
+      isEvalSupported: false,
+      useWasm: false,
+      stopAtErrors: true,
+    });
+    const players = [];
+    let columns, hasText = false;
+    try {
+      const document = await task.promise;
+      if (document.numPages > 50) throw Error("Cet export dépasse 50 pages. Filtrez votre équipe dans Footclubs avant de réexporter.");
+      for (let pageNumber = 1; pageNumber <= document.numPages; pageNumber++) {
+        const page = await document.getPage(pageNumber);
+        const { items } = await page.getTextContent();
+        const lines = pdfLines(items);
+        hasText ||= lines.length > 0;
+        const headers = lines.map(pdfColumns);
+        const firstHeader = headers.findIndex(Boolean);
+        // Repeated headers replace the previous page's positions. Continuation pages can reuse them.
+        for (let index = Math.max(0, firstHeader); index < lines.length; index++) {
+          if (headers[index]) {
+            columns = headers[index];
+            continue;
+          }
+          if (!columns) continue;
+          const cells = {};
+          for (const item of lines[index]) {
+            const key = columns.findLast(column => item.x >= column.x - 4)?.key;
+            if (key) cells[key] = [cells[key], item.value].filter(Boolean).join(" ");
+          }
+          const isName = value => /^\p{L}[\p{L}\p{M} .'’–-]*$/u.test(value || "");
+          if (!isName(cells.firstName) || !isName(cells.lastName)) continue;
+          const player = playerFrom(cells.firstName, cells.lastName, cells.license, cells.primaryCategory);
+          if (player) players.push(player);
+        }
+        page.cleanup();
+      }
+    } catch (error) {
+      if (error.message.startsWith("Cet export dépasse")) throw error;
+      throw Error("Impossible de lire ce PDF. Vérifiez qu’il s’ouvre et qu’il est accessible sans mot de passe.");
+    } finally {
+      await task.destroy();
+    }
+    if (!players.length) throw Error(hasText
+      ? "Aucun joueur reconnu dans ce PDF. Le tableau doit comporter les colonnes Nom et Prénom."
+      : "Ce PDF ne contient pas de texte lisible. Utilisez le PDF d’origine dans Footclubs si vous avez une version scannée.");
+    return { sheet: "PDF Footclubs", players };
   }
 
   function removeDuplicates(incoming, existing) {
@@ -92,11 +183,11 @@
     const teamId = coachTeamSquadId();
     const dialog = el("dialog", "squad-editor squad-footclubs-import");
     const title = el("h2", "", "Importer depuis Footclubs");
-    const instructions = el("p", "hint", "Déposez ici l’export .xls ou .xlsx téléchargé dans Footclubs, ou choisissez-le sur votre appareil.");
-    const zone = el("label", "report-field", "Fichier Excel Footclubs");
+    const instructions = el("p", "hint", "Déposez ici l’export PDF ou Excel téléchargé dans Footclubs, ou choisissez-le sur votre appareil.");
+    const zone = el("label", "report-field", "Fichier Footclubs");
     const input = el("input");
     input.type = "file";
-    input.accept = ".xls,.xlsx";
+    input.accept = ".pdf,.xls,.xlsx";
     zone.append(input);
     const message = el("p", "hint");
     message.setAttribute("role", "status");
@@ -127,7 +218,7 @@
       choices = [];
       list.replaceChildren();
       updateButton();
-      message.textContent = "Lecture du fichier Excel…";
+      message.textContent = "Lecture du fichier…";
       try {
         const { sheet, players } = await read(file);
         if (!dialog.open || reading !== request) return;
