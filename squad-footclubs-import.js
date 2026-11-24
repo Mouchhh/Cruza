@@ -3,7 +3,7 @@
     firstName: /^(prenom|prenoms|prenom du licencie|prenom licencie)$/,
     lastName: /^(nom|nom de famille|nom du licencie|nom licencie|nom de naissance)$/,
     license: /^(n (de )?licence|no (de )?licence|numero (de )?licence|licence|n (de )?licencie|numero (de )?licencie)$/,
-    primaryCategory: /^(categorie|categorie d age|categorie age|categorie licence|categorie sportive|categorie du licencie)$/,
+    primaryCategory: /^(categorie|categorie d age|categorie age|categorie licence|categorie sportive|categorie du licencie|sous categorie)$/,
   };
   const normalize = value => String(value ?? "").normalize("NFD").replace(/\p{Diacritic}/gu, "")
     .toLowerCase().replace(/[^a-z0-9]+/g, " ").trim();
@@ -97,10 +97,36 @@
         headings.push({ ...item, end });
       }
     }
-    for (const heading of headings) {
-      heading.key = Object.keys(aliases).find(key => aliases[key].test(normalize(heading.value)));
+    for (const [index, heading] of headings.entries()) {
+      const label = normalize(heading.value);
+      heading.key = /^(nom prenom|nom et prenom|nom prenom du licencie)$/.test(label)
+        ? "fullName"
+        : Object.keys(aliases).find(key => aliases[key].test(label));
+      const previous = headings[index - 1];
+      heading.start = heading.x - (previous ? Math.min(12, (heading.x - previous.end) * .65) : 4);
     }
-    return ["firstName", "lastName"].every(key => headings.some(heading => heading.key === key)) ? headings : null;
+    const has = key => headings.some(heading => heading.key === key);
+    return (has("firstName") && has("lastName")) || (has("fullName") && has("license"))
+      ? headings : null;
+  }
+
+  function pdfPlayer(cells) {
+    const isName = value => /^\p{L}[\p{L}\p{M} .'’–-]*$/u.test(value || "");
+    let { firstName, lastName, license, primaryCategory } = cells;
+    if (cells.fullName) {
+      // The Footclubs match license list prints surnames in uppercase, then given names.
+      // A numeric license distinguishes the actual player row from notes and suspension lines.
+      if (!/^\d{6,15}$/.test(license || "") || !isName(cells.fullName)) return null;
+      const words = cells.fullName.split(/\s+/);
+      const firstMixedCase = words.findIndex(word => /\p{Ll}/u.test(word));
+      const split = firstMixedCase > 0 ? firstMixedCase : words.length - 1;
+      lastName = words.slice(0, split).join(" ");
+      firstName = words.slice(split).join(" ");
+      primaryCategory = primaryCategory?.match(/\bU\s?\d{1,2}F?\b/i)?.[0].toUpperCase().replace(/\s/g, "")
+        || primaryCategory;
+    }
+    if (!isName(firstName) || !isName(lastName)) return null;
+    return playerFrom(firstName, lastName, license, primaryCategory);
   }
 
   async function readPdf(file) {
@@ -138,12 +164,10 @@
           if (!columns) continue;
           const cells = {};
           for (const item of lines[index]) {
-            const key = columns.findLast(column => item.x >= column.x - 4)?.key;
+            const key = columns.findLast(column => item.x >= column.start)?.key;
             if (key) cells[key] = [cells[key], item.value].filter(Boolean).join(" ");
           }
-          const isName = value => /^\p{L}[\p{L}\p{M} .'’–-]*$/u.test(value || "");
-          if (!isName(cells.firstName) || !isName(cells.lastName)) continue;
-          const player = playerFrom(cells.firstName, cells.lastName, cells.license, cells.primaryCategory);
+          const player = pdfPlayer(cells);
           if (player) players.push(player);
         }
         page.cleanup();
@@ -155,7 +179,7 @@
       await task.destroy();
     }
     if (!players.length) throw Error(hasText
-      ? "Aucun joueur reconnu dans ce PDF. Le tableau doit comporter les colonnes Nom et Prénom."
+      ? "Aucun joueur reconnu dans ce PDF. Vérifiez que le tableau comporte un nom et un prénom par joueur."
       : "Ce PDF ne contient pas de texte lisible. Utilisez le PDF d’origine dans Footclubs si vous avez une version scannée.");
     return { sheet: "PDF Footclubs", players };
   }
