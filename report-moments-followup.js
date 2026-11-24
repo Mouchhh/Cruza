@@ -119,9 +119,10 @@ document.addEventListener('DOMContentLoaded', () => {
     back.onclick=()=>{selected=null;paint();};
     const head=el('div','squad-followup-head');head.append(squadCardAvatar(stats.player),el('h3','',stats.player.name));
     content.append(back,head);
-    const metrics=el('p','squad-followup-metrics');metrics.textContent=playerStatsDisplay(stats,'minutes')+' min · Présence '+(stats.attendance.rate===null?'—':stats.attendance.rate+' %')+' · '+playerStatsDisplay(stats,'goals')+' buts · '+playerStatsDisplay(stats,'assists')+' passes · Jaunes '+playerStatsDisplay(stats,'yellowCards')+' / Rouges '+playerStatsDisplay(stats,'redCards');content.append(metrics);
+    const metrics=el('p','squad-followup-metrics');const keeper=playerIsKeeper(stats.player)&&playerKeeperStats(stats);
+    metrics.textContent=playerStatsDisplay(stats,'minutes')+' min · Présence '+(stats.attendance.rate===null?'—':stats.attendance.rate+' %')+' · '+(keeper?keeper.matches+' match(s) joué(s) · '+keeper.conceded+' buts encaissés · '+keeper.cleanSheets+' sans encaisser · '+keeper.average+' encaissé(s) par match':playerStatsDisplay(stats,'goals')+' buts · '+playerStatsDisplay(stats,'assists')+' passes')+' · Jaunes '+playerStatsDisplay(stats,'yellowCards')+' / Rouges '+playerStatsDisplay(stats,'redCards');content.append(metrics);
     content.append(el('h4','','Historique des bilans'));
-    for(const report of [...stats.reports].reverse())content.append(el('p','squad-followup-history',report.date+' · '+report.title+' · '+(report.minutes||'—')+' min · Buts '+(report.goals||'—')+' / Passes '+(report.assists||'—')+' · Jaunes '+(report.yellowCards||'—')+' / Rouges '+(report.redCards||'—')));
+    for(const report of [...stats.reports].reverse())content.append(el('p','squad-followup-history',report.date+' · '+report.title+' · '+(report.minutes||'—')+' min · '+(keeper?(report.kind==='match'?'Encaissés '+(report.goalsAgainst===''?'—':report.goalsAgainst)+' · ':''):'Buts '+(report.goals||'—')+' / Passes '+(report.assists||'—')+' · ')+'Jaunes '+(report.yellowCards||'—')+' / Rouges '+(report.redCards||'—')));
     if(!stats.reports.length)content.append(el('p','hint','Aucun bilan enregistré pour cette saison.'));
     content.append(el('h4','','Présences aux séances'));
     for(const entry of [...stats.attendance.entries].reverse())content.append(el('p','squad-followup-history',entry.date+' · '+entry.time+' · '+entry.title+' · '+({present:'Présent',absent:'Absent',uncertain:'À confirmer'}[entry.status]||'À confirmer')));

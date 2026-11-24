@@ -239,6 +239,8 @@ function playerStatsSeasonSnapshot(
         kind,
         minutes: row.minutes,
         role: row.role,
+        // Score de l'équipe : sert aux statistiques des gardiens.
+        goalsAgainst: kind === "match" ? (report.info.goalsAgainst ?? "") : "",
         ...Object.fromEntries(
           Object.keys(playerStatsFields).map((k) => [k, row[k] ?? ""]),
         ),
@@ -404,4 +406,27 @@ function playerDisciplineStatus(reports) {
     series.alert = series.yellow >= 3;
   }
   return series || { start: "", matches: 0, yellow: 0, alert: false };
+}
+
+// Gardiens : buts et passes n'ont pas de sens, on affiche ce qu'il encaisse.
+function playerIsKeeper(player) {
+  return squadPlayerPositions(player)[0] === "Gardien"; // poste principal
+}
+// shortcut: compte les buts encaissés par l'équipe sur tout le match, même si le gardien est sorti avant ; à affiner si les bilans notent la minute des buts encaissés.
+function playerKeeperStats(stats) {
+  const played = stats.reports.filter(
+    (r) =>
+      r.kind === "match" &&
+      (Number(r.minutes) > 0 || (r.minutes === "" && r.role === "Titulaire")) &&
+      /^\d{1,2}$/.test(r.goalsAgainst || ""),
+  );
+  const conceded = played.reduce((sum, r) => sum + Number(r.goalsAgainst), 0);
+  return {
+    matches: played.length,
+    conceded,
+    cleanSheets: played.filter((r) => Number(r.goalsAgainst) === 0).length,
+    average: played.length
+      ? (conceded / played.length).toFixed(1).replace(".", ",")
+      : "—",
+  };
 }

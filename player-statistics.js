@@ -234,7 +234,7 @@ function playerStatsPrintRow(parent, row) {
     parent.append(el("p", "report-player-stats-summary", values.join(" · ")));
 }
 function playerStatsIcon(kind) {
-  kind = { contributions: "goals", discipline: "redCards" }[kind] || kind;
+  kind = { contributions: "goals", discipline: "redCards", keeper: "goals", conceded: "goals", concededAverage: "goals", keeperMatches: "minutes" }[kind] || kind;
   const paths = {
     minutes: "M12 8v4l3 2 M9 2h6 M12 2v2",
     goals: "M12 8l4 3-2 5h-4l-2-5z M3 8l5 3 M21 8l-5 3 M7 20l3-4 M17 20l-3-4",
@@ -369,11 +369,22 @@ function playerStatsDecorateCards() {
       metric.querySelector("strong").replaceWith(value);
       return metric;
     };
-    const contributions = pair("contributions", "b / p", [
-      ["goals", ""],
-      ["assists", ""],
-    ]);
-    contributions.title = "Buts / passes décisives";
+    let contributions;
+    if (playerIsKeeper(stats.player)) {
+      const keeper = playerKeeperStats(stats);
+      contributions = playerStatsMetric(
+        "keeper",
+        "enc. / sans enc.",
+        keeper.matches ? keeper.conceded + " / " + keeper.cleanSheets : "—",
+      );
+      contributions.title = "Buts encaissés / matchs sans encaisser";
+    } else {
+      contributions = pair("contributions", "b / p", [
+        ["goals", ""],
+        ["assists", ""],
+      ]);
+      contributions.title = "Buts / passes décisives";
+    }
     const discipline = el("div", "player-stat-metric player-stat-cards");
     discipline.dataset.stat = "discipline";
     for (const [field, label, color] of [
@@ -545,8 +556,17 @@ function playerStatsPaintDetail() {
       stats.attendance.rate === null ? "—" : stats.attendance.rate + " %",
     ),
   );
+  const keeper = playerIsKeeper(stats.player) && playerKeeperStats(stats);
+  if (keeper)
+    grid.append(
+      playerStatsMetric("keeperMatches", "matchs joués", String(keeper.matches)),
+      playerStatsMetric("conceded", "buts encaissés", keeper.matches ? String(keeper.conceded) : "—"),
+      playerStatsMetric("cleanSheets", "matchs sans encaisser", keeper.matches ? String(keeper.cleanSheets) : "—"),
+      playerStatsMetric("concededAverage", "encaissés par match", keeper.average),
+    );
   for (const [key, label] of Object.entries(playerStatsFields))
-    grid.append(playerStatsMetric(key, label, playerStatsDisplay(stats, key)));
+    if (!keeper || !["goals", "assists"].includes(key))
+      grid.append(playerStatsMetric(key, label, playerStatsDisplay(stats, key)));
   dialog.append(grid, playerStatsPresenceBar(stats.attendance));
   const a = stats.attendance;
   const source =
@@ -626,17 +646,28 @@ function playerStatsPaintDetail() {
         })
       : "—";
   const contribution = el("div", "player-stat-contributions");
-  contribution.append(
-    el("strong", "", "Ratio buts / passes : " + ratio),
-    el(
-      "span",
-      "hint",
-      playerStatsDisplay(stats, "goals") +
-        " buts / " +
-        playerStatsDisplay(stats, "assists") +
-        " passes décisives",
-    ),
-  );
+  if (keeper)
+    contribution.append(
+      el("strong", "", "Buts encaissés par match : " + keeper.average),
+      el(
+        "span",
+        "hint",
+        keeper.conceded + " buts encaissés en " + keeper.matches + " match(s) joué(s) · " +
+          keeper.cleanSheets + " sans encaisser. Compté d’après le score des bilans, sur tout le match.",
+      ),
+    );
+  else
+    contribution.append(
+      el("strong", "", "Ratio buts / passes : " + ratio),
+      el(
+        "span",
+        "hint",
+        playerStatsDisplay(stats, "goals") +
+          " buts / " +
+          playerStatsDisplay(stats, "assists") +
+          " passes décisives",
+      ),
+    );
   dialog.append(
     contribution,
     el(
@@ -688,10 +719,11 @@ function playerStatsPaintDetail() {
         "hint",
         (row.minutes === "" ? "—" : row.minutes) +
           " min · " +
-          (row.goals || "—") +
-          " buts · " +
-          (row.assists || "—") +
-          " passes · " +
+          (keeper
+            ? row.kind === "match"
+              ? (row.goalsAgainst === "" ? "—" : row.goalsAgainst) + " encaissé(s) · "
+              : ""
+            : (row.goals || "—") + " buts · " + (row.assists || "—") + " passes · ") +
           (row.yellowCards || "—") +
           " jaunes · " +
           (row.redCards || "—") +
