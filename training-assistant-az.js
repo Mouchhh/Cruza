@@ -702,6 +702,7 @@ function trainingAssistantBibleTarget(block, role, objectives, needs, rank = nul
   if (role === "workshop" && !target.objectives.length) target.objectives = [...objectives];
   return {
     ...target,
+    lowWait: role === "workshop" && needs.approach?.lowWait,
     players,
     keepers: block.workshopKeepers ?? needs.keepers,
     bounds: block.parallelId
@@ -754,7 +755,8 @@ function trainingAssistantBibleScore(meta, target) {
     (target.age && refAge ? Math.floor(Math.abs(target.age - refAge) / 2) : 0) +
     (target.phases.length && !target.phases.includes(meta.phase) ? 3 : 0) +
     (target.warmup ? trainingAssistantWarmupPenalty(meta) : 0) +
-    (target.large ? (1 - filled) * 3 : 0)
+    (target.large ? (1 - filled) * 3 : 0) +
+    (target.lowWait ? Math.max(0, meta.effectif_reference - 5) / 2 : 0)
   );
 }
 function trainingAssistantBibleCandidates(target, used = new Set()) {
@@ -1110,8 +1112,10 @@ document.addEventListener("DOMContentLoaded", () => {
     ];
     return [
       fields.length ? "Critères remplis : " + fields.join(", ") + "." : "Aucun critère reconnu.",
+      ...(criteria.approach.cues.length ? ["Des repères d’encadrement seront ajoutés à la séance."] : []),
       ...criteria.intentions.filter(intent => matched.slice(0, 4).includes(intent.objective)).map(intent => intent.cue),
       ...warnings,
+      ...(criteria.approach.light ? ["La charge sera allégée et le bloc physique dédié sera écarté."] : []),
       "Vérifiez les critères, puis générez la séance.",
     ].join(" ");
   });
@@ -1404,11 +1408,14 @@ document.addEventListener("DOMContentLoaded", () => {
     if (coachBrief?.request) {
       const brief = el("section", "training-assistant-brief");
       brief.append(el("h4", "", "Votre demande"), el("p", "", coachBrief.request));
-      const cues = (bibleNeeds?.intentions || []).map(intent => intent.cue);
-      if (cues.length) {
+      for (const [title, cues] of [
+        ["Repères à observer", (bibleNeeds?.intentions || []).map(intent => intent.cue)],
+        ["Comment encadrer la séance", bibleNeeds?.approach?.cues || []],
+      ]) {
+        if (!cues.length) continue;
         const list = el("ul");
         for (const cue of cues) list.append(el("li", "", cue));
-        brief.append(el("h4", "", "Repères à observer"), list);
+        brief.append(el("h4", "", title), list);
       }
       preview.append(brief);
     }
@@ -1443,13 +1450,17 @@ document.addEventListener("DOMContentLoaded", () => {
         space: space.value,
       });
       bibleNeeds.intentions = (coachBrief?.intentions || []).filter(intent => bibleObjectives.includes(intent.objective));
+      bibleNeeds.approach = coachBrief?.approach;
+      if (bibleNeeds.approach?.light) session.coachingLoad = "light";
       if (coachBrief?.request) {
         session.notes += "\n\nDemande du coach :\n" + coachBrief.request;
         if (bibleNeeds.intentions.length)
           session.notes += "\n\nRepères à observer :\n" + bibleNeeds.intentions.map(intent => "• " + intent.cue).join("\n");
+        if (bibleNeeds.approach.cues.length)
+          session.notes += "\n\nComment encadrer la séance :\n" + bibleNeeds.approach.cues.map(cue => "• " + cue).join("\n");
       }
       session = trainingAssistantAssignRoles(session);
-      if (physical.value !== "none") session = trainingAssistantAddPhysical(session, physical.value, bibleNeeds);
+      if (physical.value !== "none" && !bibleNeeds.approach?.light) session = trainingAssistantAddPhysical(session, physical.value, bibleNeeds);
       ({ session, generated } = trainingAssistantUseBible(session, bibleNeeds, bibleObjectives));
       seenBySlot = new Map();
       owner = context();

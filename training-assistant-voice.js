@@ -30,6 +30,23 @@ const trainingCoachIntentions = [
     exercise: /centre en retrait|premier poteau|second poteau|deuxieme poteau|finition sur centre/ },
 ];
 
+function trainingCoachApproach(phrase) {
+  const cues = [];
+  const discovery = /(?:laiss\w*|je veux qu ils).{0,40}(?:chercher|trouver.{0,20}(?:seuls|eux memes)|essayer|se debrouiller)|qu ils trouvent.{0,20}eux memes|autonomie/.test(phrase);
+  const questions = /guid\w*.{0,25}questions?|pos\w*.{0,25}questions?|faire verbaliser|qu ils expliquent leurs choix/.test(phrase);
+  const fewStops = /(?:pas|evit\w*|moins|sans).{0,35}(?:arreter|couper|interrompre)|laiss\w*.{0,20}jouer|ne pas trop intervenir/.test(phrase);
+  const demonstration = /(?:montr\w*|demonstration).{0,30}(?:debut|d abord|avant)|(?:debut|d abord|avant).{0,25}(?:montr\w*|demonstration)/.test(phrase);
+  const lowWait = /pas de file|sans file|evit\w*.{0,25}(?:attente|files?)|tout le monde joue|beaucoup de repetitions/.test(phrase);
+  const light = /(?:veille|lendemain) (?:de match|du match)|recuperation active|garder.{0,22}(?:frais|fraicheur)|pas.{0,22}charger physiquement|charge (?:legere|reduite)/.test(phrase);
+  if (demonstration) cues.push("Avant de jouer, montrer brièvement un exemple et faire reformuler un seul point clé.");
+  if (discovery) cues.push("Au premier passage, donner le but de l’exercice puis laisser les joueurs essayer plusieurs solutions avant d’intervenir.");
+  if (questions) cues.push("Entre deux passages, demander « Qu’as-tu vu ? » puis « Que pourrais-tu essayer ensuite ? ». Rejouer pour vérifier leur réponse.");
+  if (fewStops) cues.push("Pendant le jeu, observer et donner un retour individuel bref si nécessaire. Garder les corrections collectives pour les pauses.");
+  if (lowWait) cues.push("Installer les espaces avant de lancer l’exercice et répartir les joueurs pour que plusieurs groupes jouent en même temps.");
+  if (light) cues.push("Réduire la charge et garder des pauses. Chercher la qualité des décisions et des gestes plutôt que le volume.");
+  return { cues, lowWait, light };
+}
+
 function trainingVoiceCriteria(request) {
   const units = ["zero", "un", "deux", "trois", "quatre", "cinq", "six", "sept", "huit", "neuf",
     "dix", "onze", "douze", "treize", "quatorze", "quinze", "seize", "dix sept", "dix huit", "dix neuf"];
@@ -89,7 +106,7 @@ function trainingVoiceCriteria(request) {
     : /\b(?:endurance|intermittent|cardio)\b/.test(phrase) ? "endurance"
     : /\b(?:vitesse|sprints?)\b/.test(phrase) ? "speed" : "";
   const organisation = /\b2\s+(?:ateliers|groupes)(?:\s+separes)?\b/.test(phrase) ? "two" : "";
-  return { objectives, level, players, space, duration, physical, organisation, intentions, request: request.trim() };
+  return { objectives, level, players, space, duration, physical, organisation, intentions, approach: trainingCoachApproach(normalized), request: request.trim() };
 }
 
 function trainingVoiceInput(form, apply) {
@@ -100,7 +117,7 @@ function trainingVoiceInput(form, apply) {
   input.name = "coachRequest";
   input.rows = 3;
   input.maxLength = 1000;
-  input.placeholder = "Ex. Avec mes U17, je veux qu’on attire leur bloc d’un côté puis qu’on renverse vite. 16 joueurs dont 2 gardiens, 90 min sur demi-terrain.";
+  input.placeholder = "Ex. Avec mes U17, je veux qu’on renverse vite. Je veux les laisser chercher et les guider avec des questions. 16 joueurs, 90 min sur demi-terrain.";
   label.append(input);
   const actions = el("div", "report-actions");
   const mic = el("button", "export", "🎙 Dicter");
