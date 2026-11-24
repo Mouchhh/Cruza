@@ -87,3 +87,9 @@ body.training-mode #training-space.training-assistant-open > #training-status { 
 .training-assistant-brief :is(h4,p,ul) { margin: 0; }
 .training-assistant-brief :is(p,ul) + h4 { margin-top: 10px; }
 .training-assistant-brief p { white-space: pre-wrap; }
+
+.exercise-studio-voice { margin-block: 10px; }
+.exercise-voice-preview:not(:empty) { display: grid; gap: 8px; margin-block: 12px; }
+.exercise-voice-preview canvas { width: min(100%, 540px); height: auto; border-radius: 8px; }
+.exercise-voice-preview .exercise-board-actions { flex-wrap: wrap; }
+.exercise-voice-preview > button { justify-self: start; }

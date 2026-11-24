@@ -106,28 +106,28 @@ function trainingVoiceCriteria(request) {
     : /\b(?:endurance|intermittent|cardio)\b/.test(phrase) ? "endurance"
     : /\b(?:vitesse|sprints?)\b/.test(phrase) ? "speed" : "";
   const organisation = /\b2\s+(?:ateliers|groupes)(?:\s+separes)?\b/.test(phrase) ? "two" : "";
-  return { objectives, level, players, space, duration, physical, organisation, intentions, approach: trainingCoachApproach(normalized), request: request.trim() };
+  return { objectives, level, players, space, duration, physical, organisation, intentions, approach: trainingCoachApproach(normalized), request: request.trim(), numbered: phrase };
 }
 
-function trainingVoiceInput(form, apply) {
+function trainingVoiceInput(form, apply, options = {}) {
   const box = el("section", "training-assistant-voice");
-  const title = el("h3", "", "Décrivez votre séance");
+  const title = el("h3", "", options.title || "Décrivez votre séance");
   const label = el("label", "report-field", "Votre demande");
   const input = el("textarea");
   input.name = "coachRequest";
   input.rows = 3;
   input.maxLength = 1000;
-  input.placeholder = "Ex. Avec mes U17, je veux qu’on renverse vite. Je veux les laisser chercher et les guider avec des questions. 16 joueurs, 90 min sur demi-terrain.";
+  input.placeholder = options.placeholder || "Ex. Avec mes U17, je veux qu’on renverse vite. Je veux les laisser chercher et les guider avec des questions. 16 joueurs, 90 min sur demi-terrain.";
   label.append(input);
   const actions = el("div", "report-actions");
   const mic = el("button", "export", "🎙 Dicter");
-  const fill = el("button", "export", "Analyser la demande");
+  const fill = el("button", "export", options.button || "Analyser la demande");
   mic.type = fill.type = "button";
   const status = el("p", "hint");
   status.setAttribute("role", "status");
   const Recognition = window.SpeechRecognition || window.webkitSpeechRecognition;
   const hint = el("p", "hint", Recognition
-    ? "La dictée utilise le service vocal de votre navigateur. Vérifiez le texte avant d’analyser la demande."
+    ? "La dictée utilise le service vocal de votre navigateur. Vérifiez le texte avant de continuer."
     : "La dictée est indisponible dans ce navigateur. Vous pouvez écrire votre demande ou utiliser la dictée de votre clavier.");
   mic.hidden = !Recognition;
   actions.append(mic, fill);
@@ -175,7 +175,7 @@ function trainingVoiceInput(form, apply) {
         if (recognition !== current) return;
         input.value = committed;
         reset();
-        status.textContent = feedback || (committed === base ? "Aucune parole reconnue. Réessayez." : "Dictée terminée. Vérifiez le texte puis analysez la demande.");
+        status.textContent = feedback || (committed === base ? "Aucune parole reconnue. Réessayez." : "Dictée terminée. Vérifiez la transcription.");
       };
       current.start();
       input.readOnly = fill.disabled = true;
@@ -188,7 +188,7 @@ function trainingVoiceInput(form, apply) {
   };
   fill.onclick = () => {
     if (!input.value.trim()) {
-      status.textContent = "Décrivez d’abord votre séance.";
+      status.textContent = "Décrivez d’abord votre demande.";
       input.focus();
       return;
     }
