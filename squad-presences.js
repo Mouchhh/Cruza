@@ -189,7 +189,8 @@ document.addEventListener("DOMContentLoaded", () => {
   }
   function setActive(on) {
     active = on;
-    squadDialog.classList.toggle("squad-followup-mode", on);
+    // Cache la liste de l'effectif ; en quittant, l'onglet choisi (Effectif ou Suivi) règle lui-même cet affichage.
+    if (on) squadDialog.classList.add("squad-followup-mode");
     squadDialog.classList.toggle("squad-presences-mode", on);
     panel.hidden = !on;
     presenceTab.setAttribute("aria-pressed", String(on));
@@ -202,12 +203,8 @@ document.addEventListener("DOMContentLoaded", () => {
   };
   // Les deux onglets existants éteignent les présences quand on les choisit.
   rosterTab?.addEventListener("click", () => active && setActive(false));
-  followTab?.addEventListener("click", () => {
-    if (active) {
-      setActive(false);
-      followTab.click();
-    }
-  });
+  // Un clic() imbriqué sur le même bouton est ignoré par le navigateur : le Suivi s'est déjà affiché lui-même.
+  followTab?.addEventListener("click", () => active && setActive(false));
   document.addEventListener("training-library-updated", () => active && paint());
   document.addEventListener("coach-teams-updated", () => active && paint());
   // Premier onglet : la page s'ouvre sur les présences.

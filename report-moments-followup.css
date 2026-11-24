@@ -4,7 +4,7 @@
 .squad-followup-tabs button { min-height: 44px; }
 .squad-followup-tabs [aria-pressed="true"] { border-color: var(--club-logo-red,#e41f28); color: var(--club-logo-red,#e41f28); }
 .squad-followup[hidden] { display: none !important; }
-.squad-followup-mode .squad-list, .squad-followup-mode .monthly-review, .squad-followup-mode .squad-category-filter, .squad-followup-mode .squad-tools, .squad-followup-mode .squad-position-filters { display: none !important; }
+.squad-followup-mode .squad-list, .squad-followup-mode .monthly-review, .squad-followup-mode .squad-category-filter, .squad-followup-mode .squad-tools, .squad-followup-mode .squad-position-filters, .squad-followup-mode .player-monthly-controls { display: none !important; }
 .squad-followup { margin-top: 20px; color: #142d50; }
 .squad-followup select { min-height: 44px; max-width: 100%; font: inherit; background: white; color: #142d50; border: 1px solid #dce5ef; padding: 10px; border-radius: 8px; }
 .squad-followup-history { padding: 16px 0; margin: 0; border-bottom: 1px solid #e5eaf1; font-size: 13px; line-height: 1.7; overflow-wrap: anywhere; }
@@ -23,3 +23,30 @@
 .report-moments-notes { margin-top: 20px; }
 .report-moments-notes > summary { min-height: 44px; align-content: center; cursor: pointer; font-size: 13px; color: #526b88; }
 .report-moments-events .report-actions button:first-child { border-color: var(--club-logo-red,#e41f28); color: var(--club-logo-red,#e41f28); }
+/* Suivi des joueurs : vue d'ensemble puis joueur par joueur */
+.squad-followup h3 { margin: 22px 0 10px; font-size: 18px; }
+.squad-followup h4 { margin: 0 0 12px; font-size: 14px; }
+.squad-followup-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 14px; }
+.squad-followup-card { background: white; border: 1px solid #dce5ef; border-radius: 12px; padding: 16px; min-width: 0; }
+.squad-followup-rate { margin: 0 0 10px; font-weight: 600; }
+.squad-followup-bars { display: grid; gap: 8px; }
+.squad-followup-bar { display: grid; grid-template-columns: minmax(0, 1.4fr) minmax(60px, 1fr) auto; align-items: center; gap: 10px; font-size: 13px; }
+.squad-followup-bar-label { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.squad-followup-track { height: 8px; border-radius: 8px; background: #e9eef6; overflow: hidden; }
+.squad-followup-track span { display: block; height: 100%; background: var(--gold, #2855a2); border-radius: 8px; }
+.squad-followup-players { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 8px; }
+.squad-followup-player { display: flex; align-items: center; gap: 10px; text-align: left; background: white; border: 1px solid #dce5ef; border-radius: 12px; padding: 10px 12px; color: #142d50; font: inherit; cursor: pointer; min-width: 0; }
+.squad-followup-player:hover { border-color: var(--gold, #2855a2); }
+.squad-followup-player .roster-avatar, .squad-followup-head .roster-avatar { flex: none; }
+.squad-followup-player-info { flex: 1; min-width: 0; }
+.squad-followup-player-info strong { display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.squad-followup-player-info small, .squad-followup-player-figures { color: #667892; font-size: 12px; }
+.squad-followup-player-figures { flex: none; text-align: right; }
+.squad-followup-back { background: none; border: 0; color: var(--gold, #2855a2); font: inherit; font-weight: 600; padding: 8px 0; cursor: pointer; }
+.squad-followup-head { display: flex; align-items: center; gap: 12px; }
+.squad-followup-head h3 { margin: 0; }
+@media (max-width: 600px) {
+  .squad-followup-players { grid-template-columns: 1fr; }
+  .squad-followup-player { flex-wrap: wrap; }
+  .squad-followup-player-figures { flex-basis: 100%; text-align: left; padding-left: 48px; }
+}
