@@ -23,3 +23,8 @@
 .squad-player-form>.squad-photo-preview{justify-self:start}
 @media(max-width:480px){.squad-player-form{grid-template-columns:1fr}}
 #edit-form label[hidden],#edit-form [hidden]{display:none!important}
+
+.squad-footclubs-results{max-height:38dvh;overflow:auto}
+.squad-footclubs-results label{display:flex;flex-wrap:nowrap;align-items:center;gap:10px;cursor:pointer}
+.squad-footclubs-results input[type=checkbox]{width:18px;height:18px;flex:none;padding:0}
+.squad-footclubs-import .report-actions{margin-top:12px}
