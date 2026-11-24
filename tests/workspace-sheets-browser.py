@@ -30,7 +30,7 @@ with sync_playwright() as p:
  page.evaluate("()=>{const d=document.createElement('dialog');d.id='sheet-guard-test';d.innerHTML='<button aria-label=Fermer>×</button>';document.body.append(d);d.addEventListener('cancel',e=>e.preventDefault());d.showModal();}")
  page.keyboard.press('Escape');assert page.locator('#sheet-guard-test').is_visible();page.evaluate("document.querySelector('#sheet-guard-test').close()")
  # The real player editor closes after a successful save, but not after failed persistence.
- page.locator('.player-stat-manage summary').click();page.get_by_role('button',name='Modifier Alex Martin',exact=True).click();editor=page.locator('#coach-squad-editor')
+ page.get_by_role('button',name='Modifier Alex Martin',exact=True).click();editor=page.locator('#coach-squad-editor')
  page.evaluate("()=>{window.sheetWriter=coachStorageSet;coachStorageSet=()=>{throw Error('quota');};}")
  editor.get_by_label('Prénom',exact=True).fill('Alex');editor.get_by_label('Nom (facultatif)',exact=True).fill('modifié');editor.get_by_role('button',name='Enregistrer le joueur',exact=True).click();assert editor.is_visible()
  page.evaluate('()=>{coachStorageSet=window.sheetWriter;}');editor.get_by_role('button',name='Enregistrer le joueur',exact=True).click();assert not editor.is_visible();assert page.evaluate("squadPlayers()[0].name")=='Alex modifié'

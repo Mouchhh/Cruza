@@ -33,10 +33,8 @@ with sync_playwright() as p:
         a, b = first.bounding_box(), second.bounding_box()
         assert b['y'] > a['y'] + a['height']
         assert first.locator('.squad-availability').is_visible()
-        first.locator('.player-stat-manage summary').click()
         assert first.get_by_role('button', name='Modifier Alex Martin', exact=True).is_visible()
         assert page.evaluate('document.documentElement.scrollWidth <= innerWidth + 1'), width
-        first.locator('.player-stat-manage summary').click()
     assert not errors, errors
     browser.close()
 print('Airy player rows, identity/category/status, four retained metrics, profile access, management and responsive widths passed')

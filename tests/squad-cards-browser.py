@@ -20,6 +20,6 @@ with sync_playwright() as p:
   page.set_viewport_size({'width':w,'height':h});assert page.evaluate('document.documentElement.scrollWidth<=innerWidth'),(w,h)
   for card in cards.all():
    box=card.bounding_box();assert box['x']>=0 and box['x']+box['width']<=w+1,(w,h,box)
- page.on('dialog',lambda d:d.dismiss());managed_click(page,'Retirer Alex de mes joueurs');assert cards.count()==4
+ page.on('dialog',lambda d:d.dismiss());page.evaluate("squadEdit(squadPlayers().find(p=>p.name==='Alex').id)");page.locator('#coach-squad-editor').get_by_role('button',name='Retirer de mon effectif',exact=True).click();page.evaluate("document.querySelector('#coach-squad-editor').close()");assert cards.count()==4
  assert not errors,errors;b.close()
 print('PASS squad cards, initials, exact position counts, legacy positions, search, preferred-foot save/reload, cancelled deletion and responsive grid.')

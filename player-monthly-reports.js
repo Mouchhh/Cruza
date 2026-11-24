@@ -13,7 +13,7 @@ document.addEventListener('DOMContentLoaded',()=>{
    // L'ancien indicateur ne concernait que les entraînements : les deux nouveaux le remplacent.
    const old=card.querySelector('.player-stat-badges [data-stat="attendance"]');if(old)old.hidden=true;
    const strip=el('div','player-monthly-row'),button=el('button','player-monthly-pdf');button.type='button';button.innerHTML=icon;button.append(document.createTextNode('Bilan Mensuel (PDF)'));button.setAttribute('aria-label','Bilan Mensuel (PDF) · '+row.player.name);button.onclick=e=>{e.stopPropagation();printPlayer(data().get(row.player.id));};
-   const edit=el('button','player-monthly-review-edit');edit.type='button';edit.innerHTML='<svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><path d="m4 16 12-12 4 4-12 12H4ZM14 6l4 4"/></svg>';edit.setAttribute('aria-label','Appréciations mensuelles · '+row.player.name);edit.title='Rédiger les appréciations du mois';edit.onclick=e=>{e.stopPropagation();open(row.player.id);};
+   const edit=el('button','player-monthly-review-edit');edit.type='button';edit.innerHTML='<svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><path d="m4 16 12-12 4 4-12 12H4ZM14 6l4 4"/></svg>';edit.append(document.createTextNode('Appréciations'));edit.setAttribute('aria-label','Appréciations mensuelles · '+row.player.name);edit.title='Rédiger les appréciations du mois';edit.onclick=e=>{e.stopPropagation();open(row.player.id);};
    const actions=el('div','player-monthly-row-actions');actions.append(button,edit);
    strip.append(indicator('Présence ce mois',row.attendance),indicator('Présence Saison',row.season),actions);card.append(strip);
   }

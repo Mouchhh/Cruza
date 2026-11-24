@@ -65,3 +65,8 @@
   .squad-pick-grid{grid-template-columns:1fr;gap:6px}
   .squad-pick-foot{padding-bottom:max(12px,env(safe-area-inset-bottom))}
 }
+/* Carte joueur simplifiée : « À compléter » + « Modifier » ; « Retirer » en bas de la fiche */
+.squad-row-actions .squad-todo{border:1px solid #f0c27a;background:#fff6e6;color:#8a5200;border-radius:9px;padding:8px 10px;font-size:11px;font-weight:600;cursor:pointer}
+.player-monthly-row .player-monthly-review-edit{width:auto;gap:6px;padding:0 12px;font-size:12px;font-weight:600}
+#coach-squad-editor .squad-remove{justify-self:center;padding:10px;font-size:13px}
+@media(max-width:900px){.squad-page .squad-card .squad-row-actions{grid-column:1/-1;justify-content:flex-start}}

@@ -25,18 +25,18 @@ with sync_playwright() as p:
  saved=page.evaluate('squadDocument()');assert saved['squadDirectory']['players'][0]['photo'].startswith('data:image/jpeg');assert saved['players']==[]
  assert page.locator('#saved .saved-entry').count()==0
  before=page.evaluate('structuredClone(getCompositionBoard().players[0])')
- managed_click(d,'Utiliser Alex Martin');page.locator('#coach-squad-picker').get_by_role('button',name='Ajouter à cette place').click()
+ page.evaluate("squadChoose(squadPlayers().find(p=>p.name==='Alex Martin').id)");page.locator('#coach-squad-picker').get_by_role('button',name='Ajouter à cette place').click()
  after=page.evaluate('getCompositionBoard().players[0]');assert after['number']==before['number'];assert after['name']=='Alex Martin' and after['id']==before['id'] and after['x']==before['x'] and after['y']==before['y'] and after['photo']
  page.reload();page.wait_for_function("typeof squadPlayers==='function'");assert page.evaluate('squadPlayers().length')==1;assert page.evaluate('getCompositionBoard().players[0].name')=='Alex Martin'
  page.wait_for_function('window.documentEntry && window.taskWorkspace')
  if page.locator('#document-entry-resume').is_visible():page.locator('#document-entry-resume').click()
  else:assert page.evaluate("document.body.classList.contains('squad-mode') || workspaceFlows.terrain.index()===0")
  # No duplicate addition; profile edits affect future selections, not old compositions.
- page.evaluate('openCoachSquad()');managed_click(d,'Utiliser Alex Martin');assert not page.locator('#coach-squad-picker').is_visible()
+ page.evaluate('openCoachSquad()');page.evaluate("squadChoose(squadPlayers().find(p=>p.name==='Alex Martin').id)");assert not page.locator('#coach-squad-picker').is_visible()
  managed_click(d,'Modifier Alex Martin');editor.get_by_label('Catégorie principale',exact=True).fill('U17');editor.get_by_role('button',name='Enregistrer le joueur',exact=True).click();assert page.evaluate('getCompositionBoard().players[0].number')==before['number'];assert page.evaluate("!('number' in squadPlayers().find(p=>p.name==='Alex Martin'))")
  d.get_by_role('button',name='+ Nouveau joueur',exact=True).click();editor.get_by_label('Prénom',exact=True).fill('Sam');editor.get_by_role('button',name='Enregistrer le joueur',exact=True).click()
  page.evaluate("()=>{activateTerrainBoard('plan');window.oldPlan=JSON.stringify(getGamePlanBoard())}")
- managed_click(d,'Utiliser Sam');picker=page.locator('#coach-squad-picker');picker.get_by_label('Place dans la composition',exact=True).select_option('__bench');picker.get_by_role('button',name='Ajouter à cette place').click()
+ page.evaluate("squadChoose(squadPlayers().find(p=>p.name==='Sam').id)");picker=page.locator('#coach-squad-picker');picker.get_by_label('Place dans la composition',exact=True).select_option('__bench');picker.get_by_role('button',name='Ajouter à cette place').click()
  assert page.evaluate("getCompositionBoard().players.some(p=>p.name==='Sam'&&p.role==='sub')")
  assert page.evaluate('JSON.stringify(getGamePlanBoard())===window.oldPlan')
  # Account-scoped persistence feeds the actual versioned publishing queue.

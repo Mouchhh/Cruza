@@ -2,7 +2,7 @@
 let compositionCanvas=null,compositionRenderVersion=0,compositionObjectURL=null,compositionExportName='Composition',compositionExportSnapshot=null;
 function compositionFit(ctx,text,max){let value=text;while(value.length>1&&ctx.measureText(value).width>max)value=value.slice(0,-1);return value===text?value:value.slice(0,-1)+'…';}
 async function compositionImages(snapshot,options={bench:true}){
- const sources=snapshot.boardKind==='plan'?[]:snapshot.players.filter(p=>options.bench||p.role!=='sub').map(p=>p.photo).filter(Boolean),images=new Map();let failed=false;
+ const sources=snapshot.boardKind==='plan'?[]:[]/* pions sans photo : uniquement le numéro */,images=new Map();let failed=false;
  await Promise.all([...new Set(sources)].map(async source=>{try{const img=new Image();img.src=source;await img.decode();images.set(source,img);}catch{failed=true;}}));
  if(failed)throw Error('Une photo affichée ne peut pas être lue. Fermez cet aperçu et remplacez ou retirez cette photo avant de réessayer.');return images;
 }
@@ -33,7 +33,7 @@ function compositionPitch(ctx,rect,landscape,snapshot,images,options){
  if(options.opponents&&snapshot.opponents)snapshot.opponents.players.forEach(p=>{const [px,py]=xy(p.x,p.y);compositionPortrait(ctx,p,px,py,radius*.7,images,snapshot.opponents.color);});
  const players=snapshot.players.filter(p=>p.role!=='sub');
  if(options.bench)snapshot.players.filter(p=>p.role==='sub').forEach((p,i)=>players.push({...p,x:p.benchX??92-Math.floor(i/7)*11,y:p.benchY??20+(i%7)*10,name:'I/F · '+p.name}));
- players.forEach(p=>{const [px,py]=xy(p.x,p.y),r=p.role==='sub'?radius*.75:radius;compositionPortrait(ctx,minimal?{...p,photo:''}:p,px,py,r,images,snapshot.color);
+ players.forEach(p=>{const [px,py]=xy(p.x,p.y),r=p.role==='sub'?radius*.75:radius;compositionPortrait(ctx,{...p,photo:''},px,py,r,images,snapshot.color);
  if(minimal)return;
  ctx.font=(options.nameWeight==='normal'?'normal ':'bold ')+Math.round(r*.45*(options.nameScale||1))+'px Arial';ctx.textAlign='center';ctx.textBaseline='middle';const name=compositionFit(ctx,p.name,w*.22),tw=ctx.measureText(name).width,height=r*.67*(options.nameScale||1);
  const left=Math.max(x+6,Math.min(x+w-tw-34,px-tw/2-14)),top=Math.min(y+h-height-6,py+r+10);

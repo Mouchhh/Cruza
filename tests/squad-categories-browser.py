@@ -12,7 +12,7 @@ with sync_playwright() as p:
  alex=page.locator('[data-player-id=clean-a]');assert alex.locator('.squad-primary-category').inner_text()=='U17';assert alex.locator('.squad-availability').inner_text()=='Disponible'
  alex.locator('.player-stat-profile-link').click();detail=page.locator('#player-stats-dialog');assert 'N°' not in detail.inner_text();assert detail.locator('.squad-primary-category').inner_text()=='U17'
  detail.locator('.external-modal-close').click()
- alex.locator('.player-stat-manage summary').click();alex.get_by_role('button',name='Modifier Alex Martin',exact=True).click()
+ alex.get_by_role('button',name='Modifier Alex Martin',exact=True).click()
  editor=page.locator('#coach-squad-editor');assert not editor.get_by_label('Numéro habituel',exact=True).is_visible()
  editor.get_by_label('Catégorie principale',exact=True).fill('U15');editor.get_by_label('Disponibilité',exact=True).select_option('Indisponible');editor.get_by_role('button',name='Enregistrer le joueur',exact=True).click()
  assert page.evaluate("squadPlayers().find(p=>p.id==='clean-a').number")==9

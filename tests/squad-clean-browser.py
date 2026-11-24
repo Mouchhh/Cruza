@@ -7,9 +7,9 @@ with sync_playwright() as p:
  page.evaluate("()=>{squadSave(Array.from({length:6},(_,i)=>({id:'clean-'+i,name:['Alex Martin','Noah Bernard','Maxime Petit','Lucas Moreau','Gabriel Thomas','Louis Robert'][i],number:i+1,position:i===0?'Gardien':'Milieu',foot:'Droit',photo:''})));}")
  page.locator('#workspace-squad-entry').click();card=page.locator('[data-player-id=clean-0]')
  assert card.locator('.player-stat-badges>.player-stat-metric').count()==4
- assert not card.get_by_role('button',name='Modifier Alex Martin',exact=True).is_visible()
- card.locator('.player-stat-manage summary').click();assert card.get_by_role('button',name='Modifier Alex Martin',exact=True).is_visible()
- card.locator('.player-stat-manage summary').click();assert not page.locator('#player-stats-dialog').count()
+ assert card.get_by_role('button',name='Modifier Alex Martin',exact=True).is_visible()
+ assert card.get_by_role('button',name='Modifier Alex Martin',exact=True).is_visible()
+ assert not page.locator('#player-stats-dialog').count()
  for width in [1440,768,390,320]:
   page.set_viewport_size({'width':width,'height':1000});assert page.evaluate('document.documentElement.scrollWidth<=innerWidth+1')
   assert card.locator('.player-stat-badges').evaluate('e=>getComputedStyle(e).display')=='flex'

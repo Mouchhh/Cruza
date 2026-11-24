@@ -406,9 +406,9 @@ function playerStatsDecorateCards() {
     if (position)
       position.textContent = squadPositionsLabel(stats.player);
     const actions = card.querySelector(".squad-row-actions");
-    const manage = el("details", "player-stat-manage");
-    manage.append(el("summary", "", "Gérer le joueur"), actions);
-    card.append(badges, manage);
+    // Plus de tiroir « Gérer le joueur » : « Modifier » (et « À compléter ») restent visibles.
+    card.append(badges);
+    if (actions) card.append(actions);
     if (stats.discipline?.alert)
       card.append(
         el(
