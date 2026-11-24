@@ -1,5 +1,5 @@
 // Lecture d'une liste de joueurs (CSV ou lignes Excel) sans aucun accès réseau ni base de données.
-// Fonctions pures : testées par test-core.js (node apercu-import-effectif/test-core.js).
+// Fonctions pures : testées par tests/squad-import-core-test.cjs (node tests/squad-import-core-test.cjs).
 (function (root) {
   // Excel (Windows, en français) enregistre souvent ses CSV en Windows-1252 : on bascule si l'UTF-8 échoue.
   function decodeText(buffer) {
@@ -47,10 +47,10 @@
 
   // Les titres attendus sont une hypothèse tant qu'on n'a pas vu un vrai export (FFF, Club Compagnon…).
   const FIELDS = [
-    { key: "firstName", label: "Prénom", required: true, guess: ["prenom", "prenoms", "first name", "prenom joueur"] },
-    { key: "lastName", label: "Nom", guess: ["nom", "nom de famille", "nom joueur", "last name", "nom usage"] },
-    { key: "license", label: "N° de licence", guess: ["licence", "n licence", "no licence", "num licence", "numero licence", "numero de licence", "n de licence"] },
-    { key: "category", label: "Catégorie", guess: ["categorie", "sous categorie", "cat", "categorie age"] },
+    { key: "firstName", label: "Prénom", required: true, guess: ["prenom", "prenoms", "first name", "prenom joueur", "prenom du licencie", "prenom licencie"] },
+    { key: "lastName", label: "Nom", guess: ["nom", "nom de famille", "nom joueur", "last name", "nom usage", "nom du licencie", "nom licencie", "nom de naissance"] },
+    { key: "license", label: "N° de licence", guess: ["licence", "n licence", "no licence", "num licence", "numero licence", "numero de licence", "n de licence", "n de licencie", "numero de licencie", "numero licencie"] },
+    { key: "category", label: "Catégorie", guess: ["categorie", "sous categorie", "cat", "categorie age", "categorie d age", "categorie licence", "categorie sportive", "categorie du licencie"] },
     { key: "birthDate", label: "Date de naissance", guess: ["date de naissance", "naissance", "date naissance", "ne le", "ddn", "ne e le"] },
     { key: "position", label: "Poste", guess: ["poste", "postes", "position"] },
   ];
@@ -143,12 +143,28 @@
       .replace(/(^|[\s\-'’])(\p{L})/gu, (_, sep, letter) => sep + letter.toLocaleUpperCase("fr"));
   }
 
-  // Un joueur est reconnu par sa licence, ou à défaut par son prénom + nom.
-  function playerKeys(p) {
-    const keys = [];
-    if (p.license) keys.push("L:" + String(p.license).toUpperCase());
-    keys.push("N:" + normalize((p.firstName || "") + " " + (p.lastName || "")));
-    return keys;
+  const licenseKey = (value) => String(value || "").replace(/[\s-]/g, "").toUpperCase();
+  const nameKey = (p) => normalize(p.firstName || p.lastName ? (p.firstName || "") + " " + (p.lastName || "") : p.name);
+
+  // Reconnaît un joueur déjà connu : même licence, ou même nom quand l'un des deux n'a pas de licence.
+  // Deux homonymes avec deux licences différentes restent deux joueurs (règle reprise de l'import d'Enzo).
+  function createMatcher(list = []) {
+    const byLicense = new Map(),
+      byName = new Map();
+    const matcher = {
+      find(p) {
+        const license = licenseKey(p.license),
+          known = byName.get(nameKey(p)) || [];
+        return (license && byLicense.get(license)) || known.find((k) => !license || !licenseKey(k.license)) || null;
+      },
+      add(p) {
+        const license = licenseKey(p.license);
+        if (license) byLicense.set(license, p);
+        byName.set(nameKey(p), (byName.get(nameKey(p)) || []).concat(p));
+      },
+    };
+    list.forEach(matcher.add);
+    return matcher;
   }
 
   const MAX_NAME = 25; // même limite que la fiche joueur du site (prénom + nom)
@@ -158,8 +174,9 @@
       firstLine = options.firstLine || 2,
       players = [],
       problems = [],
-      seen = new Map();
+      seen = createMatcher();
     rows.forEach((row, i) => {
+      if (!row.some((v) => String(v ?? "").trim())) return; // ligne vide d'un tableur
       const line = firstLine + i,
         raw = (key) => (mapping[key] >= 0 ? row[mapping[key]] : ""),
         get = (key) => String(raw(key) ?? "").trim();
@@ -194,12 +211,12 @@
         else problems.push({ line, message: "date de naissance illisible (« " + get("birthDate") + " »), catégorie à préciser" });
       }
       const player = { line, firstName, lastName, name, license, category, position: normalizePosition(get("position")) };
-      const twin = playerKeys(player).map((k) => seen.get(k)).find(Boolean);
+      const twin = seen.find(player);
       if (twin) {
         problems.push({ line, message: name + " est déjà ligne " + twin.line + ", doublon ignoré" });
         return;
       }
-      playerKeys(player).forEach((k) => seen.set(k, player));
+      seen.add(player);
       players.push(player);
     });
     return { players, problems };
@@ -219,7 +236,7 @@
     normalizeCategory,
     normalizePosition,
     cleanName,
-    playerKeys,
+    createMatcher,
     buildPlayers,
   };
   if (typeof module !== "undefined") module.exports = api;

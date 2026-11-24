@@ -1,6 +1,6 @@
-// Vérifie les règles de lecture : node apercu-import-effectif/test-core.js (joueurs inventés uniquement).
+// Vérifie les règles de lecture : node tests/squad-import-core-test.cjs (joueurs inventés uniquement).
 const assert = require("assert");
-const I = require("./import-effectif-core.js");
+const I = require("../squad-import-core.js");
 
 // CSV : séparateur « ; », guillemets, retour à la ligne Windows, BOM
 const rows = I.parseCsv('﻿Nom;Prénom;Poste\r\n"DUPONT; fils";Léo;"Milieu ""relayeur"""\r\n\r\nMARTIN;Inès;G\r\n'.replace(/^﻿/, ""));
@@ -51,6 +51,25 @@ const data = [
 const result = I.buildPlayers(data, I.guessMapping(header), { seasonEnd: 2027 });
 assert.deepStrictEqual(result.players.map((p) => [p.name, p.category]), [["Léo Martin", "U16"], ["Maximilien D.", "U17"], ["Noah Petit", ""]]);
 assert.deepStrictEqual(result.problems.map((p) => p.line), [3, 4, 5, 6]);
-assert.ok(I.playerKeys({ firstName: "Léo", lastName: "MARTIN" }).includes("N:leo martin"));
+// Reconnaissance d'un joueur déjà dans l'effectif
+const known = I.createMatcher([
+  { firstName: "Léo", lastName: "Martin", license: "9000000001" },
+  { firstName: "Adam", lastName: "Moreau", license: "" },
+]);
+assert.ok(known.find({ firstName: "LEO", lastName: "martin", license: "" })); // même nom, une licence manquante
+assert.ok(known.find({ firstName: "Autre", lastName: "Nom", license: "9000 000 001" })); // même licence
+assert.ok(known.find({ firstName: "Adam", lastName: "Moreau", license: "9000000006" }));
+assert.strictEqual(known.find({ firstName: "Léo", lastName: "Martin", license: "9000000099" }), null); // homonyme
+
+// Homonymes avec deux licences différentes : deux joueurs
+const twins = I.buildPlayers([["Léo", "Martin", "9000000001"], ["Léo", "Martin", "9000000099"]], { firstName: 0, lastName: 1, license: 2 }, { seasonEnd: 2027 });
+assert.strictEqual(twins.players.length, 2);
+
+// Fichier exemple du dépôt : 19 joueurs, 3 lignes signalées
+const fs = require("fs");
+const sample = I.parseCsv(I.decodeText(fs.readFileSync(__dirname + "/exemple-effectif.csv")));
+const h = I.findHeaderRow(sample);
+const built = I.buildPlayers(sample.slice(h + 1), I.guessMapping(sample[h]), { firstLine: h + 2, seasonEnd: 2027 });
+assert.deepStrictEqual([built.players.length, built.problems.length], [19, 3]);
 
 console.log("import-effectif-core : tous les tests passent");
