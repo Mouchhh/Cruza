@@ -138,7 +138,43 @@ function trainingDictatedBoard({ blue, red, jokers, keepers, ring, switchPlay, t
     const goal = find(goals[0]);
     frame({ [ball]: goal && !switchPlay ? { x: goal.x - 1, y: goal.y } : ballAt(dribble || third) });
   }
-  return { version: 1, lines: toGoals, seconds: 1.5, frames };
+  return { version: 1, viewer: "bible", laneCount, lines: toGoals, seconds: 1.5, frames };
+}
+
+function trainingBibleExercisePreview(custom) {
+  const { board, title, width, length } = custom;
+  const types = { blue: "home", red: "away", keeper: "keeper", ball: "ball", disc: "disc", cone: "cone", goal: "goal", mini: "mini" };
+  if (board.drawings?.length || board.frames[0].objects.some(object => !types[object.type] || object.scale !== 1))
+    return exerciseBoardPreview(board, title);
+  const height = Math.round(1000 * width / length) / 10;
+  const tokens = board.frames[0].objects.map(object => ({
+    id: object.id,
+    type: object.type === "blue" && /^J\d+$/.test(object.label) ? "neutral" : types[object.type],
+    label: object.label,
+    color: object.color,
+    rot: object.rotation,
+  }));
+  const ids = new Set(tokens.map(token => token.id));
+  const model = {
+    kind: "field", W: 100, H: height, len: length, wid: width, tokens,
+    frames: board.frames.map(frame => Object.fromEntries(frame.objects.filter(object => ids.has(object.id))
+      .map(object => [object.id, [object.x, object.y * height / 100]]))),
+    arrows: [],
+    zones: [2, 3].includes(board.laneCount)
+      ? Array.from({ length: board.laneCount - 1 }, (_, i) => [0, height * (.09 + .82 * (i + 1) / board.laneCount), 100, 0]) : [],
+  };
+  const host = el("div", "training-bible-exercise-preview");
+  const shadow = host.attachShadow({ mode: "open" });
+  for (const href of ["supplied-exercise-base.css?v=cards-149", "imported-exercises-theme.css?v=coach-bundles-166"]) {
+    const link = el("link");
+    link.rel = "stylesheet";
+    link.href = href;
+    shadow.append(link);
+  }
+  const style = el("style", "", ":host{display:block;min-width:0;color:#203958;--blue:#2855a2;--navy:#142d50;--line:#dce5ef;--ink:#203958;--card:#fff;--muted:#536a83;--text:system-ui,sans-serif;--display:system-ui,sans-serif}.board-svg{display:block;width:100%;max-height:460px}");
+  const viewer = suppliedExerciseEngine.createBoard(model, { editable: false, viewer: true, title });
+  shadow.append(style, viewer.el);
+  return host;
 }
 
 document.addEventListener("DOMContentLoaded", () => {
@@ -168,7 +204,7 @@ document.addEventListener("DOMContentLoaded", () => {
       const adjust = el("button", "export", "Retoucher le terrain");
       adjust.type = "button";
       adjust.onclick = () => $("studio-tab-board").click();
-      preview.replaceChildren(exerciseBoardPreview(exerciseDraft, custom.title), adjust);
+      preview.replaceChildren(trainingBibleExercisePreview(custom), adjust);
       return "Exercice préparé. Lancez l’animation ci-dessous, puis enregistrez l’exercice.";
     } catch (error) {
       return error.message;
