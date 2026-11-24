@@ -1,4 +1,4 @@
-// « Créer mon effectif » / « Ajouter des joueurs » : l'éducateur coche ses joueurs dans la liste
+// « Ajouter mes joueurs » : l'éducateur coche ses joueurs dans la liste
 // des licenciés du club (export Excel ou PDF de Footclubs, ou CSV).
 // Les joueurs ne vont que dans l'effectif de l'équipe et de l'éducateur connectés (squadSave habituel) :
 // rien n'est envoyé ailleurs, et le fichier n'est lu que dans le navigateur.
@@ -205,7 +205,7 @@
   function open() {
     const teamId = coachTeamSquadId();
     const dialog = el("dialog", "squad-editor squad-pick");
-    const title = el("h2", "", squadPlayers().length ? "Ajouter des joueurs" : "Créer mon effectif");
+    const title = el("h2", "", "Ajouter mes joueurs");
     title.id = "squad-pick-title";
     dialog.setAttribute("aria-labelledby", title.id);
     const closeIcon = el("button", "squad-pick-close", "×");
@@ -427,18 +427,13 @@
     if (lastSource) showPick(lastSource);
   }
 
-  // Bouton à côté de « + Nouveau joueur » : « Créer mon effectif » tant qu'il est vide, puis « Ajouter des joueurs ».
-  const button = el("button", "export squad-pick-open");
+  // « Ajouter mes joueurs » devient le gros bouton bleu de « Mes joueurs » ;
+  // « + Nouveau joueur » (saisie à la main) passe en bouton discret dans la barre d'outils de l'onglet Effectif.
+  const button = el("button", "primary squad-pick-open", "Ajouter mes joueurs");
   button.type = "button";
   button.onclick = open;
-  squadNew.before(button);
-  const label = () => (button.textContent = squadPlayers().length ? "Ajouter des joueurs" : "Créer mon effectif");
-  const render = squadRender;
-  squadRender = function (...args) {
-    const result = render.apply(this, args);
-    label();
-    return result;
-  };
-  label();
+  squadNew.replaceWith(button);
+  squadNew.className = "export";
+  squadTools.insertBefore(squadNew, squadClose);
   window.squadPick = { open }; // ouvert aussi depuis la composition quand l'effectif est vide
 })();

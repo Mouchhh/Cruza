@@ -282,8 +282,8 @@ document.addEventListener("DOMContentLoaded", () => {
         list.append(el("li", "hint", "Aucun joueur ne correspond à votre recherche."));
       else if (!rows.length) {
         // L'effectif se crée d'abord dans « Mes joueurs » (import du club), la compo pioche ensuite dedans.
-        const empty = el("li", "hint composition-picker-empty", "Votre effectif est vide : créez-le d’abord, puis choisissez vos joueurs ici. ");
-        const goSquad = el("button", "primary", "Créer mon effectif");
+        const empty = el("li", "hint composition-picker-empty", "Votre effectif est vide : ajoutez d’abord vos joueurs, puis choisissez-les ici. ");
+        const goSquad = el("button", "primary", "Ajouter mes joueurs");
         goSquad.type = "button";
         goSquad.onclick = () => {
           dialog.close();
