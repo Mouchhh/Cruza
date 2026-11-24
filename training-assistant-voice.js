@@ -192,7 +192,7 @@ function trainingVoiceInput(form, apply, options = {}) {
       input.focus();
       return;
     }
-    status.textContent = apply(trainingVoiceCriteria(input.value));
+    status.textContent = apply(options.raw ? { request: input.value.trim() } : trainingVoiceCriteria(input.value));
   };
   function cancel() {
     if (!recognition) return;

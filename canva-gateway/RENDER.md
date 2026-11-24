@@ -86,3 +86,7 @@ transmettre cette valeur dans une conversation ni la mettre dans GitHub.
 - Ne pas ajouter de trafic artificiel pour maintenir l’instance éveillée.
 - Si les quotas gratuits sont épuisés, le service peut être indisponible. Vérifier
   la situation dans Render avant toute décision de changement de plan.
+
+## Assistant conversationnel Cruza
+
+Le point d’entrée `POST /api/coach-ai` est disponible pour les éducateurs actifs du club. Pour l’activer, ajouter `OPENAI_API_KEY` aux variables privées du service Render et redéployer une version contenant `coach-ai.mjs`. Le modèle par défaut est `gpt-4.1-mini`, configurable via `OPENAI_COACH_MODEL`. Le projet API doit disposer d’un budget autorisé. Les limites du serveur sont de 15 requêtes par éducateur et 100 par processus et par jour, en mémoire. Configurer aussi les limites et alertes de dépenses chez le fournisseur.

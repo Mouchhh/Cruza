@@ -1,3 +1,4 @@
+import {createCoachAI} from './coach-ai.mjs';
 import {sportcoricoReader,sportcoricoSearcher,sportcoricoTeamLister,sportcoricoLogoLoader} from './sportcorico.mjs';
 import http from 'node:http';
 import fs from 'node:fs';
@@ -96,6 +97,7 @@ export function createCanvaGateway(config,{fetcher=fetch,auth=token=>authorize(t
   return Buffer.concat(chunks);
  }
  const readSportcorico=sportcoricoReader(fetcher,now),searchSportcorico=sportcoricoSearcher(fetcher,now),listSportcoricoTeams=sportcoricoTeamLister(fetcher,now),loadSportcoricoLogo=sportcoricoLogoLoader(fetcher,now);
+ const coachAI=createCoachAI(config,fetcher,now);
  const server=http.createServer(async(req,res)=>{
   res.setHeader('Cache-Control','no-store');res.setHeader('X-Content-Type-Options','nosniff');res.setHeader('Referrer-Policy','no-referrer');
   res.setHeader('Content-Security-Policy',"default-src 'none'; frame-ancestors 'none'");
@@ -160,6 +162,11 @@ export function createCanvaGateway(config,{fetcher=fetch,auth=token=>authorize(t
    }
    const owner=await auth((req.headers.authorization||'').replace(/^Bearer /,''));if(!uuid.test(owner||''))throw error('Compte invalide.',401);
    const rate=rates.get(owner)||{count:0,until:now()+60000};if(++rate.count>60)throw error('Trop de demandes. Réessayez dans une minute.',429);rates.set(owner,rate);
+   if(route.pathname==='/api/coach-ai'&&req.method==='POST'){
+    let input;
+    try{input=JSON.parse((await body(req,64*1024)).toString('utf8'));}catch(e){if(e.status)throw e;throw error('Demande invalide.');}
+    return send(200,await coachAI(owner,input));
+   }
    return await serial(owner,async()=>{
     const record=vault.read(owner);
     if(route.pathname==='/api/status'&&req.method==='GET')return send(200,{connected:!!record,latest_job_id:record?.jobs.at(-1)?.id||null,max_import_bytes:MAX_IMPORT_BYTES});
@@ -199,7 +206,7 @@ export function runtimeConfig(environment=process.env){
  const settings={...environment,PUBLIC_URL:environment.PUBLIC_URL||environment.RENDER_EXTERNAL_URL};
  const required=['PUBLIC_URL','CANVA_CLIENT_ID','CANVA_CLIENT_SECRET','TOKEN_ENCRYPTION_KEY','SUPABASE_URL','SUPABASE_PUBLISHABLE_KEY','ALLOWED_ORIGINS'];
  if(required.some(name=>!settings[name]))throw Error('Configuration manquante : '+required.filter(name=>!settings[name]).join(', '));
- return {publicURL:settings.PUBLIC_URL,clientId:settings.CANVA_CLIENT_ID,clientSecret:settings.CANVA_CLIENT_SECRET,encryptionKey:settings.TOKEN_ENCRYPTION_KEY,supabaseUrl:settings.SUPABASE_URL,publishableKey:settings.SUPABASE_PUBLISHABLE_KEY,origins:settings.ALLOWED_ORIGINS.split(',').map(s=>s.trim()).filter(Boolean),directory:settings.DATA_DIR||(settings.RENDER_EXTERNAL_URL?'/tmp/vestiaire-canva':'/data')};
+ return {coachAIKey:settings.OPENAI_API_KEY,coachAIModel:settings.OPENAI_COACH_MODEL,publicURL:settings.PUBLIC_URL,clientId:settings.CANVA_CLIENT_ID,clientSecret:settings.CANVA_CLIENT_SECRET,encryptionKey:settings.TOKEN_ENCRYPTION_KEY,supabaseUrl:settings.SUPABASE_URL,publishableKey:settings.SUPABASE_PUBLISHABLE_KEY,origins:settings.ALLOWED_ORIGINS.split(',').map(s=>s.trim()).filter(Boolean),directory:settings.DATA_DIR||(settings.RENDER_EXTERNAL_URL?'/tmp/vestiaire-canva':'/data')};
 }
 if(process.argv[1]&&fileURLToPath(import.meta.url)===path.resolve(process.argv[1])){
  createCanvaGateway(runtimeConfig()).server.listen(Number(process.env.PORT)||3001,'0.0.0.0',()=>console.log('Service Canva démarré.'));
