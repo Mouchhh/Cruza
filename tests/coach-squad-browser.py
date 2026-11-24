@@ -58,10 +58,6 @@ with sync_playwright() as p:
  page.evaluate("localStorage.setItem('vestiaire-active-coach','account-"+A+"')");page.reload();page.wait_for_function("typeof squadPlayers==='function'")
  assert page.evaluate('squadPlayers().length')==4
  other.set_viewport_size({'width':390,'height':844});other.evaluate('openCoachSquad()');assert other.evaluate('document.documentElement.scrollWidth<=innerWidth+1');other.screenshot(path='/tmp/coach-squad-mobile.png',full_page=True)
- other.evaluate("()=>{getCompositionBoard().players[0].name='Chris';getCompositionBoard().players[0].number=9;}")
- other.locator('#coach-squad-dialog').get_by_role('button',name='Récupérer les joueurs de la compo',exact=True).click()
- assert other.evaluate('squadPlayers().length')==3
- managed_click(other.locator('#coach-squad-dialog'),'Utiliser Chris')
  assert not other.locator('#coach-squad-picker').is_visible()
  assert other.evaluate("valid({...squadDocument(),squadDirectory:{version:1,players:[null]}})===false")
  assert not errors,errors

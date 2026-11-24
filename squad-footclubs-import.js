@@ -440,4 +440,5 @@
     return result;
   };
   label();
+  window.squadPick = { open }; // ouvert aussi depuis la composition quand l'effectif est vide
 })();

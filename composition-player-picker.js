@@ -278,16 +278,20 @@ document.addEventListener("DOMContentLoaded", () => {
             squadPlayerPositions(p).join(" "),
         ).includes(normal(search.value.trim())),
       );
-      if (!rows.length)
-        list.append(
-          el(
-            "li",
-            "hint",
-            squadPlayers().length
-              ? "Aucun joueur ne correspond à votre recherche."
-              : "Aucun joueur enregistré. Utilisez « Créer un joueur ».",
-          ),
-        );
+      if (!rows.length && squadPlayers().length)
+        list.append(el("li", "hint", "Aucun joueur ne correspond à votre recherche."));
+      else if (!rows.length) {
+        // L'effectif se crée d'abord dans « Mes joueurs » (import du club), la compo pioche ensuite dedans.
+        const empty = el("li", "hint composition-picker-empty", "Votre effectif est vide : créez-le d’abord, puis choisissez vos joueurs ici. ");
+        const goSquad = el("button", "primary", "Créer mon effectif");
+        goSquad.type = "button";
+        goSquad.onclick = () => {
+          dialog.close();
+          workspaceNavigation.run("workspace-squad-entry", () => window.squadPick?.open());
+        };
+        empty.append(goSquad);
+        list.append(empty);
+      }
       for (const p of rows) {
         const row = el("li", "composition-picker-row"),
           info = el("div"),
