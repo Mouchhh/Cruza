@@ -1064,6 +1064,48 @@ document.addEventListener("DOMContentLoaded", () => {
   );
   const organisation = field("Organisation du groupe", el("select"));
   organisation.append(new Option("Répartition automatique", "auto"), new Option("Deux ateliers séparés", "two"));
+  const cancelVoice = trainingVoiceInput(form, (criteria) => {
+    const fields = [];
+    const checks = [...objectives.querySelectorAll("input[type=checkbox]")];
+    const matched = criteria.objectives.filter(key => checks.some(check => check.value === key));
+    if (matched.length) {
+      for (const check of checks) {
+        check.checked = matched.slice(0, 4).includes(check.value);
+        if (check.checked) check.closest("details").open = true;
+      }
+      goal.value = selectedObjectives().map(bmfObjectiveLabel).join(" · ").slice(0, 200);
+      fields.push("objectifs");
+    }
+    for (const [input, value, label] of [
+      [level, criteria.level, "niveau"], [players, criteria.players, "joueurs"],
+      [space, criteria.space, "terrain"], [physical, criteria.physical, "physique"],
+      [organisation, criteria.organisation, "ateliers"],
+    ]) {
+      if (!value) continue;
+      input.value = value;
+      fields.push(label);
+    }
+    const durationAllowed = criteria.duration >= 45 && criteria.duration <= 150;
+    if (durationAllowed) {
+      const minutes = String(criteria.duration);
+      if (![...sessionDuration.options].some(option => option.value === minutes)) {
+        sessionDuration.append(new Option(minutes + " min", minutes));
+      }
+      sessionDuration.value = minutes;
+      fields.push("durée");
+    }
+    if (fields.length) form.dispatchEvent(new Event("input", { bubbles: true }));
+    const warnings = [
+      ...(!matched.length ? ["Choisissez l’objectif dans les intentions de jeu."] : []),
+      ...(matched.length > 4 ? ["Les quatre premiers objectifs ont été retenus."] : []),
+      ...(criteria.duration !== null && !durationAllowed ? ["La durée doit être comprise entre 45 et 150 minutes."] : []),
+    ];
+    return [
+      fields.length ? "Critères remplis : " + fields.join(", ") + "." : "Aucun critère reconnu.",
+      ...warnings,
+      "Vérifiez les critères, puis générez la séance.",
+    ].join(" ");
+  });
   const generate = el(
     "button",
     "primary",
@@ -1111,6 +1153,7 @@ document.addEventListener("DOMContentLoaded", () => {
   tab.id = "training-assistant-open";
   root.querySelector(".training-workspace-tabs").append(tab);
   function hide() {
+    cancelVoice();
     panel.hidden = true;
     if (root.classList.contains("training-assistant-open"))
       root.classList.remove("training-assistant-open");
@@ -1142,8 +1185,8 @@ document.addEventListener("DOMContentLoaded", () => {
     seenBySlot = new Map(),
     bibleNeeds = null,
     bibleObjectives = [];
-  form.addEventListener("input", () => {
-    if (session) {
+  form.addEventListener("input", (event) => {
+    if (session && !event.target.closest(".training-assistant-voice")) {
       stale = true;
       for (const b of [edit, save, plan, pdf]) b.disabled = true;
       status.textContent =

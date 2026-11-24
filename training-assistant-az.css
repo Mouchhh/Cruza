@@ -48,3 +48,32 @@ body.training-mode #training-space.training-assistant-open > #training-status { 
 .training-assistant-bible-actions button{min-height:44px}
 .training-assistant-bible-list summary{cursor:pointer;font-weight:600;color:#2855a2;margin-top:4px}
 @media (max-width:480px){.training-assistant-bible-actions button{flex:1 1 100%}}
+
+.training-assistant-voice {
+ grid-column: 1 / -1;
+ min-width: 0;
+ display: grid;
+ gap: 10px;
+ padding: clamp(14px, 2vw, 22px);
+ background: #f4f8ff;
+ border: 1px solid #d8e4f3;
+ border-radius: 14px;
+}
+.training-assistant-voice :is(h3,p) { margin: 0; }
+.training-assistant-voice p:empty { display: none; }
+.training-assistant-voice textarea {
+ display: block;
+ box-sizing: border-box;
+ width: 100%;
+ min-height: 90px;
+ resize: vertical;
+ padding: 10px 12px;
+ border: 1px solid #aebfd7;
+ border-radius: 8px;
+ background: white;
+ color: #142d50;
+ font: inherit;
+ font-size: max(16px, 1em);
+}
+.training-assistant-voice .report-actions { flex-wrap: wrap; margin: 0; }
+.training-assistant-voice button { min-height: 44px; }
