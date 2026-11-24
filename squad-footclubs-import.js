@@ -189,12 +189,14 @@
       picture.height = data.height;
       picture.getContext("2d").putImageData(new ImageData(pixels, data.width, data.height), 0, 0);
     }
-    if (!picture?.width || !picture?.height) return "";
+    // Les JPEG arrivent en VideoFrame, sans .width : la taille vient de pdf.js.
+    const width = data.width || picture?.width, height = data.height || picture?.height;
+    if (!picture || !width || !height) return "";
     // Même format que la photo de la fiche joueur : carré de 180 px, JPEG.
-    const canvas = document.createElement("canvas"), side = Math.min(picture.width, picture.height);
+    const canvas = document.createElement("canvas"), side = Math.min(width, height);
     canvas.width = canvas.height = 180;
     // Photo d'identité en hauteur : on garde plutôt le haut, où se trouve le visage.
-    canvas.getContext("2d").drawImage(picture, (picture.width - side) / 2, (picture.height - side) / 4, side, side, 0, 0, 180, 180);
+    canvas.getContext("2d").drawImage(picture, (width - side) / 2, (height - side) / 4, side, side, 0, 0, 180, 180);
     return canvas.toDataURL("image/jpeg", 0.72);
   }
 
