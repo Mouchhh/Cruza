@@ -1,3 +1,35 @@
+function trainingCoachLanguage(value) {
+  return String(value || "").normalize("NFD").replace(/\p{Diacritic}/gu, "").toLowerCase()
+    .replace(/[’'\p{Pd}]/gu, " ").replace(/\s+/g, " ");
+}
+
+const trainingCoachIntentions = [
+  { objective: "ball-build", request: /ressortir (?:proprement|sous pression|court)|repartir de derriere|sortir (?:du|sous le) pressing|relance courte/,
+    cue: "Ressortir proprement sous pression en proposant des solutions courtes au porteur.",
+    exercise: /relance|sortie de balle|jeu au pied|sortir du pressing/ },
+  { objective: "ball-control", request: /fixer.{0,45}(?:renverser|liberer|decaler|autre cote|oppose)|renvers\w*|cote oppose|chang\w* de cote/,
+    cue: "Attirer le bloc d’un côté, puis jouer vite vers le côté opposé quand il se libère.",
+    exercise: /fixer.{0,25}liberer|renversement|renverser|cote oppose|changement de cote/ },
+  { objective: "ball-control", request: /casser les lignes|entre les lignes|troisieme (?:joueur|homme)|jouer dans le dos du milieu/,
+    cue: "Se rendre disponible entre les lignes, s’orienter avant de recevoir et jouer vers l’avant si la passe est ouverte.",
+    exercise: /entre les lignes|casser.{0,15}lignes|troisieme (?:joueur|homme)|franchir.{0,15}lignes/ },
+  { objective: "loss-press", request: /(?:des|a) la perte.{0,40}(?:recuper\w*|press\w*|reagi\w*|bond\w*)|(?:recuper\w*|press\w*|reagi\w*).{0,45}(?:a|apres) la perte|contre pressing/,
+    cue: "À la perte, le plus proche presse le porteur et les partenaires ferment les solutions courtes.",
+    exercise: /contre pressing|perte|reaction a la perte|transition defensive/ },
+  { objective: "off-high", request: /passe en retrait|mauvais controle|declencheur.{0,25}pressing/,
+    cue: "Déclencher le pressing ensemble sur le signal demandé par le coach.",
+    exercise: /pressing|piege|declenche|presser/ },
+  { objective: "off-control", request: /rester compact|bloc compact|resserrer les lignes|fermer l axe|proteger l axe/,
+    cue: "Rester serrés entre les lignes et protéger l’axe pendant le déplacement du ballon.",
+    exercise: /bloc compact|bloc equipe|fermer l axe|couliss|deux lignes|proteger l axe/ },
+  { objective: "win-score", request: /(?:recuperation|recupere).{0,60}(?:jouer vite|se projeter|attaquer vite|vers l avant)|(?:jouer vite|se projeter).{0,45}recuperation/,
+    cue: "Dès la récupération, repérer une passe vers l’avant et déclencher des courses de soutien.",
+    exercise: /recuperation|contre attaque|transition offensive|se projeter/ },
+  { objective: "ball-finish", request: /centre en retrait|attaquer (?:le premier|le second|le deuxieme) poteau|arriver lance.{0,25}surface/,
+    cue: "Coordonner les courses dans la surface avec le départ du centreur et attaquer des zones différentes.",
+    exercise: /centre en retrait|premier poteau|second poteau|deuxieme poteau|finition sur centre/ },
+];
+
 function trainingVoiceCriteria(request) {
   const units = ["zero", "un", "deux", "trois", "quatre", "cinq", "six", "sept", "huit", "neuf",
     "dix", "onze", "douze", "treize", "quatorze", "quinze", "seize", "dix sept", "dix huit", "dix neuf"];
@@ -12,8 +44,7 @@ function trainingVoiceCriteria(request) {
   numbers.set("quatre vingts", 80);
   numbers.set("une", 1);
   const numberWords = [...numbers.keys()].sort((a, b) => b.length - a.length).join("|");
-  const normalized = request.normalize("NFD").replace(/\p{Diacritic}/gu, "").toLowerCase()
-    .replace(/[’'\p{Pd}]/gu, " ").replace(/\s+/g, " ");
+  const normalized = trainingCoachLanguage(request);
   const phrase = normalized.replace(new RegExp("\\b(?:" + numberWords + ")\\b", "g"), word => String(numbers.get(word)));
   const themes = [
     ["loss-press", /\b(?:contre pressing|pressing a la perte|reaction a la perte|transition defensive)\b/],
@@ -28,10 +59,11 @@ function trainingVoiceCriteria(request) {
     ["ball-finish", /\b(?:finition|finir|frappes?|tirs?|finalisation|marquer)\b/],
     ["ludic-game", /\b(?:ludique|jeux et defis)\b/],
   ];
-  const objectives = themes.flatMap(([key, pattern]) => {
+  const intentions = trainingCoachIntentions.filter(intent => intent.request.test(normalized));
+  const objectives = [...new Set([...intentions.map(intent => intent.objective), ...themes.flatMap(([key, pattern]) => {
     const match = pattern.exec(phrase);
     return match ? [{ key, index: match.index }] : [];
-  }).sort((a, b) => a.index - b.index).map(({key}) => key);
+  }).sort((a, b) => a.index - b.index).map(({key}) => key)])];
   if (objectives.includes("loss-press") && !/\b(?:defendre haut|presser haut|pressing haut|pression haute)\b/.test(phrase)) {
     const index = objectives.indexOf("off-high");
     if (index >= 0) objectives.splice(index, 1);
@@ -57,7 +89,7 @@ function trainingVoiceCriteria(request) {
     : /\b(?:endurance|intermittent|cardio)\b/.test(phrase) ? "endurance"
     : /\b(?:vitesse|sprints?)\b/.test(phrase) ? "speed" : "";
   const organisation = /\b2\s+(?:ateliers|groupes)(?:\s+separes)?\b/.test(phrase) ? "two" : "";
-  return { objectives, level, players, space, duration, physical, organisation };
+  return { objectives, level, players, space, duration, physical, organisation, intentions, request: request.trim() };
 }
 
 function trainingVoiceInput(form, apply) {
@@ -65,19 +97,20 @@ function trainingVoiceInput(form, apply) {
   const title = el("h3", "", "Décrivez votre séance");
   const label = el("label", "report-field", "Votre demande");
   const input = el("textarea");
+  input.name = "coachRequest";
   input.rows = 3;
   input.maxLength = 1000;
-  input.placeholder = "Ex. Une séance U17 de 90 minutes sur demi-terrain, avec 16 joueurs dont 2 gardiens, pour travailler la relance et la finition.";
+  input.placeholder = "Ex. Avec mes U17, je veux qu’on attire leur bloc d’un côté puis qu’on renverse vite. 16 joueurs dont 2 gardiens, 90 min sur demi-terrain.";
   label.append(input);
   const actions = el("div", "report-actions");
   const mic = el("button", "export", "🎙 Dicter");
-  const fill = el("button", "export", "Remplir les critères");
+  const fill = el("button", "export", "Analyser la demande");
   mic.type = fill.type = "button";
   const status = el("p", "hint");
   status.setAttribute("role", "status");
   const Recognition = window.SpeechRecognition || window.webkitSpeechRecognition;
   const hint = el("p", "hint", Recognition
-    ? "La dictée utilise le service vocal de votre navigateur. Vérifiez le texte avant de remplir les critères."
+    ? "La dictée utilise le service vocal de votre navigateur. Vérifiez le texte avant d’analyser la demande."
     : "La dictée est indisponible dans ce navigateur. Vous pouvez écrire votre demande ou utiliser la dictée de votre clavier.");
   mic.hidden = !Recognition;
   actions.append(mic, fill);
@@ -125,7 +158,7 @@ function trainingVoiceInput(form, apply) {
         if (recognition !== current) return;
         input.value = committed;
         reset();
-        status.textContent = feedback || (committed === base ? "Aucune parole reconnue. Réessayez." : "Dictée terminée. Vérifiez le texte puis remplissez les critères.");
+        status.textContent = feedback || (committed === base ? "Aucune parole reconnue. Réessayez." : "Dictée terminée. Vérifiez le texte puis analysez la demande.");
       };
       current.start();
       input.readOnly = fill.disabled = true;

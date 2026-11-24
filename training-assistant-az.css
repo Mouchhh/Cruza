@@ -77,3 +77,13 @@ body.training-mode #training-space.training-assistant-open > #training-status { 
 }
 .training-assistant-voice .report-actions { flex-wrap: wrap; margin: 0; }
 .training-assistant-voice button { min-height: 44px; }
+.training-assistant-brief {
+ margin-block: 14px;
+ padding: 14px 18px;
+ border-left: 3px solid #41659d;
+ background: #f4f8ff;
+ overflow-wrap: anywhere;
+}
+.training-assistant-brief :is(h4,p,ul) { margin: 0; }
+.training-assistant-brief :is(p,ul) + h4 { margin-top: 10px; }
+.training-assistant-brief p { white-space: pre-wrap; }

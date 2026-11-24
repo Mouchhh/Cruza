@@ -707,6 +707,8 @@ function trainingAssistantBibleTarget(block, role, objectives, needs, rank = nul
     bounds: block.parallelId
       ? [Math.floor((needs.bounds[0] - 3) / 2), needs.bounds[1]]
       : [...needs.bounds],
+    intentions: role === "workshop" || role === "game"
+      ? (needs.intentions || []).filter(intent => target.objectives.includes(intent.objective)) : [],
     age: needs.age || 0,
   };
 }
@@ -780,7 +782,11 @@ function trainingAssistantBibleCandidates(target, used = new Set()) {
     if (target.warmup && !trainingAssistantOppositionFree(meta, exercise)) continue;
     if (target.physical && !target.physical.test(String(meta.titre || "") + " " + String(exercise.sub || ""))) continue;
     seen.add(meta.source_id);
-    out.push({ meta, score: trainingAssistantBibleScore(meta, target) });
+    const intentMatches = target.intentions?.length
+      ? target.intentions.filter(intent => intent.exercise.test(trainingCoachLanguage(
+        [meta.titre, ...(meta.mots_cles || []), exercise.sub, exercise.goal].join(" ")
+      ))).length : 0;
+    out.push({ meta, score: trainingAssistantBibleScore(meta, target) - Math.min(intentMatches, 2) * 7 });
   }
   return out
     .sort(
@@ -1064,7 +1070,9 @@ document.addEventListener("DOMContentLoaded", () => {
   );
   const organisation = field("Organisation du groupe", el("select"));
   organisation.append(new Option("Répartition automatique", "auto"), new Option("Deux ateliers séparés", "two"));
+  let coachBrief = null;
   const cancelVoice = trainingVoiceInput(form, (criteria) => {
+    coachBrief = criteria;
     const fields = [];
     const checks = [...objectives.querySelectorAll("input[type=checkbox]")];
     const matched = criteria.objectives.filter(key => checks.some(check => check.value === key));
@@ -1094,7 +1102,7 @@ document.addEventListener("DOMContentLoaded", () => {
       sessionDuration.value = minutes;
       fields.push("durée");
     }
-    if (fields.length) form.dispatchEvent(new Event("input", { bubbles: true }));
+    form.dispatchEvent(new Event("input", { bubbles: true }));
     const warnings = [
       ...(!matched.length ? ["Choisissez l’objectif dans les intentions de jeu."] : []),
       ...(matched.length > 4 ? ["Les quatre premiers objectifs ont été retenus."] : []),
@@ -1102,6 +1110,7 @@ document.addEventListener("DOMContentLoaded", () => {
     ];
     return [
       fields.length ? "Critères remplis : " + fields.join(", ") + "." : "Aucun critère reconnu.",
+      ...criteria.intentions.filter(intent => matched.slice(0, 4).includes(intent.objective)).map(intent => intent.cue),
       ...warnings,
       "Vérifiez les critères, puis générez la séance.",
     ].join(" ");
@@ -1185,8 +1194,8 @@ document.addEventListener("DOMContentLoaded", () => {
     seenBySlot = new Map(),
     bibleNeeds = null,
     bibleObjectives = [];
-  form.addEventListener("input", (event) => {
-    if (session && !event.target.closest(".training-assistant-voice")) {
+  form.addEventListener("input", () => {
+    if (session) {
       stale = true;
       for (const b of [edit, save, plan, pdf]) b.disabled = true;
       status.textContent =
@@ -1392,11 +1401,28 @@ document.addEventListener("DOMContentLoaded", () => {
           trainingSpaceLabels[session.space],
       ),
     );
+    if (coachBrief?.request) {
+      const brief = el("section", "training-assistant-brief");
+      brief.append(el("h4", "", "Votre demande"), el("p", "", coachBrief.request));
+      const cues = (bibleNeeds?.intentions || []).map(intent => intent.cue);
+      if (cues.length) {
+        const list = el("ul");
+        for (const cue of cues) list.append(el("li", "", cue));
+        brief.append(el("h4", "", "Repères à observer"), list);
+      }
+      preview.append(brief);
+    }
     renderStages(preview);
   }
   form.onsubmit = (event) => {
     event.preventDefault();
     if (!form.reportValidity()) return;
+    const request = form.elements.coachRequest.value.trim();
+    if (request && request !== coachBrief?.request) {
+      status.textContent = "Cliquez sur « Analyser la demande » pour prendre en compte votre texte.";
+      return;
+    }
+    if (!request) coachBrief = null;
     stale = true;
     for (const b of [edit, save, plan, pdf]) b.disabled = true;
     try {
@@ -1416,6 +1442,12 @@ document.addEventListener("DOMContentLoaded", () => {
         players: players.value,
         space: space.value,
       });
+      bibleNeeds.intentions = (coachBrief?.intentions || []).filter(intent => bibleObjectives.includes(intent.objective));
+      if (coachBrief?.request) {
+        session.notes += "\n\nDemande du coach :\n" + coachBrief.request;
+        if (bibleNeeds.intentions.length)
+          session.notes += "\n\nRepères à observer :\n" + bibleNeeds.intentions.map(intent => "• " + intent.cue).join("\n");
+      }
       session = trainingAssistantAssignRoles(session);
       if (physical.value !== "none") session = trainingAssistantAddPhysical(session, physical.value, bibleNeeds);
       ({ session, generated } = trainingAssistantUseBible(session, bibleNeeds, bibleObjectives));
@@ -1561,6 +1593,7 @@ document.addEventListener("DOMContentLoaded", () => {
       print.replaceChildren();
       controls.hidden = true;
       goal.value = "";
+      coachBrief = null; form.elements.coachRequest.value = "";
       objectives
         .querySelectorAll("input")
         .forEach((check) => (check.checked = false));
@@ -1571,7 +1604,7 @@ document.addEventListener("DOMContentLoaded", () => {
   });
   function reset() {
     session = null; owner = ""; stale = true; generated = []; bibleNeeds = null;
-    form.reset(); goal.value = ""; level.value = activeCoachTeam.category || "";
+    coachBrief = null; form.reset(); goal.value = ""; level.value = activeCoachTeam.category || "";
     preview.replaceChildren(); print.replaceChildren();
     date.value = time.value = ""; schedule.open = false;
     controls.hidden = true; status.textContent = "";
