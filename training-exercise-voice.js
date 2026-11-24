@@ -20,7 +20,14 @@ function trainingExerciseFromRequest(criteria, session) {
   if (explicit && !format && !rondo && !solo && totalPlayers > 30)
     throw Error("Précisez le nombre de joueurs par atelier pour cet effectif.");
 
-  const jokers = Number(phrase.match(/\b(\d{1,2})\s+jokers?\b/)?.[1] || 0);
+  const jokers = Number(phrase.match(/\b(\d{1,2})\s+(?:jokers?|appuis?)\b/)?.[1] || 0);
+  const outside = jokers > 0 && /\b(?:jokers?|appuis?)\b.{0,35}\b(?:exterieurs?|sur les cotes|sur les lignes|couloirs?)\b/.test(phrase);
+  const miniGoals = Number(phrase.match(/\b(\d{1,2})\s+(?:mini buts?|petits buts?|petites cages)\b/)?.[1] || 0);
+  if (miniGoals > 4) throw Error("Le schéma peut représenter jusqu’à quatre mini-buts.");
+  const lanes = /\b(?:2|3)\s+(?:zones?|couloirs?)\b/.exec(phrase);
+  const laneCount = lanes ? Number(lanes[0][0]) : 0;
+  const backPass = press && /\b(?:passe en retrait|ballon en retrait|joue en arriere)\b/.test(phrase);
+  const reverseSide = /\b(?:de droite a gauche|(?:fix\w*|attir\w*).{0,25}a droite)\b/.test(phrase);
   const keepers = Number(phrase.match(/\b(\d{1,2})\s+(?:gardiens?|gb)\b/)?.[1] || 0);
   if (!blue || (format && !red) || blue > 15 || red > 15 || jokers > 4 || keepers > 2)
     throw Error("Pour ce schéma, indiquez 1 à 15 joueurs par équipe, jusqu’à 4 jokers et 2 gardiens.");
@@ -33,7 +40,8 @@ function trainingExerciseFromRequest(criteria, session) {
   const duration = criteria.duration ?? 12;
   if (duration < 1 || duration > 120) throw Error("Choisissez une durée d’exercice entre 1 et 120 minutes.");
   const touches = phrase.match(/\b(\d{1,2})\s+touches?\b/)?.[1];
-  const toGoals = !rondo && !solo && (finish || keepers || /\b(?:buts?|match)\b/.test(phrase));
+  const toGoals = !/\b(?:sans buts?|sans cages?)\b/.test(phrase) &&
+    (miniGoals > 0 || !rondo && !solo && (finish || keepers || /\b(?:buts?|match)\b/.test(phrase)));
   const title = (rondo ? "Toro" : solo ? "Circuit de passes" : finish ? "Finition sous opposition" : switchPlay ? "Fixer et renverser" : buildup ? "Sortie de balle sous pression" : press ? "Déclencher le pressing" : transition ? "Se projeter après récupération" : possession ? "Jeu de conservation" : "Jeu réduit") +
     (red ? " · " + blue + " contre " + red : " · " + blue + " joueurs");
   const aim = criteria.intentions[0]?.cue || (rondo || possession ? "Créer un angle de passe et conserver sous pression."
@@ -46,6 +54,7 @@ function trainingExerciseFromRequest(criteria, session) {
     : solo ? "Jouer sur l’appui suivant puis suivre sa passe. Au premier tour, annoncer le sens de rotation."
     : switchPlay ? "Fixer les défenseurs d’un côté, passer par un appui intérieur, puis ressortir vers le côté libre."
     : buildup ? "Les bleus démarrent bas. Les rouges pressent au départ du ballon. Trouver un appui intérieur ou ressortir côté libre pour franchir la première ligne."
+    : backPass ? "La passe en retrait déclenche le pressing. Le rouge le plus proche sort sur le receveur pendant que les autres ferment l’axe."
     : press ? "Les bleus repartent court. Au signal du pressing, le rouge le plus proche sort sur le porteur et ses partenaires couvrent les passes intérieures."
     : transition ? "Démarrer par une récupération. Chercher vite un partenaire vers l’avant, puis accompagner la passe avec des courses de soutien."
     : toGoals ? "Attaquer le but adverse en utilisant un appui. À la récupération, repartir dans l’autre sens."
@@ -53,19 +62,20 @@ function trainingExerciseFromRequest(criteria, session) {
   const custom = {
     title, width, length, kind: possession ? "possession" : solo ? "circuit" : blue === 1 && red === 1 ? "duel" : "game",
     goal: aim,
-    organisation: [red ? blue + " bleus contre " + red + " rouges" : blue + " joueurs", jokers ? jokers + " joker(s) en appui" : "", keepers ? keepers + " gardien(s)" : "", width + " × " + length + " m"].filter(Boolean).join(" · "),
-    instructions: [action, touches ? touches + " touche(s) maximum par réception." : "", ...criteria.approach.cues,
+    organisation: [red ? blue + " bleus contre " + red + " rouges" : blue + " joueurs", jokers ? jokers + (outside ? " appui(s) extérieur(s)" : " joker(s) en appui") : "", laneCount ? laneCount + " couloirs matérialisés" : "", keepers ? keepers + " gardien(s)" : "", width + " × " + length + " m"].filter(Boolean).join(" · "),
+    instructions: [action, outside ? "Les appuis restent sur les côtés et jouent avec l’équipe qui a le ballon." : "",
+      miniGoals && toGoals ? "Les équipes peuvent marquer dans les mini-buts du camp adverse." : "", touches ? touches + " touche(s) maximum par réception." : "", ...criteria.approach.cues,
       "Demande du coach : " + criteria.request].filter(Boolean).join("\n\n"),
-    material: ["Ballons", "4 coupelles", red ? "Chasubles" : "", toGoals ? (keepers ? "Buts" : "Mini-buts") : ""].filter(Boolean).join(" · "),
+    material: ["Ballons", laneCount ? "Coupelles pour les couloirs et les limites" : "4 coupelles", red ? "Chasubles" : "", toGoals ? (miniGoals ? miniGoals + " mini-but(s)" : keepers ? "Buts" : "Mini-buts") : ""].filter(Boolean).join(" · "),
     success: rondo ? "Réaliser une série de passes sans interception." : solo ? "Conserver la précision en accélérant l’enchaînement."
       : toGoals ? "Créer un tir après avoir trouvé un partenaire disponible." : "Sortir de la pression vers un appui libre.",
-    board: trainingDictatedBoard({ blue, red, jokers, keepers, ring: rondo || solo, switchPlay, toGoals }),
+    board: trainingDictatedBoard({ blue, red, jokers, keepers, ring: rondo || solo, switchPlay, toGoals, miniGoals, outside, laneCount, backPass, reverseSide }),
   };
   if (!trainingCustomValid(custom)) throw Error("Vérifiez le format et les dimensions de l’exercice.");
   return { custom, duration };
 }
 
-function trainingDictatedBoard({ blue, red, jokers, keepers, ring, switchPlay, toGoals }) {
+function trainingDictatedBoard({ blue, red, jokers, keepers, ring, switchPlay, toGoals, miniGoals, outside, laneCount, backPass, reverseSide }) {
   const colors = { blue: "#2373d7", red: "#e44242", keeper: "#edc641", ball: "#ffffff", disc: "#ffb23e", goal: "#ffffff", mini: "#ffffff" };
   const objects = [];
   function add(type, x, y, label = "", color = colors[type], rotation = 0) {
@@ -81,29 +91,53 @@ function trainingDictatedBoard({ blue, red, jokers, keepers, ring, switchPlay, t
   const defenders = Array.from({ length: red }, (_, index) =>
     add("red", ring ? 45 + Math.floor(index / 5) * 6 : 65 + Math.floor(index / 5) * 7,
       (ring ? 27 : 12) + (index % 5) * (ring ? 11 : 17), String(index + 1)));
-  Array.from({ length: jokers }, (_, index) => add("blue", 51, 14 + index * 23, "J" + (index + 1), "#7f51b5"));
+  const supports = Array.from({ length: jokers }, (_, index) =>
+    add("blue", outside ? (index < 2 ? 52 : 72) : 51,
+      outside ? (index % 2 ? 94 : 6) : 14 + index * 23, "J" + (index + 1), "#7f51b5"));
   Array.from({ length: keepers }, (_, index) => add("keeper", index ? 13 : 87, 50, "G" + (index + 1)));
+  const goals = [];
   if (toGoals) {
-    add(keepers ? "goal" : "mini", 5, 50, "", undefined, 90);
-    add(keepers ? "goal" : "mini", 95, 50, "", undefined, 270);
+    const count = miniGoals || 2;
+    for (let index = 0; index < count; index++) {
+      const left = index % 2 === 1;
+      const y = count <= 2 || count === 3 && left ? 50 : index < 2 ? 25 : 75;
+      goals.push(add(miniGoals || !keepers ? "mini" : "goal", left ? 5 : 95, y, "", undefined, left ? 90 : 270));
+    }
   }
   for (const [x, y] of [[10, 9], [90, 9], [10, 91], [90, 91]]) add("disc", x, y);
+  for (let lane = 1; lane < laneCount; lane++) {
+    const y = 9 + 82 * lane / laneCount;
+    for (const x of [10, 30, 50, 70, 90]) add("disc", x, y);
+  }
   const find = id => objects.find(object => object.id === id);
-  const holder = find(attackers[0]);
-  const receiver = find(attackers[Math.min(1, blue - 1)]);
-  const third = find(attackers[switchPlay ? Math.min(4, blue - 1) : Math.min(2, blue - 1)]);
+  const wide = attackers.map(find).sort((a, b) => a.y - b.y);
+  const holder = backPass ? find(attackers.at(-1))
+    : switchPlay && reverseSide ? wide.at(-1) : find(attackers[0]);
+  const receiver = backPass ? find(attackers[0])
+    : switchPlay && outside ? find(supports[reverseSide && supports.length > 1 ? 1 : 0])
+    : find(attackers[Math.min(1, blue - 1)]);
+  const third = switchPlay ? (reverseSide ? wide[0] : wide.at(-1)) : find(attackers[Math.min(2, blue - 1)]);
   const ball = add("ball", holder.x + 3, holder.y + 2);
   const pressed = find(defenders[0]);
-  const pressure = pressed && { x: Math.max(9, Math.min(91, holder.x + 9)), y: Math.max(10, Math.min(90, holder.y + 7)) };
+  const target = backPass ? receiver : holder;
+  const pressure = pressed && { x: Math.max(9, Math.min(91, target.x + 9)), y: Math.max(10, Math.min(90, target.y + 7)) };
   const frames = [{ objects }];
+  const ballAt = object => ({ x: object.x + 3, y: object.y + 2 });
   function frame(moves) {
     frames.push({ objects: frames.at(-1).objects.map(object => ({ ...object, ...moves[object.id] })) });
   }
-  if (pressed) frame({ [pressed.id]: pressure });
-  const dribble = blue === 1 ? { x: holder.x + 12, y: holder.y + 5 } : null;
-  frame({ [ball]: { x: (dribble || receiver).x + 3, y: (dribble || receiver).y + 2 },
-    ...(ring ? {} : { [holder.id]: dribble || { x: holder.x + 10, y: holder.y + 5 } }) });
-  frame({ [ball]: toGoals ? { x: 94, y: 50 } : { x: (dribble || third).x + 3, y: (dribble || third).y + 2 } });
+  if (backPass && pressed && holder.id !== receiver.id) {
+    frame({ [ball]: ballAt(receiver) });
+    frame({ [pressed.id]: pressure });
+    frame({ [ball]: ballAt(pressure) });
+  } else {
+    if (pressed) frame({ [pressed.id]: pressure });
+    const dribble = blue === 1 && !switchPlay ? { x: holder.x + 12, y: holder.y + 5 } : null;
+    frame({ [ball]: ballAt(dribble || receiver),
+      ...(ring ? {} : { [holder.id]: dribble || { x: holder.x + 10, y: holder.y + 5 } }) });
+    const goal = find(goals[0]);
+    frame({ [ball]: goal && !switchPlay ? { x: goal.x - 1, y: goal.y } : ballAt(dribble || third) });
+  }
   return { version: 1, lines: toGoals, seconds: 1.5, frames };
 }
 
