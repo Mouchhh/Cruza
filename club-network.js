@@ -554,15 +554,17 @@ function clubAuthChoose(mode){
  const url=new URL(location.href);url.searchParams.set('auth',signup?'signup':'login');history.replaceState(null,'',url.href);
  if(signup)clubNetworkStatus('Renseignez votre prénom, votre nom et les accès autorisés par le club.');
 }
+$('club-signup-terms-link').href=CRUZA_TERMS.url;
 $('club-auth-show-signup').onclick=()=>clubAuthChoose('signup');
 $('club-auth-show-login').onclick=()=>clubAuthChoose('login');
 $('club-network-signup').onsubmit=e=>{e.preventDefault();clubNetworkRun(async()=>{
  const firstName=$('club-signup-first-name').value.trim(),lastName=$('club-signup-last-name').value.trim();if(!firstName||!lastName||(firstName+' '+lastName).length>70)return clubNetworkStatus('Renseignez un prénom et un nom, avec 70 caractères maximum au total.');
+ if(!$('club-signup-terms').checked)return clubNetworkStatus('Cochez la case des CGU pour créer votre compte.');
  const email=$('club-signup-email').value.trim(),password=$('club-signup-password').value;if(password!==$('club-signup-confirm').value)return clubNetworkStatus('Les deux mots de passe doivent être identiques.');
  const ready=await clubNetworkRequest('/rest/v1/rpc/club_profile_registration_ready',{method:'POST',auth:false,body:{}});if(ready!==true)throw clubNetworkError('Installation nécessaire',400,'PGRST202');
  const settings=await clubNetworkRequest('/auth/v1/settings',{auth:false});if(settings.disable_signup)throw clubNetworkError('Inscriptions fermées',400,'signup_disabled');
  // L'autorisation de l'adresse est vérifiée par les triggers serveur, jamais dans le navigateur.
- const session=await clubNetworkRequest('/auth/v1/signup'+(typeof clubAccountReturnURL==='function'?'?redirect_to='+encodeURIComponent(clubAccountReturnURL('login')):''),{method:'POST',auth:false,body:{email,password,data:{club_activation_code:$('club-signup-code').value.trim(),first_name:firstName,last_name:lastName}}});$('club-signup-code').value='';$('club-signup-password').value='';$('club-signup-confirm').value='';
+ const session=await clubNetworkRequest('/auth/v1/signup'+(typeof clubAccountReturnURL==='function'?'?redirect_to='+encodeURIComponent(clubAccountReturnURL('login')):''),{method:'POST',auth:false,body:{email,password,data:{club_activation_code:$('club-signup-code').value.trim(),first_name:firstName,last_name:lastName,terms_accepted:true,terms_version:CRUZA_TERMS.version}}});$('club-signup-code').value='';$('club-signup-password').value='';$('club-signup-confirm').value='';
  if(session.access_token)await clubNetworkAfterLogin(session);else{$('club-auth-show-login').click();$('club-network-email').value=email;clubNetworkStatus('Compte demandé. Confirmez votre adresse avec le message reçu avant de vous connecter. Si vous ne recevez rien, contactez le responsable.');}
 });};
 $('club-network-password-form').onsubmit=e=>{e.preventDefault();clubNetworkRun(async()=>{
