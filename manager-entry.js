@@ -1,8 +1,9 @@
 // Entry follows server authorization; showing the button is never the access control.
 (() => {
- // L’entrée suit toujours les droits Responsable confirmés par le serveur.
- const MANAGER_ENTRY_ENABLED=true;
- if(!MANAGER_ENTRY_ENABLED)return;
+ // INTERRUPTEUR : l’espace Responsable n’est pas fini, donc caché pour tout le monde.
+ // Pour le réactiver plus tard : remplacer false par true ci-dessous (le bouton suivra alors les droits du serveur).
+ const RESPONSABLE_ACTIVE=false;
+ if(!RESPONSABLE_ACTIVE)return;
  const nav=document.querySelector('.app-navigation');if(!nav)return;
  const visibilityRule=document.createElement('style');visibilityRule.textContent='.app-navigation>#view-management[hidden]{display:none!important}';document.head.append(visibilityRule);
  const button=document.createElement('button');button.id='view-management';button.type='button';button.hidden=true;button.textContent='Responsable';button.setAttribute('aria-label','Ouvrir l’espace Responsable');nav.append(button);
