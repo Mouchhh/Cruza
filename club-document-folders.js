@@ -1,5 +1,5 @@
 // Virtual folders use existing authorized metadata and versioned documents, not a second library.
-const clubDocumentFolders={training:{label:'Séances',hint:'Préparations et exercices de séance'},report:{label:'Bilans',hint:'Rapports et suivis après-match'},causeries:{label:'Causeries',hint:'Messages et plan de jeu du match'},composition:{label:'Compositions',hint:'Équipes, systèmes et placements'},tactics:{label:'Tactique',hint:'Plans de jeu et situations tactiques'},explanation:{label:'Animations',hint:'Situations de jeu, sorties de balle, pions et flèches'},squad:{label:'Effectifs',hint:'Répertoires de joueurs'}};
+const clubDocumentFolders={training:{label:'Séances',hint:'Préparations et exercices de séance'},report:{label:'Bilans',hint:'Rapports et suivis après-match'},causeries:{label:'Causeries',hint:'Messages et plan de jeu du match'},composition:{label:'Compositions',hint:'Équipes, systèmes et placements'},tactics:{label:'Tactique',hint:'Plans de jeu et situations tactiques'},squad:{label:'Effectifs',hint:'Répertoires de joueurs'}};
 const clubCompositionFolders=['composition','causeries','explanation','tactics'];
 const clubFolderNormal=value=>String(value||'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLocaleLowerCase('fr');
 function clubFolderForSource(kind,payload){
