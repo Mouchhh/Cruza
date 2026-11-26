@@ -13,7 +13,8 @@ try{if(new URLSearchParams(location.search).get('mode')!=='local'){
  const scope=base+(clubId?'/'+clubId:'');
  const saved=JSON.parse(sessionStorage.getItem('vestiaire-private-session:'+scope)||'null');
  const binding=JSON.parse(sessionStorage.getItem('vestiaire-account-binding:'+scope)||'null');
- if(binding&&saved?.session?.user?.id===binding.userId&&validCoachProfile(binding.coach)&&binding.coach.id===(clubId?'mc-'+clubId+'-'+binding.userId:'account-'+binding.userId))accountCoachBinding=binding;
+ if(binding&&saved?.session?.user?.id===binding.userId&&validCoachProfile(binding.coach)&&(binding.coach.id===(clubId?'mc-'+clubId+'-'+binding.userId:'account-'+binding.userId)||
+   (window.CLUB_CLOUD_CONFIG?.preserveLegacyDrafts===true&&/^account-[0-9a-f]{8}(-[0-9a-f]{4}){3}-[0-9a-f]{12}$/.test(binding.coach.id))))accountCoachBinding=binding;
 }}catch{}
 const activeCoach=Object.freeze(accountCoachBinding?{...accountCoachBinding.coach}:{...coachProfiles.find(p=>p.id===selectedCoachId)});
 function coachStorageKey(key,id=activeCoach.id){return id==='legacy'?key:'vestiaire-coach:'+id+':'+key;}

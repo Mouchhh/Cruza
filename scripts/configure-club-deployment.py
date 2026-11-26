@@ -31,7 +31,7 @@ def configure(profile, destination):
         raise ValueError("Renseignez l’origine HTTPS du club et l’URL Supabase.")
     if not re.fullmatch(r"sb_publishable_[A-Za-z0-9_-]+", key or ""):
         raise ValueError("Renseignez exclusivement une clé Supabase publiable sb_publishable_.")
-    if (slug == "stade-mayennais") != (url == SMFC_URL) or (slug != "stade-mayennais" and site == "https://mouchhh.github.io"):
+    if slug != "stade-mayennais" and (url == SMFC_URL or site == "https://mouchhh.github.io"):
         raise ValueError("La cible du Stade Mayennais est réservée à son propre profil.")
     club_id = profile["supabase"].get("club_id")
     cloud = {"url": url, "publishableKey": key}
@@ -39,6 +39,8 @@ def configure(profile, destination):
         if not isinstance(club_id, str) or str(UUID(club_id)) != club_id:
             raise ValueError("Renseignez l’identifiant UUID du club dans la base commune.")
         cloud["clubId"] = club_id
+        if slug == "stade-mayennais" and profile["supabase"].get("preserve_legacy_drafts") is True:
+            cloud["preserveLegacyDrafts"] = True
     elif club_id is not None:
         raise ValueError("Le club_id est réservé à la base commune Cruza.")
     services = profile["services"]

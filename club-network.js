@@ -181,7 +181,7 @@ async function clubNetworkRefreshSession(){
  if(!clubNetworkSession)throw clubNetworkError('Connexion requise',401);
  clubNetworkRefreshPromise=(async()=>{try{const session=await clubNetworkRequest('/auth/v1/token?grant_type=refresh_token',{method:'POST',auth:false,body:{refresh_token:clubNetworkSession.refresh_token}});clubNetworkStoreSession(session);}catch(error){if(error.status===400||error.status===401||error.status===403)clubNetworkClear();throw error;}finally{clubNetworkRefreshPromise=null;}})();return clubNetworkRefreshPromise;
 }
-function clubNetworkBound(){return !!clubNetworkMember&&activeCoach.id===clubNetworkCoachId(clubNetworkMember.user_id);}
+function clubNetworkBound(){return !!clubNetworkMember&&activeCoach.id===(clubNetworkMember.storageCoachId||clubNetworkCoachId(clubNetworkMember.user_id));}
 function clubNetworkRenderState(){
  clubSaveRender();
  const bound=clubNetworkBound();document.documentElement.classList.toggle('club-private-request',clubNetworkPrivateRequested);document.documentElement.classList.toggle('club-authenticated',bound);document.body.classList.toggle('club-private-active',bound);
@@ -345,10 +345,14 @@ function clubNetworkRenderSources(){
 async function clubNetworkLoadMember(){
  const members=await clubNetworkRequest('/rest/v1/club_members?select=user_id,display_name,active&order=display_name');
  if(!Array.isArray(members))throw Error('Réponse invalide');const member=members.find(m=>m.user_id===clubNetworkSession.user.id&&m.active===true);if(!member)throw clubNetworkError('Compte non autorisé',403);
+ if(clubNetworkConfig.preserveLegacyDrafts){
+  const previousId=await clubNetworkRequest('/rest/v1/rpc/cruza_legacy_storage_id',{method:'POST',body:{}});
+  if(typeof previousId==='string'&&/^[0-9a-f]{8}(-[0-9a-f]{4}){3}-[0-9a-f]{12}$/.test(previousId))member.storageCoachId='account-'+previousId;
+ }
  clubNetworkMembers=members;clubNetworkMember=member;
  if(!clubNetworkBound()||activeCoach.name!==member.display_name){
   if(!flushCoachWorkspace())throw Error('Impossible de préserver le travail ouvert.');
-  sessionStorage.setItem(clubNetworkBindingKey,JSON.stringify({userId:member.user_id,coach:{id:clubNetworkCoachId(member.user_id),name:member.display_name}}));
+  sessionStorage.setItem(clubNetworkBindingKey,JSON.stringify({userId:member.user_id,coach:{id:member.storageCoachId||clubNetworkCoachId(member.user_id),name:member.display_name}}));
   const url=new URL(location.href);url.searchParams.delete('mode');url.searchParams.delete('auth');url.hash='educateurs';history.replaceState(null,'',url.href);location.reload();return false;
  }
  const author=$('club-network-author'),previous=author.value;author.replaceChildren();const all=el('option','','Tous les éducateurs');all.value='';author.append(all);

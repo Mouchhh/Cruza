@@ -7,9 +7,11 @@
     "hebergeur": "GitHub Pages"
   },
   "supabase": {
-    "url": "https://uesbqljrcaugwcbzijcj.supabase.co",
-    "cle_publiable": "sb_publishable_rCJm8f_XMniU5loSAqgV2Q_ObSbyuzz",
-    "nom_projet": "Cruza - Stade Mayennais"
+    "url": "https://nzmkeylibdcqmgqopesu.supabase.co",
+    "cle_publiable": "sb_publishable_WvB3kBGAjwaUvLf8H5D2ZQ_fNnglQzh",
+    "nom_projet": "Cruza - Multi-clubs",
+    "club_id": "85d0f696-1b33-4333-a27f-ae642dd32b13",
+    "preserve_legacy_drafts": true
   },
   "services": {
     "canva": "https://canva-educateur-smfc.onrender.com",
