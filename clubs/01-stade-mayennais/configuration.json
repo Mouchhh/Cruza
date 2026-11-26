@@ -1,0 +1,18 @@
+{
+  "slug": "stade-mayennais",
+  "nom": "Stade Mayennais",
+  "site": {
+    "origine": "https://mouchhh.github.io",
+    "chemin": "/Cruza/",
+    "hebergeur": "GitHub Pages"
+  },
+  "supabase": {
+    "url": "https://uesbqljrcaugwcbzijcj.supabase.co",
+    "cle_publiable": "sb_publishable_rCJm8f_XMniU5loSAqgV2Q_ObSbyuzz",
+    "nom_projet": "Cruza - Stade Mayennais"
+  },
+  "services": {
+    "canva": "https://canva-educateur-smfc.onrender.com",
+    "classement": "https://canva-educateur-smfc.onrender.com"
+  }
+}

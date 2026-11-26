@@ -1,6 +1,6 @@
 // Season fixtures supplied by the club in chat; not a live FFF feed.
 // Keep team names as supplied. Do not equate MAYENNE STADE FC 2 with another club automatically.
-const clubFixtureSchedules=[{
+const clubFixtureSchedules=(window.CRUZA_CLUB && window.CRUZA_CLUB.slug !== "stade-mayennais") ? [] : [{
  id:'mayenne-stade-fc-2-u17-d1-2026-2027',ownerCoachName:'Enzo Mouchet',team:'MAYENNE STADE FC 2',category:'U17',season:'2026–2027',competition:'U17 Division 1 - U17 - U16',source:'Rencontres transmises par le club',
  fixtures:[
   {round:2,date:'2026-09-19',time:'17:00',home:'GJ HAUT-ANJOU',away:'MAYENNE STADE FC 2',score:{home:1,away:1}},

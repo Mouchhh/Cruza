@@ -1,12 +1,58 @@
 {
   "version": 1,
-  "updated_at": "2026-11-16",
-  "strategy": "Code commun à terme, projet et origine dédiés par club pilote. Pas de mutualisation de données actuellement.",
+  "updated_at": "2026-11-26",
+  "strategy": "Code commun et configuration par club. Projet Supabase et origine dédiés pendant le pilote.",
   "instances": [
-    {"id":"smfc-production","name":"Stade Mayennais","purpose":"Utilisation du club existant","code":"racine du dépôt actuel","url":"https://mouchhh.github.io/Cruza/","supabase_ref":"uesbqljrcaugwcbzijcj","source_commit":"b54ee8041055d7b57d8571e87559006361925f53","deployment_status":"non vérifié depuis cet espace","database_admin_verified":false},
-    {"id":"demo","name":"CRUZA — démonstration vierge","purpose":"Essais avec données locales uniquement","code":"cruza-demo/","url":"https://mouchhh.github.io/Cruza/cruza-demo/index.html?mode=local","supabase_ref":null,"status":"code publié ; disponibilité publique à vérifier","storage":"préfixe local propre ; même origine que le SMFC, donc séparation logique uniquement"},
-    {"id":"preproduction","name":"CRUZA — préproduction","purpose":"Valider avant mise en ligne","code":null,"url":null,"supabase_ref":null,"status":"à créer sur origine distincte"},
-    {"id":"club-pilote","name":"Deuxième club — à désigner","purpose":"Recette avant commercialisation","code":"dépôt Cruza commun","url":null,"supabase_ref":null,"status":"installation neuve préparée, projet et hébergement à créer"},
-    {"id":"vitrine","name":"CRUZA — vitrine","purpose":"Présentation du produit","code":"prototype dans les livrables personnels","url":null,"supabase_ref":null,"status":"prototype, pas de vitrine commerciale validée"}
+    {
+      "id": "smfc-production",
+      "name": "Stade Mayennais",
+      "purpose": "Utilisation du club existant",
+      "code": "racine du dépôt actuel",
+      "url": "https://mouchhh.github.io/Cruza/",
+      "supabase_ref": "uesbqljrcaugwcbzijcj",
+      "source_commit": "b54ee8041055d7b57d8571e87559006361925f53",
+      "deployment_status": "non vérifié depuis cet espace",
+      "database_admin_verified": false,
+      "configuration": "clubs/01-stade-mayennais/configuration.json",
+      "nom_projet_supabase": "Cruza - Stade Mayennais"
+    },
+    {
+      "id": "demo",
+      "name": "CRUZA — démonstration vierge",
+      "purpose": "Essais avec données locales uniquement",
+      "code": "cruza-demo/",
+      "url": "https://mouchhh.github.io/Cruza/cruza-demo/index.html?mode=local",
+      "supabase_ref": null,
+      "status": "code publié ; disponibilité publique à vérifier",
+      "storage": "préfixe local propre ; même origine que le SMFC, donc séparation logique uniquement"
+    },
+    {
+      "id": "preproduction",
+      "name": "CRUZA — préproduction",
+      "purpose": "Valider avant mise en ligne",
+      "code": null,
+      "url": null,
+      "supabase_ref": null,
+      "status": "à créer sur origine distincte"
+    },
+    {
+      "id": "club-pilote",
+      "name": "Deuxième club — à désigner",
+      "purpose": "Recette avant commercialisation",
+      "code": "dépôt Cruza commun",
+      "url": null,
+      "supabase_ref": null,
+      "status": "Lot SQL prêt. Création du projet refusée par l’API Supabase avec les droits disponibles. Hébergement à créer.",
+      "configuration": "clubs/02-pilote/configuration.json"
+    },
+    {
+      "id": "vitrine",
+      "name": "CRUZA — vitrine",
+      "purpose": "Présentation du produit",
+      "code": "prototype dans les livrables personnels",
+      "url": null,
+      "supabase_ref": null,
+      "status": "prototype, pas de vitrine commerciale validée"
+    }
   ]
 }

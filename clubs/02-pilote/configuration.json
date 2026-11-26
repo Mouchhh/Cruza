@@ -1,0 +1,18 @@
+{
+  "slug": "pilote",
+  "nom": null,
+  "site": {
+    "origine": null,
+    "chemin": "/",
+    "hebergeur": "Cloudflare Pages"
+  },
+  "supabase": {
+    "url": null,
+    "cle_publiable": null,
+    "nom_projet": "Cruza - Club 02 - Pilote"
+  },
+  "services": {
+    "canva": null,
+    "classement": null
+  }
+}
