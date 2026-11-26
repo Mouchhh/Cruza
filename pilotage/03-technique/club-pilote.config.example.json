@@ -1,0 +1,22 @@
+{
+  "club": {
+    "slug": null,
+    "nom": null,
+    "logo": null,
+    "couleur_principale": null,
+    "couleur_accent": null,
+    "equipes": []
+  },
+  "site": {
+    "origine": null,
+    "hebergeur_prevu": "Cloudflare Pages"
+  },
+  "supabase": {
+    "url_publique": null,
+    "cle_publiable": null
+  },
+  "services": {
+    "canva": false,
+    "assistant_ia_vocal": false
+  }
+}

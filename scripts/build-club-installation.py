@@ -3,7 +3,16 @@
 from pathlib import Path
 import hashlib,json,re
 ROOT=Path(__file__).resolve().parents[1]
-MIGRATIONS=['club.sql','club-accounts.sql','club-presence.sql','club-references.sql','club-management.sql','club-management-statistics.sql']
+MIGRATIONS = [
+ 'club.sql',
+ 'club-accounts.sql',
+ 'club-terms-acceptance.sql',
+ 'club-presence.sql',
+ 'club-references.sql',
+ 'coach-private-sync.sql',
+ 'club-management.sql',
+ 'club-management-statistics.sql',
+]
 PREAMBLE='''-- CRUZA — initialisation d’un projet Supabase NEUF uniquement.
 -- Généré depuis les migrations du dépôt. Aucun compte ni droit nominatif créé.
 -- Refuse les projets déjà utilisés. Ne pas exécuter sur le SMFC existant.

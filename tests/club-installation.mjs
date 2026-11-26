@@ -8,13 +8,15 @@ create table auth.users(id uuid primary key,email text,raw_user_meta_data jsonb 
 create function auth.uid() returns uuid language sql stable as $$select nullif(current_setting('request.jwt.claim.sub',true),'')::uuid$$;
 grant usage on schema auth,public to authenticated,anon;grant execute on function auth.uid() to authenticated,anon;`);
 await db.exec(sql);
-assert.equal((await db.query("select count(*)::int as n from pg_tables where schemaname='public' and tablename like 'club_%'")).rows[0].n,7);
+assert.equal((await db.query("select count(*)::int as n from pg_tables where schemaname='public' and tablename like 'club_%'")).rows[0].n,8);
 assert.equal((await db.query("select count(*)::int as n from public.club_management_access")).rows[0].n,0);
 assert.equal((await db.query("select public.club_registration_ready() as ok")).rows[0].ok,true);
+assert.equal((await db.query("select to_regclass('public.coach_private_records') is not null as ok")).rows[0].ok,true);
+assert.equal((await db.query("select exists (select 1 from pg_trigger where tgfoid='public.club_require_terms()'::regprocedure and tgenabled='O') as ok")).rows[0].ok,true);
 await assert.rejects(db.exec(sql),e=>e.message.includes('installation applicative existe'));
 await db.exec('rollback');
 assert.equal((await db.query("select count(*)::int as n from public.club_members")).rows[0].n,0);
 await db.exec('set role anon');
 await assert.rejects(db.exec('select * from public.club_members'),e=>e.code==='42501');
 await db.exec('reset role');await db.close();
-console.log('PASS: seven tables on a fresh project, no assigned manager, guarded reinstall, registration hooks and denied anonymous read.');
+console.log('PASS: eight club tables plus private synchronization on a fresh project, no assigned manager, guarded reinstall, registration hooks and denied anonymous read.');

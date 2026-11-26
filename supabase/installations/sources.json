@@ -10,12 +10,20 @@
       "sha256": "96e8e9606473ce2ea8ba3f9a57580df0b7e19e7eef4db79008bcf612dd784625"
     },
     {
+      "file": "club-terms-acceptance.sql",
+      "sha256": "1b9c5614a1c4785c16a91e2cbc740b22f536701556f3cff02a7131145071fe47"
+    },
+    {
       "file": "club-presence.sql",
       "sha256": "03edc9bd3d3e3a215dd040ff85510c2993a4f48b0afa8bcb7aff0b4375f4bf4e"
     },
     {
       "file": "club-references.sql",
       "sha256": "29386d9cd87d695dc9f57e897f99cb209f51ff5aa4bc82a753a016541e8c387d"
+    },
+    {
+      "file": "coach-private-sync.sql",
+      "sha256": "18e4a32e71ad7b29bc7f0290e17e5906aaea557d53e47651d96dbc60dadf5aa1"
     },
     {
       "file": "club-management.sql",

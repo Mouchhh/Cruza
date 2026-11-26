@@ -219,6 +219,49 @@ grant execute on function public.club_profile_registration_ready() to anon,authe
 notify pgrst,'reload schema';
 
 
+-- SOURCE : club-terms-acceptance.sql
+-- Preuve d'acceptation des CGU à l'inscription. Réexécutable. Ne modifie aucune donnée existante.
+-- À lancer APRÈS club-accounts.sql.
+create table if not exists public.club_terms_acceptances (
+ user_id uuid primary key references auth.users(id) on delete cascade,
+ version text not null check (length(version) between 1 and 40),
+ accepted_at timestamptz not null default now()
+);
+alter table public.club_terms_acceptances enable row level security;
+revoke all on public.club_terms_acceptances from public,anon,authenticated;
+grant select on public.club_terms_acceptances to authenticated;
+drop policy if exists club_terms_read_own on public.club_terms_acceptances;
+create policy club_terms_read_own on public.club_terms_acceptances for select to authenticated using (user_id=(select auth.uid()));
+
+-- Refuse la création du compte si la case n'est pas cochée (contrôle côté serveur).
+create or replace function public.club_require_terms() returns trigger
+language plpgsql security definer set search_path='' as $$
+begin
+ if coalesce(new.raw_user_meta_data->>'terms_accepted','')<>'true'
+  or length(coalesce(new.raw_user_meta_data->>'terms_version',''))not between 1 and 40 then
+  raise exception 'Acceptation des CGU obligatoire' using errcode='22023';
+ end if;
+ return new;
+end; $$;
+revoke all on function public.club_require_terms() from public,anon,authenticated;
+drop trigger if exists club_registration_terms_check on auth.users;
+create trigger club_registration_terms_check before insert on auth.users
+ for each row execute function public.club_require_terms();
+
+-- Enregistre la preuve (date + version) une fois le compte créé.
+create or replace function public.club_record_terms() returns trigger
+language plpgsql security definer set search_path='' as $$
+begin
+ insert into public.club_terms_acceptances(user_id,version) values(new.id,new.raw_user_meta_data->>'terms_version')
+ on conflict(user_id) do nothing;
+ return new;
+end; $$;
+revoke all on function public.club_record_terms() from public,anon,authenticated;
+drop trigger if exists club_registration_terms_record on auth.users;
+create trigger club_registration_terms_record after insert on auth.users
+ for each row execute function public.club_record_terms();
+
+
 -- SOURCE : club-presence.sql
 -- À exécuter après club.sql. Présence temporaire des éducateurs, sans toucher aux documents.
 -- Script réexécutable ; chaque navigateur publie uniquement sa propre présence authentifiée.
@@ -380,6 +423,83 @@ revoke all on function public.club_review_reference(uuid,integer,boolean) from p
 grant execute on function public.club_reference_overview() to authenticated;
 grant execute on function public.club_review_reference(uuid,integer,boolean) to authenticated;
 notify pgrst,'reload schema';
+
+
+-- SOURCE : coach-private-sync.sql
+-- Synchronisation personnelle : aucun accès aux autres éducateurs, même responsables.
+-- Réexécutable. Ne modifie ni les documents du club ni les données locales.
+
+create table if not exists public.coach_private_records (
+ owner_id uuid not null references auth.users(id) on delete cascade,
+ kind text not null check (kind in ('settings','photo')),
+ record_key text not null,
+ payload jsonb not null,
+ revision bigint not null default 1 check (revision > 0),
+ deleted boolean not null default false,
+ updated_at timestamptz not null default now(),
+ primary key(owner_id,kind,record_key),
+ check (jsonb_typeof(payload) = 'object'),
+ check (octet_length(payload::text) <= case when kind='photo' then 2000000 else 500000 end),
+ check ((kind='settings' and record_key in ('profile','club')) or
+        (kind='photo' and record_key ~ '^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$'))
+);
+alter table public.coach_private_records enable row level security;
+revoke all on public.coach_private_records from public,anon,authenticated;
+grant select on public.coach_private_records to authenticated;
+drop policy if exists coach_private_read_own on public.coach_private_records;
+create policy coach_private_read_own on public.coach_private_records for select to authenticated
+ using (owner_id=(select auth.uid()) and (select public.club_is_member()));
+create or replace function public.coach_private_write(
+ p_owner_id uuid,p_kind text,p_key text,p_payload jsonb,
+ p_expected_revision bigint,p_deleted boolean default false
+) returns jsonb language plpgsql security definer set search_path = '' as $$
+declare existing public.coach_private_records; result public.coach_private_records;
+begin
+ if auth.uid() is null or auth.uid()<>p_owner_id or not public.club_is_member() then
+  raise exception 'Compte non autorisé' using errcode='42501';
+ end if;
+ if p_kind not in ('settings','photo') or p_kind is null or p_key is null or p_payload is null
+    or p_deleted is null or p_expected_revision is null or p_expected_revision<0 then
+  raise exception 'Paramètres invalides' using errcode='22023';
+ end if;
+ -- Serialize this account's writes, including the 30-photo quota check.
+ perform pg_catalog.pg_advisory_xact_lock(pg_catalog.hashtextextended(p_owner_id::text,0));
+ select * into existing from public.coach_private_records
+  where owner_id=p_owner_id and kind=p_kind and record_key=p_key for update;
+ if coalesce(existing.revision,0)<>p_expected_revision then
+  raise exception 'Version personnelle modifiée sur un autre appareil' using errcode='40001';
+ end if;
+ if p_deleted and existing.owner_id is null then
+  raise exception 'Donnée personnelle inexistante' using errcode='22023';
+ end if;
+ if existing.owner_id is null and
+    (select count(*) from public.coach_private_records where owner_id=p_owner_id)>=2000 then
+  raise exception 'Historique personnel à archiver' using errcode='23514';
+ end if;
+ if p_kind='photo' and not p_deleted then
+  if jsonb_typeof(p_payload->'name') is distinct from 'string'
+     or length(p_payload->>'name') not between 1 and 60
+     or jsonb_typeof(p_payload->'data') is distinct from 'string'
+     or (p_payload->>'data') !~ '^data:image/jpeg;base64,[A-Za-z0-9+/=]+$'
+     or jsonb_typeof(p_payload->'createdAt') is distinct from 'string'
+     or length(p_payload->>'createdAt')>40 then
+   raise exception 'Photo invalide' using errcode='22023';
+  end if;
+  if (existing.owner_id is null or existing.deleted) and
+     (select count(*) from public.coach_private_records where owner_id=p_owner_id and kind='photo' and not deleted)>=30 then
+   raise exception '30 photos maximum par éducateur' using errcode='23514';
+  end if;
+ end if;
+ insert into public.coach_private_records(owner_id,kind,record_key,payload,revision,deleted)
+ values(p_owner_id,p_kind,p_key,case when p_deleted then '{}'::jsonb else p_payload end,1,p_deleted)
+ on conflict(owner_id,kind,record_key) do update set
+  payload=excluded.payload,deleted=excluded.deleted,
+  revision=coach_private_records.revision+1,updated_at=now()
+ returning * into result;
+ return to_jsonb(result);
+end; $$;
+revoke all on function public.coach_private_write(uuid,text,text,jsonb,bigint,boolean) from public,anon;
+grant execute on function public.coach_private_write(uuid,text,text,jsonb,bigint,boolean) to authenticated;
 
 
 -- SOURCE : club-management.sql
