@@ -1,0 +1,33 @@
+<!doctype html>
+<html lang="fr">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; connect-src https://nzmkeylibdcqmgqopesu.supabase.co; script-src 'self'; style-src 'self' 'unsafe-inline'; form-action 'none'; base-uri 'none'">
+<title>Cruza · Essai multi-clubs</title>
+<style>
+*{box-sizing:border-box}[hidden]{display:none!important}body{margin:0;background:#f3e9d2;color:#071c55;font:16px/1.5 system-ui,sans-serif}main{max-width:760px;padding:20px;margin:auto}header,section,form{padding:20px;border-radius:14px;margin:12px 0;background:#fffdf7}header{background:#0b2e8a;color:white}h1,h2,p{margin:0 0 12px}label{display:block;margin:12px 0}input,select,button{font:inherit;border:1px solid #bdc9df;border-radius:8px;padding:9px 12px}input,select{width:100%;display:block}button{background:#0b2e8a;color:white;cursor:pointer}small{display:block}li{padding:8px 0}button:disabled{opacity:.55}
+</style>
+<main>
+<header><strong>cruza.</strong><h1>Essai multi-clubs</h1><p>Vérifier les accès et le partage de séances avec des comptes fictifs.</p></header>
+<form id="connexion">
+ <h2>Connexion de test</h2>
+ <label>Clé publiable du projet de test<input name="key" type="text" pattern="sb_publishable_[A-Za-z0-9_-]+" required autocapitalize="off" spellcheck="false"></label>
+ <label>E-mail du compte fictif<input name="email" type="email" autocomplete="username" required></label>
+ <label>Mot de passe<input name="password" type="password" autocomplete="current-password" required></label>
+ <button>Se connecter</button>
+</form>
+<section id="espace" hidden>
+ <button id="quitter" type="button">Fermer la session de test</button>
+ <label>Club actif<select id="club"></select></label>
+ <p id="vide" hidden>Aucun club actif pour ce compte.</p>
+ <div id="documents">
+  <h2>Séances visibles</h2><ul id="liste"></ul>
+  <form id="nouvelle"><label>Titre de la séance fictive<input name="title" maxlength="160" required></label>
+  <label><input type="checkbox" name="shared" style="display:inline;width:auto"> Partager avec les membres du club</label>
+  <button>Enregistrer la séance de test</button></form>
+ </div>
+</section>
+<p id="etat" role="status"></p>
+</main>
+<script src="essai.js" defer></script>
+</html>

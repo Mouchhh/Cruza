@@ -11,3 +11,9 @@ Le test `tests/multi-club-access.mjs` vérifie les politiques PostgreSQL avec de
 1. Disposer d’un projet Supabase neuf et appliquer la migration sur ce seul projet.
 2. Adapter la sélection du club, les invitations, les RPC, les synchronisations et les brouillons au contexte de club. Le site actuel utilise toujours les tables et RPC de l’installation dédiée.
 3. Tester les parcours réels avec deux clubs, y compris le compte commun et la révocation. Préparer ensuite une reprise des données SMFC après sauvegarde et validation, avec retour possible vers le site actuel.
+
+## Aperçu de test du nouveau projet
+
+La [page de test](../../apercu-multi-clubs/index.html) cible uniquement le projet `nzmkeylibdcqmgqopesu`. C’est un banc d’essai de connexion, de sélection du club et de lecture et écriture de séances fictives. Le site de production utilise son propre projet. Ouvrir cette page via un serveur HTTP statique ou sur une préproduction dédiée.
+
+Créer deux utilisateurs fictifs confirmés dans **Authentication → Users**, puis adapter et exécuter [002-jeu-essai.sql](002-jeu-essai.sql) dans le nouveau projet. Dans la page de test, saisir la clé **Publishable** du nouveau projet ainsi que le compte fictif. Les informations ne sont pas enregistrées par la page. Connecter le compte A, partager une séance fictive et fermer la session. Avec le compte B, vérifier que seul le club B apparaît et que la séance A est absente. Tester aussi dans le sens inverse. Les tests SQL locaux complètent cet essai avec des opérations de tentative d’accès direct.
