@@ -2,7 +2,7 @@
 (() => {
  const KEY='vestiaire-private-sync',conflicts=new Map();
  let running=null,timer=null,rerun=false,status='Données personnelles conservées sur cet appareil.',phase='local';
- const context=()=>typeof clubNetworkBound==='function'&&clubNetworkBound()&&clubNetworkSession?.user?.id&&activeCoach.id==='account-'+clubNetworkSession.user.id?{owner:clubNetworkSession.user.id,generation:clubNetworkGeneration}:null;
+ const context=()=>typeof clubNetworkBound==='function'&&clubNetworkBound()&&clubNetworkSession?.user?.id?{owner:clubNetworkSession.user.id,generation:clubNetworkGeneration}:null;
  const current=c=>{const n=context();return !!n&&n.owner===c.owner&&n.generation===c.generation;};
  const validKey=(kind,key)=>kind==='settings'?['profile','club'].includes(key):kind==='photo'&&/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/.test(key);
  function journal(){const raw=coachStorageGet(KEY);if(!raw)return {};const v=JSON.parse(raw);if(v?.version!==1||!v.entries||typeof v.entries!=='object'||Array.isArray(v.entries))throw Error('État de synchronisation personnelle illisible.');return v.entries;}
