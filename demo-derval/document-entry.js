@@ -1,0 +1,981 @@
+// Explicit document entry: context lookup → choice → resume/create → editor.
+// Archived versions are local to this coach and are never published automatically.
+function documentEntryContext(kind, payload) {
+  const p = kind === "report" ? payload.info : payload.matchPreparation;
+  return {
+    id: kind === "report" ? payload.id : payload.documentId || "draft",
+    key: kind === "report" ? payload.agendaSourceKey : payload.fffFixtureKey,
+    date: p?.date || "",
+    opponent: p?.opponent || p?.match || "",
+    team: kind === "report" ? p?.team : payload.team,
+    category: kind === "report" ? p?.category : payload.category,
+  };
+}
+function documentEntrySameContext(a, b) {
+  const normal = (v) =>
+    String(v || "")
+      .normalize("NFD")
+      .replace(/[\u0300-\u036f]/g, "")
+      .trim()
+      .replace(/\s+/g, " ")
+      .toLowerCase();
+  if (a.key && b.key) return a.key === b.key;
+  if (a.date && b.date && a.opponent && b.opponent)
+    return (
+      a.date === b.date &&
+      normal(a.opponent) === normal(b.opponent) &&
+      (!a.category ||
+        !b.category ||
+        normal(a.category) === normal(b.category)) &&
+      (!a.team || !b.team || normal(a.team) === normal(b.team))
+    );
+  return !!a.id && a.id === b.id;
+}
+function documentEntryMeaningful(kind, payload) {
+  if (kind === "causerie") {
+    if (
+      payload.matchCreation === "blank" &&
+      !payload.players.length &&
+      ["", "4-3-3"].includes(payload.formation) &&
+      !payload.notes.trim() &&
+      !payload.arrows.length &&
+      !payload.matchPreparation?.objectives.some(Boolean) &&
+      !["offensive", "defensive", "specific", "context"].some((k) =>
+        payload.matchPreparation?.[k]?.trim(),
+      )
+    )
+      return false;
+    // Legacy storage kind retained: the decision now concerns the whole Match preparation.
+    return (
+      !!payload.documentId ||
+      !!payload.title?.trim() ||
+      !!payload.notes.trim() ||
+      payload.arrows.length > 0 ||
+      payload.formation !== "4-3-3" ||
+      payload.players.length !== 11 ||
+      payload.players.some(
+        (p, i) =>
+          p.name !== "Joueur " + (i + 1) ||
+          p.photo ||
+          p.role === "sub" ||
+          p.x !== layouts["4-3-3"][i]?.[0] ||
+          p.y !== layouts["4-3-3"][i]?.[1],
+      ) ||
+      matchPreparationFilled(payload.matchPreparation)
+    );
+  }
+  const r = payload,
+    plan = r.preparation?.plan;
+  return (
+    !!r.title?.trim() ||
+    Object.values(r.analysis).some((v) => v.trim()) ||
+    Object.values(r.plan).some((v) => v.trim()) ||
+    Object.values(r.ratings).some((v) => v.score !== "" || v.note.trim()) ||
+    r.players.length > 0 ||
+    r.events.length > 0 ||
+    [
+      "competition",
+      "round",
+      "time",
+      "stadium",
+      "goalsFor",
+      "goalsAgainst",
+      "halfFor",
+      "halfAgainst",
+      "scorers",
+    ].some((k) => r.info[k]?.trim()) ||
+    ["date", "opponent", "conditions"].some(
+      (k) =>
+        r.info[k]?.trim() &&
+        r.info[k] !==
+          {
+            date: plan?.date,
+            opponent: plan?.opponent,
+            conditions: plan?.context,
+          }[k],
+    )
+  );
+}
+function documentEntryPayloadValid(kind, payload) {
+  return kind === "report"
+    ? reportValid(payload)
+    : valid(payload) &&
+        !payload.squadDirectory &&
+        !payload.pionExplanation &&
+        payload.boardKind !== "plan";
+}
+function documentEntrySignature(payload) {
+  const { teamContext, ...content } = payload;
+  return JSON.stringify({ ...content, updatedAt: "" });
+}
+function documentEntryArchives() {
+  try {
+    const rows = JSON.parse(
+      coachStorageGet("vestiaire-document-versions") || "[]",
+    );
+    return Array.isArray(rows) && rows.length <= 100
+      ? rows.filter(
+          (r) =>
+            r &&
+            ["causerie", "report"].includes(r.kind) &&
+            typeof r.at === "string" &&
+            typeof r.id === "string" &&
+            documentEntryPayloadValid(r.kind, r.payload),
+        )
+      : [];
+  } catch {
+    return [];
+  }
+}
+document.addEventListener("DOMContentLoaded", () => {
+  let bypass = 0,
+    pending = null;
+  const accepted = { causerie: null, report: null };
+  const acceptedStorageKey =
+    "vestiaire-document-entry-active:" +
+    activeCoach.id +
+    ":" +
+    activeCoachTeam.id;
+  try {
+    const saved = JSON.parse(
+      sessionStorage.getItem(acceptedStorageKey) || "{}",
+    );
+    for (const kind of ["causerie", "report"])
+      if (typeof saved[kind] === "string" && saved[kind].length < 500)
+        accepted[kind] = saved[kind];
+  } catch {}
+  function rememberAccepted() {
+    try {
+      sessionStorage.setItem(acceptedStorageKey, JSON.stringify(accepted));
+    } catch {}
+  }
+  document.addEventListener("document-completed", (event) => {
+    const kind = event.detail?.kind;
+    if (Object.hasOwn(accepted, kind)) {
+      accepted[kind] = null;
+      rememberAccepted();
+    }
+  });
+  const state = { phase: "idle", kind: null, context: null, error: "" };
+  const perform = (fn) => {
+    bypass++;
+    try {
+      return fn();
+    } finally {
+      bypass--;
+    }
+  };
+  const current = (kind) =>
+    kind === "report" ? currentReport : getCompositionBoard();
+  const key = (kind, payload) =>
+    activeCoach.id +
+    ":" +
+    activeCoachTeam.id +
+    ":" +
+    kind +
+    ":" +
+    (kind === "report" ? payload.id : payload.documentId || "draft");
+  const inside = (kind) =>
+    kind === "report"
+      ? document.body.classList.contains("reports-mode")
+      : terrainBoardKind === "composition" &&
+        ![
+          "resources-mode",
+          "home-mode",
+          "training-mode",
+          "reports-mode",
+          "coach-agenda-mode",
+          "club-network-mode",
+          "squad-mode",
+          "simple-mode",
+        ].some((c) => document.body.classList.contains(c));
+  // Preserve the full previous payload before replacing any draft.
+  function archive(kind, payload) {
+    if (!documentEntryMeaningful(kind, payload)) return true;
+    if (!documentEntryPayloadValid(kind, payload)) {
+      state.error =
+        "Corrigez les champs signalés avant de créer une nouvelle version. Votre travail reste ouvert.";
+      return false;
+    }
+    const rows = documentEntryArchives();
+    if (
+      rows.some(
+        (r) =>
+          r.kind === kind &&
+          documentEntrySignature(r.payload) === documentEntrySignature(payload),
+      )
+    )
+      return true;
+    if (rows.length >= 100) {
+      state.error =
+        "Les versions précédentes sont pleines. Enregistrez votre document et libérez le stockage avant de recommencer.";
+      return false;
+    }
+    try {
+      rows.unshift({
+        id: crypto.randomUUID(),
+        kind,
+        at: new Date().toISOString(),
+        payload: structuredClone(payload),
+      });
+      coachStorageSet("vestiaire-document-versions", JSON.stringify(rows));
+      refreshHistory();
+      return true;
+    } catch {
+      state.error =
+        "Impossible de conserver la version précédente. Votre travail reste ouvert et n’a pas été remplacé.";
+      return false;
+    }
+  }
+  function candidates(kind, context) {
+    const live = current(kind),
+      saved =
+        kind === "report"
+          ? reportLibrary.filter((r) => !reportIsRecoveryCopy(r))
+          : saves.map((s) => s.state),
+      rows = saved.map((payload) => ({
+        payload,
+        label: "Document enregistré",
+        saved: true,
+      })),
+      seen = new Set();
+    return rows.filter((row) => {
+      const p = row.payload;
+      if (
+        context.id === "draft" &&
+        !context.key &&
+        !context.date &&
+        !context.opponent &&
+        p !== live
+      )
+        return false;
+      if (
+        !documentEntryPayloadValid(kind, p) ||
+        !documentEntrySameContext(context, documentEntryContext(kind, p)) ||
+        !(documentEntryMeaningful(kind, p) || (kind === "report" && row.saved))
+      )
+        return false;
+      const signature = documentEntrySignature(p);
+      if (seen.has(signature)) return false;
+      seen.add(signature);
+      return true;
+    });
+  }
+  function blank(kind, context, source) {
+    if (kind === "causerie") {
+      return newBlankMatch(context);
+    }
+    const next = newReport(),
+      info = source?.info || next.info;
+    next.title = "";
+    next.info = {
+      ...emptyObject(reportInfo),
+      team: context.team || info.team || "",
+      coach: activeCoach.name,
+      category: context.category || info.category || "",
+      date: context.date,
+      opponent: context.opponent,
+      venue: info.venue || "Domicile",
+    };
+    for (const k of [
+      "time",
+      "competition",
+      "round",
+      "stadium",
+      "formation",
+      "duration",
+    ])
+      next.info[k] = info[k] || "";
+    if (context.key) next.agendaSourceKey = context.key;
+    const statsSource = source?.info ? source : currentReport;
+    if (
+      statsSource?.id &&
+      documentEntrySameContext(
+        context,
+        documentEntryContext("report", statsSource),
+      )
+    ) {
+      next.statsEventId = statsSource.statsEventId || statsSource.id;
+      next.eventType = statsSource.eventType || "match";
+    }
+    if (source?.preparation) {
+      next.preparation = structuredClone(source.preparation);
+      for (const objective of next.preparation.objectives) {
+        objective.status = "Non évalué";
+        objective.observation = "";
+      }
+    } else if (
+      !documentEntrySameContext(
+        context,
+        documentEntryContext("causerie", getCompositionBoard()),
+      )
+    )
+      delete next.preparation;
+    return next;
+  }
+  function replace(kind, payload) {
+    if (
+      kind === "causerie" &&
+      payload.matchCreation === "blank" &&
+      !payload.players.length &&
+      ["", "4-3-3"].includes(payload.formation)
+    )
+      return matchWorkspaceInstall(payload);
+    return perform(() =>
+      workspaceReplaceDraft(
+        kind === "report" ? "report" : "composition",
+        payload,
+      ),
+    );
+  }
+  function openEditor(kind, continuation, fresh = false) {
+    state.phase = "opening";
+    if (fresh && kind === "report") reportTab = "general";
+    perform(() => continuation());
+    if (typeof documentCompletionBeginEdit === "function")
+      documentCompletionBeginEdit(kind, current(kind));
+    if (fresh && kind === "report") {
+      renderReportTabs();
+      renderReportContent();
+    }
+    if (kind === "causerie")
+      perform(() =>
+        navigation("view-pitch", () => {
+          activateTerrainBoard("composition");
+          terrainGo(0);
+        }),
+      );
+    accepted[kind] = key(kind, current(kind));
+    rememberAccepted();
+    state.kind = kind;
+    state.context = documentEntryContext(kind, current(kind));
+    state.error = "";
+    state.phase = "idle";
+  }
+  // A pending choice never mutates the active document. Only an explicit action can replace it.
+  function request(kind, continuation, options = {}) {
+    if (kind === "causerie" && options.newDocument) {
+      if (pending?.open) pending.close();
+      return startBlankMatch();
+    }
+    if (bypass) return continuation();
+    if (pending && !pending.open) {
+      pending.remove();
+      pending = null;
+    }
+    if (pending) return false;
+    if (kind === "report" && reportAutosaveTimer) flushReportDraft();
+    if (!workspaceNavigationCanLeave()) return false;
+    // A unique agenda encounter can resume through the same guarded editor path.
+    // Explicit agenda/archive/new-document actions keep their original policy.
+    if (!options.context && !options.force && !options.newDocument && !options.managesContext) {
+      const automatic = window.matchContinuity?.autoEntry(kind);
+      if (automatic) {
+        const readOnly = documentCompletionIsCompleted(kind, automatic) &&
+          !documentCompletionIsEditing(kind, automatic);
+        if (automatic !== current(kind) && !replace(kind, automatic)) return false;
+        openEditor(kind, continuation, kind === "report");
+        if (readOnly) {
+          documentCompletionEndEdit(kind);
+          documentCompletionRefresh();
+        }
+        return true;
+      }
+    }
+    const matchContext = documentEntryContext(
+        "causerie",
+        getCompositionBoard(),
+      ),
+      fromMatch = ![
+        "resources-mode",
+        "home-mode",
+        "training-mode",
+        "reports-mode",
+        "coach-agenda-mode",
+        "club-network-mode",
+        "squad-mode",
+      ].some((c) => document.body.classList.contains(c));
+    const context =
+      (options.context
+        ? {
+            id: "",
+            date: "",
+            opponent: "",
+            team: "",
+            category: "",
+            ...options.context,
+          }
+        : null) ||
+      (kind === "report" &&
+      fromMatch &&
+      matchContext.date &&
+      matchContext.opponent
+        ? matchContext
+        : documentEntryContext(kind, current(kind)));
+    // Acceptance belongs to the document, not the page currently displayed.
+    if (
+      !options.force &&
+      !options.newDocument &&
+      !options.managesContext &&
+      accepted[kind] === key(kind, current(kind)) &&
+      documentEntrySameContext(
+        context,
+        documentEntryContext(kind, current(kind)),
+      )
+    )
+      return perform(continuation);
+    // Completed documents stay quiet on passive module entry, including after reload.
+    if (
+      typeof documentCompletionIsCompleted === "function" &&
+      documentCompletionIsCompleted(kind, current(kind)) &&
+      !documentCompletionIsEditing(kind, current(kind)) &&
+      !options.newDocument &&
+      !options.managesContext &&
+      documentEntrySameContext(
+        context,
+        documentEntryContext(kind, current(kind)),
+      )
+    ) {
+      openEditor(kind, continuation);
+      documentCompletionEndEdit(kind);
+      documentCompletionRefresh();
+      return true;
+    }
+    state.phase = "checking";
+    state.kind = kind;
+    state.context = structuredClone(context);
+    state.error = "";
+    const rows = candidates(kind, context);
+    if (!rows.length) {
+      if (options.newDocument) {
+        if (
+          !archive(kind, current(kind)) ||
+          !replace(kind, blank(kind, context, current(kind)))
+        )
+          return false;
+        openEditor(kind, continuation, true);
+        return true;
+      }
+      if (
+        options.managesContext &&
+        !documentEntrySameContext(
+          context,
+          documentEntryContext(kind, current(kind)),
+        ) &&
+        !archive(kind, current(kind))
+      ) {
+        notify(state.error);
+        state.phase = "error";
+        return false;
+      }
+      if (
+        !options.managesContext &&
+        !documentEntrySameContext(
+          context,
+          documentEntryContext(kind, current(kind)),
+        )
+      ) {
+        const old = current(kind);
+        if (
+          !archive(kind, old) ||
+          !replace(kind, blank(kind, context, kind === "report" ? null : old))
+        ) {
+          notify(state.error || "Le document ouvert reste conservé.");
+          state.phase = "error";
+          return false;
+        }
+      }
+      openEditor(kind, continuation, true);
+      return true;
+    }
+    if (kind === "causerie")
+      perform(() =>
+        navigation("view-pitch", () => {
+          activateTerrainBoard("composition");
+          terrainGo(0);
+        }),
+      );
+    const owner = activeCoach.id,
+      generation = clubNetworkGeneration,
+      initial = documentEntrySignature(current(kind));
+    const isReport = kind === "report";
+    const dialog = el("dialog", "document-entry-dialog");
+    dialog.id = "document-entry-dialog";
+    dialog.dataset.entryKind = kind;
+    dialog.setAttribute("aria-labelledby", "document-entry-title");
+    const head = el("div", "section-heading"),
+      cancel = el("button", "export", "Retour");
+    cancel.type = "button";
+    cancel.setAttribute("aria-label", "Fermer");
+    cancel.onclick = () => {
+      dialog.close();
+      if (kind === "causerie")
+        perform(() =>
+          navigation("view-home", () => taskWorkspace.enter("view-home")),
+        );
+    };
+    dialog.addEventListener("cancel", (event) => {
+      if (kind === "causerie") {
+        event.preventDefault();
+        cancel.onclick();
+      }
+    });
+    head.append(
+      el(
+        "h2",
+        "",
+        kind === "report"
+          ? "Un bilan existe déjà"
+          : "Une préparation de match existe déjà",
+      ),
+      cancel,
+    );
+    head.querySelector("h2").id = "document-entry-title";
+    const description = el(
+      "p",
+      "document-entry-context",
+      [
+        trainingDateValid(context.date)
+          ? agendaCalendarDateLabel(context.date)
+          : context.date,
+        String(context.opponent || "")
+          .split("\n")[0]
+          .slice(0, 160),
+        context.category,
+      ]
+        .filter(Boolean)
+        .join(" · ") || "Votre travail en cours",
+    );
+    const versions = el("label", "report-field", "Document à reprendre"),
+      select = el("select");
+    select.id = "document-entry-version";
+    rows.forEach((row, i) =>
+      select.append(
+        new Option(
+          row.label +
+            " · " +
+            (row.payload.title ||
+              row.payload.info?.opponent ||
+              row.payload.matchPreparation?.match ||
+              "Sans titre"),
+          String(i),
+        ),
+      ),
+    );
+    versions.append(select);
+    versions.hidden = rows.length === 1;
+    const actions = el("div", "document-entry-choices"),
+      resume = el("button", "primary document-entry-choice"),
+      create = el("button", "export document-entry-choice");
+    resume.type = create.type = "button";
+    resume.id = isReport ? "report-entry-open" : "document-entry-resume";
+    create.id = isReport ? "report-entry-create" : "document-entry-create";
+    resume.append(
+      el("strong", "", "Reprendre / Modifier"),
+      el(
+        "span",
+        "",
+        "Retrouver le contenu existant et continuer votre travail.",
+      ),
+    );
+    create.append(
+      el(
+        "strong",
+        "",
+        kind === "report" ? "Créer un nouveau bilan" : "Créer un nouveau match",
+      ),
+      el(
+        "span",
+        "",
+        kind === "report"
+          ? "Repartir avec un texte vierge. L’ancien travail sera conservé dans les versions précédentes."
+          : "Match entièrement vierge, sans joueur ni consigne. L’ancien match est conservé dans les versions précédentes.",
+      ),
+    );
+    actions.append(resume, create);
+    const status = el("p", "hint");
+    status.setAttribute("role", "status");
+    const alive = () =>
+      activeCoach.id === owner &&
+      clubNetworkGeneration === generation &&
+      (isReport || documentEntrySignature(current(kind)) === initial);
+    function choose(fresh) {
+      if (!alive()) {
+        status.textContent =
+          "Le compte ou le document a changé. Fermez cette fenêtre puis rouvrez l’onglet.";
+        state.error = status.textContent;
+        state.phase = "error";
+        return;
+      }
+      if (kind === "causerie" && fresh) {
+        if (!archive(kind, current(kind))) {
+          status.textContent = state.error;
+          state.phase = "error";
+          return;
+        }
+        dialog.close();
+        return startBlankMatch();
+      }
+      const row = isReport
+        ? candidates(kind, context)[0]
+        : rows[Number(select.value)];
+      if (!row) return;
+      state.phase = fresh ? "creating" : "opening";
+      state.error = "";
+      resume.disabled = create.disabled = true;
+      const live = current(kind),
+        sameDocument =
+          kind === "report"
+            ? live.id === row.payload.id
+            : live.documentId === row.payload.documentId;
+      let next = fresh
+        ? blank(kind, context, row.payload)
+        : structuredClone(sameDocument ? live : row.payload);
+      if (kind === "report" && context.key) next.agendaSourceKey = context.key;
+      if (
+        (fresh && !archive(kind, row.payload)) ||
+        (JSON.stringify(next) !== JSON.stringify(current(kind)) &&
+          !archive(kind, current(kind)))
+      ) {
+        status.textContent = state.error;
+        resume.disabled = create.disabled = false;
+        state.phase = "error";
+        return;
+      }
+      if (
+        JSON.stringify(next) !== JSON.stringify(current(kind)) &&
+        !replace(kind, next)
+      ) {
+        status.textContent =
+          "Le nouveau document n’a pas pu être ouvert. L’existant est conservé.";
+        state.error = status.textContent;
+        resume.disabled = create.disabled = false;
+        state.phase = "error";
+        return;
+      }
+      dialog.close();
+      openEditor(kind, continuation, fresh);
+    }
+    resume.onclick = () => choose(false);
+    create.onclick = () => choose(true);
+    dialog.append(head, description, versions, actions, status);
+    const backdrop = el("div", "document-entry-backdrop");
+    backdrop.setAttribute("aria-hidden", "true");
+    document.body.append(backdrop);
+    dialog.addEventListener("close", () => backdrop.remove(), { once: true });
+    document.body.append(dialog);
+    pending = dialog;
+    state.phase = "choice";
+    dialog.addEventListener(
+      "close",
+      () => {
+        const closingCurrent = pending === dialog;
+        if (closingCurrent) pending = null;
+        dialog.remove();
+        if (
+          closingCurrent &&
+          (state.phase === "choice" || state.phase === "error")
+        )
+          state.phase = "idle";
+      },
+      { once: true },
+    );
+    dialog.showModal();
+    resume.focus();
+    return false;
+  }
+  function showHistory(kind) {
+    if (pending?.open || $("document-version-history")?.open) return;
+    const rows = documentEntryArchives().filter((r) => r.kind === kind),
+      owner = activeCoach.id,
+      generation = clubNetworkGeneration,
+      dialog = el("dialog", "document-entry-dialog");
+    dialog.id = "document-version-history";
+    const close = el("button", "export", "Fermer");
+    close.type = "button";
+    close.onclick = () => dialog.close();
+    dialog.append(
+      el("h2", "", "Versions précédentes"),
+      close,
+      el(
+        "p",
+        "hint",
+        "Copies conservées sur cet appareil, dans votre espace personnel.",
+      ),
+    );
+    if (!rows.length) dialog.append(el("p", "", "Aucune version précédente."));
+    for (const r of rows) {
+      const section = el("section", "document-version-row"),
+        restore = el("button", "export", "Reprendre cette version");
+      restore.type = "button";
+      section.append(
+        el(
+          "strong",
+          "",
+          r.payload.title ||
+            r.payload.info?.opponent ||
+            r.payload.matchPreparation?.match ||
+            "Sans titre",
+        ),
+        el(
+          "p",
+          "hint",
+          new Date(r.at).toLocaleString("fr-FR", { timeZone: "Europe/Paris" }),
+        ),
+        restore,
+      );
+      restore.onclick = () => {
+        if (owner !== activeCoach.id || generation !== clubNetworkGeneration)
+          return dialog.close();
+        if (!archive(kind, current(kind)) || !replace(kind, r.payload))
+          return notify(state.error || "Restauration impossible.");
+        dialog.close();
+        openEditor(kind, () => {
+          if (kind === "report")
+            navigation("view-reports", () => {
+              reportTab = "general";
+              renderReportTabs();
+              renderReportContent();
+            });
+          else
+            navigation("view-pitch", () => {
+              activateTerrainBoard("composition");
+              terrainGo(0);
+              renderMatchPreparation();
+            });
+        });
+      };
+      dialog.append(section);
+    }
+    document.body.append(dialog);
+    dialog.addEventListener("close", () => dialog.remove(), { once: true });
+    dialog.showModal();
+  }
+  function refreshHistory() {
+    for (const kind of ["causerie", "report"]) {
+      const button = $("document-versions-" + kind);
+      if (button)
+        button.hidden = !documentEntryArchives().some((r) => r.kind === kind);
+    }
+  }
+  // Route main tabs, match steps and agenda shortcuts through the same entry policy.
+  const navigation = workspaceNavigation.run;
+  workspaceNavigation.run = function (parent, action) {
+    if (parent !== "view-reports" || bypass) return navigation(parent, action);
+    return request("report", () => navigation(parent, action));
+  };
+  const terrainGo = workspaceFlows.terrain.go;
+  workspaceFlows.terrain.go = function (index) {
+    if (
+      index !== 0 ||
+      bypass ||
+      document.body.classList.contains("simple-mode") ||
+      terrainBoardKind !== "composition"
+    )
+      return terrainGo(index);
+    terrainGo(0);
+    return request("causerie", () => terrainGo(0));
+  };
+  // Direct navigation buttons use the same transition before the old form can appear.
+  document.addEventListener(
+    "click",
+    (event) => {
+      if (bypass || workspaceNavigationRouting) return;
+      const button = event.target.closest("#view-reports");
+      if (!button) return;
+      event.preventDefault();
+      event.stopImmediatePropagation();
+      request(
+        "report",
+        () =>
+          navigation("view-reports", () =>
+            window.taskWorkspace?.enter("view-reports"),
+          ),
+        {},
+      );
+    },
+    true,
+  );
+  // A saved agenda report must not replace the live draft before the choice.
+  const calendarEvents = agendaCalendarEvents;
+  agendaCalendarEvents = function () {
+    return calendarEvents().map((event) => {
+      if (event.recurring || event.otherTeam) return event; // match d'une autre équipe : s'ouvre dans l'interface de cette équipe
+      if (event.kind === "match")
+        return {
+          ...event,
+          open: () => {
+            const board = agendaEventBoard(event),
+              fixture = event.fff;
+            if (!fixture && !board)
+              return notify(
+                "Cette préparation n’est plus disponible. Actualisez l’agenda.",
+              );
+            const context = fixture
+              ? {
+                  id: board?.documentId || "agenda",
+                  key: fixture.key,
+                  date: event.date,
+                  opponent: fixture.opponent || "",
+                  team: fixture.team || "",
+                  category: event.category || "",
+                }
+              : {
+                  ...documentEntryContext("causerie", board),
+                  date: event.date,
+                };
+            return request(
+              "causerie",
+              () => {
+                if (fixture) agendaFFFPrepare(fixture);
+                else homeOpenTerrain();
+              },
+              { context, force: true, managesContext: true },
+            );
+          },
+        };
+      if (event.kind !== "report") return event;
+      return {
+        ...event,
+        open: () => {
+          const reportId = event.id.slice("report:".length);
+          const payload =
+            currentReport.id === reportId
+              ? currentReport
+              : reportLibrary.find((r) => r.id === reportId);
+          if (!payload)
+            return notify(
+              "Ce bilan n’est plus disponible. Actualisez l’agenda.",
+            );
+          return request(
+            "report",
+            () =>
+              navigation("view-reports", () => {
+                reportTab = "general";
+                renderReportTabs();
+                renderReportContent();
+              }),
+            {
+              context: documentEntryContext("report", payload),
+              force: true,
+              managesContext: true,
+            },
+          );
+        },
+      };
+    });
+  };
+  const agendaReport = agendaEventReport;
+  agendaEventReport = function (event, date) {
+    const board = event && agendaEventBoard(event),
+      f = event?.fff;
+    const context =
+      event?.kind === "report"
+        ? documentEntryContext(
+            "report",
+            reportLibrary.find((r) => "report:" + r.id === event.id) ||
+              currentReport,
+          )
+        : {
+            id: "agenda",
+            key: event ? agendaMatchKeys(event)[0] : null,
+            date: event?.date || date,
+            opponent: f?.opponent || board?.matchPreparation?.opponent || "",
+            category: event?.category || "",
+            team: f?.team || board?.team || "",
+          };
+    return request("report", () => agendaReport(event, date), {
+      context,
+      force: true,
+      managesContext: true,
+    });
+  };
+  const agendaTalk = agendaEventCauserie;
+  agendaEventCauserie = function (event, date) {
+    if (event?.recurring) return agendaEventCauserie(null, event.date);
+    const board = event && agendaEventBoard(event),
+      f = event?.fff;
+    const context = {
+      id: board?.documentId || "agenda",
+      key: f?.key,
+      date: event?.date || date,
+      opponent: f?.opponent || board?.matchPreparation?.opponent || "",
+      team: f?.team || board?.team || "",
+      category: event?.category || "",
+    };
+    return request("causerie", () => agendaTalk(event, date), {
+      context,
+      force: true,
+      managesContext: true,
+    });
+  };
+  $("report-new").onclick = () =>
+    request(
+      "report",
+      () =>
+        navigation("view-reports", () => {
+          reportTab = "general";
+          renderReportTabs();
+          renderReportContent();
+        }),
+      { force: true, newDocument: true },
+    );
+  const clear = clubNetworkClear;
+  clubNetworkClear = function () {
+    pending?.close();
+    $("report-entry-banner")?.remove();
+    $("document-version-history")?.close();
+    accepted.causerie = accepted.report = null;
+    rememberAccepted();
+    state.phase = "idle";
+    clear();
+    refreshHistory();
+  };
+  window.documentEntry = {
+    request,
+    accept: (kind) => {
+      accepted[kind] = key(kind, current(kind));
+      rememberAccepted();
+      state.kind = kind;
+      state.context = documentEntryContext(kind, current(kind));
+      state.phase = "idle";
+      state.error = "";
+    },
+    perform,
+    history: showHistory,
+    getState: () => structuredClone(state),
+    refresh: refreshHistory,
+  };
+  refreshHistory();
+  let reloadHomeApplied = false;
+  function checkRestoredEntry(initial = false) {
+    if (
+      initial &&
+      performance.getEntriesByType("navigation")[0]?.type === "reload"
+    ) {
+      if(!reloadHomeApplied){reloadHomeApplied=true;perform(() => navigation("view-home", () => workspaceFlows.home.go(0)));}
+      return;
+    }
+    if (pending || (accountCoachBinding && !clubNetworkBound())) return;
+    if (inside("report") && accepted.report !== key("report", currentReport))
+      request("report", () => {
+        renderReportTabs();
+        renderReportContent();
+      });
+    else if (
+      inside("causerie") &&
+      accepted.causerie !== key("causerie", getCompositionBoard())
+    ) {
+      perform(() => {
+        activateTerrainBoard("composition");
+        terrainGo(0);
+      });
+      request("causerie", () => terrainGo(0));
+    }
+  }
+  document.addEventListener("club-session-ready", () =>
+    queueMicrotask(() => checkRestoredEntry(true)),
+  );
+  window.addEventListener("popstate", () => queueMicrotask(checkRestoredEntry));
+  checkRestoredEntry(true);
+});

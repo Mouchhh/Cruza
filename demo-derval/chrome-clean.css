@@ -1,0 +1,26 @@
+/* Ordinateur et tablette : bandeau du haut épuré, logo Cruza dans la barre latérale. Le téléphone garde sa disposition. */
+.sidebar-cruza,.header-crumb{display:none}
+@media screen and (min-width:701px){
+ .sidebar-cruza{display:flex;align-items:baseline;gap:3px;padding:26px 20px 22px;margin:0 0 8px;color:#fff!important;text-decoration:none;font-family:SMFCUnbounded,SMFCArchivo,Arial,sans-serif;font-size:36px;font-weight:700;letter-spacing:-.03em;line-height:1}
+ .sidebar-cruza i{width:10px;height:10px;border-radius:50%;background:#e8424a;flex:0 0 10px;transform:translateY(-1px)}
+ html body>header{background:#fff!important;border-bottom:1px solid #e6ebf2!important;box-shadow:none!important;min-height:62px}
+ html body>header .cruza-lockup,html body>header .brand-times{display:none!important}
+ html body>header .brand,html body.task-navigation.responsive-navigation>header .brand{gap:11px!important;flex:0 0 auto!important;margin:0!important}
+ html body>header .brand .club-logo{width:34px!important;height:34px!important}
+ html body>header .brand>span:not(.club-monogram){font-size:14px!important;letter-spacing:.01em!important}
+ html body>header{justify-content:flex-start!important}
+ .header-crumb{display:inline-flex;align-items:center;gap:10px;margin:0 auto 0 16px!important;padding-left:16px;flex:0 0 auto;border-left:1px solid #dfe5ee;font-size:13px;color:#5d7089;white-space:nowrap}
+ .header-crumb::before{content:"/";display:none}
+ html body>header .header-actions{gap:12px!important}
+ html body>header .header-actions .primary,html body>header #club-network-shortcut{background:#fff!important;color:#2855a2!important;border:1px solid #d6deea!important;box-shadow:none!important;font-weight:650}
+
+ /* Partie droite du bandeau : sélecteur d'équipe discret, connexion en simple lien, profil réduit à l'avatar et au nom court. */
+ html body>header .header-actions{gap:6px!important}
+ html body>header .team-space-trigger{background:#f2f5f9!important;border:0!important;border-radius:999px!important;box-shadow:none!important;padding:8px 14px!important;min-height:38px;color:#17305a!important}
+ html body>header .team-space-trigger small{display:none!important}
+ html body>header .team-space-trigger::before,html body>header .team-space-trigger::after{display:none!important}
+ html body>header #club-network-shortcut{background:transparent!important;border:0!important;box-shadow:none!important;color:#5d7089!important;font-size:12.5px!important;font-weight:600!important;padding:6px 10px!important;min-height:0!important}
+ html body>header #club-network-shortcut:hover{color:#2855a2!important;text-decoration:underline}
+ html body>header .coach-profile-trigger{background:transparent!important;border:0!important;box-shadow:none!important;gap:8px;padding:4px 6px!important}
+ html body>header .coach-profile-trigger>span:last-child{font-size:12.5px;color:#4a5f78;max-width:150px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+}

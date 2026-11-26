@@ -1,0 +1,239 @@
+/* Confort téléphone uniquement (≤ 700 px). L'ordinateur et la tablette large ne changent pas. */
+html body .mc-extra{display:none!important}
+@media screen and (max-width:700px){
+ html body .mc-extra{display:block!important;width:100%;text-align:left;min-height:44px}
+ html body.task-navigation.responsive-navigation #workspace-navigation{display:flex!important;flex-wrap:nowrap!important;gap:0!important;padding:4px 4px calc(4px + env(safe-area-inset-bottom,0px))!important}
+ html body.task-navigation.responsive-navigation #workspace-navigation>button{flex:1 1 0!important;order:var(--mc-order,0);min-height:56px!important;font-size:11px!important;padding:6px 2px!important;gap:3px!important;white-space:nowrap!important}
+ html body.task-navigation.responsive-navigation #workspace-navigation>button[data-mc="more"]{display:flex!important;position:absolute!important;left:-9999px!important;width:1px!important;height:1px!important;min-height:0!important;padding:0!important;opacity:0!important;pointer-events:none!important;overflow:hidden!important}
+ /* Contraste des cartes bleues de l'accueil */
+ body.home-mode .home-hero{background:#1b3f86!important;color:#fff!important}
+ body.home-mode .home-hero p,body.home-mode .home-hero .eyebrow,body.home-mode .home-hero #home-date{color:#fff!important;opacity:1!important}
+}
+
+/* Accueil téléphone : « Bonjour coach » en simple bannière */
+@media screen and (max-width:700px){
+ html body.home-mode .home-hero{padding:12px 14px!important;gap:10px!important;margin-bottom:10px!important;min-height:0!important;align-items:center!important}
+ html body.home-mode .home-hero>div>p:not(#home-date),html body.home-mode .home-hero .home-welcome-intro,html body.home-mode .home-hero .home-stats{display:none!important}
+ html body.home-mode .home-hero .eyebrow{margin:0!important;font-size:10px!important}
+ html body.home-mode .home-hero #home-date{margin:2px 0 0!important;font-size:11px!important}
+ html body.home-mode .home-hero h1{font-size:22px!important;line-height:1.15!important;margin:4px 0 0!important;padding-left:10px}
+ html body.home-mode .home-hero .home-crest{width:44px!important;height:44px!important}
+}
+/* Accueil téléphone : tout tient sur un écran, sans défilement */
+@media screen and (max-width:700px){
+ html body.home-mode #home-page-0{display:flex!important;flex-direction:column;height:calc(100dvh - 150px - var(--navigation-bottom-space,64px) - 10px);min-height:0!important}
+ html body.home-mode #home-page-0 #home-live-widgets{flex:1 1 0;min-height:0;display:grid!important;grid-template-columns:1fr!important;grid-template-rows:repeat(3,minmax(0,1fr))!important;gap:8px!important;margin:0!important}
+ html body #home-live-widgets .home-live-card{aspect-ratio:auto!important;height:auto!important;min-height:0!important;overflow:hidden;display:flex!important;flex-direction:row!important;flex-wrap:wrap;align-content:center;align-items:center!important;justify-content:space-between!important;gap:2px 12px!important;padding:10px 16px!important;text-align:left!important}
+ html body #home-live-widgets .home-live-card>:is(p,h3,.home-live-caption){display:none!important}
+ html body #home-live-widgets .home-live-card h2{flex:1 1 100%;font-size:12px!important;margin:0!important;opacity:.85}
+ html body #home-live-widgets .home-live-card .home-live-value{margin:0!important;font-size:20px!important;line-height:1.15}
+ html body #home-live-widgets .home-live-card progress{flex:1 1 100%;margin:2px 0 0!important}
+ html body #home-live-widgets .home-live-card .home-live-open{margin:0 0 0 auto!important;min-height:36px;padding:6px 12px!important;font-size:12px!important}
+ html body #home-live-widgets .home-live-group{order:1}
+ html body #home-live-widgets .home-live-training{order:2}
+ html body #home-live-widgets .home-live-form{order:3}
+}
+@media screen and (max-width:700px){html body #landscape-toggle,html body .tactic-fs-open-button{display:none!important}}
+/* Téléphone et ordinateur : on masque le bloc repliable « Réglages du match » */
+html body details:has(>summary.mc-hide-reglages){display:none!important}
+/* Téléphone : en-tête sur une seule ligne (logo, équipe, connexion, profil) */
+@media screen and (max-width:700px){
+ html body>header{display:flex!important;flex-wrap:nowrap!important;align-items:center!important;gap:8px!important;padding:6px 10px!important;height:auto!important;min-height:0!important}
+ html body>header .brand{flex:0 0 auto!important;gap:0!important}
+ html body>header .brand>span,html body>header .brand small,html body>header .season{display:none!important}
+ html body>header .brand .club-logo{width:34px!important;height:34px!important}
+ html body>header .header-actions{flex:1 1 0!important;min-width:0!important;display:flex!important;flex-wrap:nowrap!important;align-items:center!important;gap:6px!important;margin:0!important;padding:0!important}
+ html body>header .team-space-picker{flex:1 1 0!important;min-width:0!important}
+ html body>header #club-network-shortcut{flex:0 0 auto!important;font-size:11px!important;padding:6px 8px!important;line-height:1.15;max-width:84px}
+ html body>header .coach-profile-menu{flex:0 0 auto!important}
+}
+/* Téléphone : logo + nom CRUZA à gauche, équipe en petite pastille, boutons d'action, profil */
+@media screen and (max-width:700px){
+ html body>header .brand>span:not(.club-monogram){display:inline!important;font-size:15px!important;font-weight:800;letter-spacing:.04em;margin-left:8px}
+ html body>header .brand>span small{display:none!important}
+ html body>header .header-actions{justify-content:flex-end!important}
+ html body>header .team-space-picker{flex:0 1 auto!important;max-width:42%!important;width:auto!important}
+ html body>header .team-space-trigger{height:34px!important;min-height:34px!important;padding:4px 8px!important;display:flex!important;align-items:center!important;gap:4px!important}
+ html body>header .team-space-trigger small{display:none!important}
+ html body>header .team-space-trigger strong{font-size:12px!important;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0}
+ html body>header .header-actions .primary{font-size:12px!important;padding:6px 10px!important;min-height:34px!important;white-space:nowrap}
+}
+@media screen and (max-width:700px){html body>header #save{white-space:nowrap!important;flex:0 0 auto!important;font-size:11px!important;padding:6px 8px!important}}
+/* Téléphone : équipe à gauche, logo CRUZA centré, action + profil à droite */
+@media screen and (max-width:700px){
+ html body>header{position:relative!important}
+ html body>header .brand{position:absolute!important;left:50%!important;top:50%!important;transform:translate(-50%,-50%)!important;z-index:1}
+ html body>header .header-actions{flex:1 1 auto!important;justify-content:flex-start!important}
+ html body>header .team-space-picker{max-width:34%!important}
+ html body>header #save{margin-left:auto!important}
+ html body>header .coach-profile-menu{margin-left:auto!important}
+ html body>header #save+.coach-profile-menu{margin-left:6px!important}
+}
+@media screen and (max-width:700px){html body>header .team-space-picker{margin:0!important}html body>header .coach-profile-menu{margin-left:6px!important}}
+@media screen and (max-width:700px){html body>header #club-network-shortcut{display:none!important}}
+@media screen and (max-width:700px){
+ html body>header .team-space-picker{margin:0 auto 0 0!important}
+ html body>header #save{margin-left:0!important;padding:6px 7px!important;font-size:11px!important}
+ html body>header .brand>span:not(.club-monogram){font-size:13px!important;margin-left:6px!important}
+ html body>header .brand .club-logo{width:30px!important;height:30px!important}
+}
+@media screen and (max-width:700px){html body>header #save{display:none!important}}
+html body .mc-step-label{display:none}
+/* Téléphone : page Séances allégée */
+@media screen and (max-width:700px){
+ html body #workspace-save-open{display:none!important}
+ html body #training-new,html body #training-save,html body #training-pdf{flex:1 1 0!important;min-width:0!important;padding:8px 4px!important;font-size:12px!important;line-height:1.2}
+ html body nav.mc-step-stepper>button{display:none!important}
+ html body nav.mc-step-stepper{margin:0 0 6px!important;padding:0!important;background:none!important;border:0!important;min-height:0!important}
+ html body nav.mc-step-stepper .mc-step-label{grid-column:1/-1}
+ html body .mc-step-label{display:block;margin:8px 0 4px;font-size:13px;font-weight:700;color:#304f75}
+ html body .mc-field-link{display:block;width:100%;margin:12px 0 4px}
+}
+@media screen and (max-width:700px){
+ html body #training-field-open,html body #training-exercises-resume,html body #bible-group-context,html body details.mc-hide{display:none!important}
+ html body .training-catalogue-action{display:flex!important;gap:8px!important}
+ html body #training-custom-add,html body #training-personal-exercises{flex:1 1 0!important;min-height:44px}
+ html body #bible-results{margin:10px 0 6px!important;font-size:13px!important;font-weight:700}
+}
+@media screen and (max-width:700px){
+ html body .mc-error{margin:6px 0 10px;padding:10px 12px;border-radius:10px;background:#fdeaea;border:1px solid #e24b4a;color:#8a1c1c;font-size:13px;font-weight:600}
+ html body .training-step-footer{bottom:var(--navigation-bottom-space,64px)!important;z-index:50!important;background:#f3f6fb;padding-bottom:8px}
+}
+html body .mc-search-row{display:contents}
+@media screen and (max-width:700px){
+ html body #training-library-page .training-step-heading h2,html body #training-resume-session{display:none!important}
+ html body #training-library-page .training-step-heading{margin:0!important;min-height:0!important}
+ html body .mc-search-row{display:flex!important;gap:8px;align-items:center;margin:0 0 10px}
+ html body .mc-search-row .training-library-search{flex:1 1 0;min-width:0;font-size:0!important;margin:0!important}
+ html body .mc-search-row .training-library-search input{font-size:16px!important;width:100%;min-height:44px}
+ html body .mc-search-row #training-create-session{flex:0 0 auto;min-height:44px;padding:8px 12px!important;white-space:nowrap}
+}
+/* Téléphone : « Créer mon exercice » — terrain pleine largeur, palette en bandeau qui défile dessous */
+@media screen and (max-width:700px){
+ html body #exercise-studio-board .studio-board-layout{display:flex!important;flex-direction:column!important;gap:8px!important;height:auto!important}
+ html body #exercise-studio-board .studio-stage{order:1!important;width:100%!important;min-width:0!important;height:auto!important}
+ html body #exercise-studio-board .studio-stage canvas{width:100%!important;height:auto!important;max-height:none!important}
+ html body #exercise-studio-board nav.tactical-tools{order:2!important;display:flex!important;flex-direction:column!important;width:100%!important;height:auto!important;gap:6px!important;padding:6px!important;overflow:visible!important}
+ html body #exercise-studio-board nav.tactical-tools .studio-tools{display:flex!important;flex-direction:row!important;flex-wrap:nowrap!important;overflow-x:auto!important;gap:6px!important;width:100%!important;height:auto!important;padding:2px 0!important;-webkit-overflow-scrolling:touch}
+ html body #exercise-studio-board nav.tactical-tools .studio-tools>*{flex:0 0 auto!important}
+ html body #exercise-studio-board nav.tactical-tools .studio-tools button{flex:0 0 62px!important;width:62px!important;min-height:64px!important}
+ html body #exercise-studio-board nav.tactical-tools>button{display:inline-flex!important;width:auto!important}
+}
+@media screen and (max-width:700px){
+ html body #exercise-studio-board nav.tactical-tools{flex-direction:row!important;flex-wrap:wrap!important;align-items:stretch!important}
+ html body #exercise-studio-board nav.tactical-tools .studio-tools{flex:1 1 100%!important;display:block!important;overflow:visible!important}
+ html body #exercise-studio-board nav.tactical-tools .studio-tools>.exercise-board-actions{display:flex!important;flex-direction:row!important;flex-wrap:nowrap!important;overflow-x:auto!important;gap:6px!important;grid-template-columns:none!important;width:100%!important;height:auto!important;padding:2px 0 6px!important}
+ html body #exercise-studio-board nav.tactical-tools>button{flex:1 1 calc(20% - 6px)!important;min-width:0!important;min-height:44px!important;width:auto!important;padding:4px!important}
+}
+@media screen and (max-width:700px){
+ html body #exercise-studio-board .studio-stage{justify-content:center!important;align-items:flex-start!important}
+ html body #exercise-studio-board .studio-stage canvas{width:auto!important;height:calc(100dvh - 398px)!important;max-width:100%!important;aspect-ratio:1500/2400}
+ html body #exercise-studio-board .studio-stage canvas[data-portrait="false"]{width:100%!important;height:auto!important;aspect-ratio:2400/1500}
+}
+/* Téléphone : liste « Mes séances » plus claire — recherche + créer, filtres sur une ligne, cartes avec Ouvrir / Supprimer */
+@media screen and (max-width:700px){
+ html body #training-library-page .report-library,html body #training-library-page>p.hint{display:none!important}
+ html body #training-library-page>*{margin-top:0!important;margin-bottom:10px!important}
+ html body #training-library-page .training-session-filters{display:grid!important;grid-template-columns:1fr 1fr!important;gap:8px!important}
+ html body #training-library-page .training-session-filters label{font-size:11px!important;gap:3px!important;margin:0!important;min-width:0}
+ html body #training-library-page .training-session-filters select{min-height:44px;font-size:16px!important;padding:6px 8px!important;width:100%}
+ html body #training-library-page .training-session-results{font-size:12px!important;color:#5d7391;margin-bottom:6px!important}
+ html body #training-library-page .training-saved-card{display:flex!important;flex-wrap:wrap!important;gap:8px!important;padding:12px!important}
+ html body #training-library-page .training-saved-card>div{flex:1 1 100%!important}
+ html body #training-library-page .training-saved-card>button{flex:1 1 0!important;min-height:44px}
+ html body .training-workspace-tabs,html body #training-space>.task-section-tabs{margin-bottom:8px!important}
+}
+/* Téléphone : onglets répartis à égalité, Agenda allégé, Assistant retiré */
+@media screen and (max-width:700px){
+ html body .task-section-tabs{display:grid!important;grid-auto-flow:column!important;grid-auto-columns:minmax(0,1fr)!important;grid-template-columns:none!important;gap:6px!important}
+ html body .task-section-tabs .task-section-tab{width:auto!important;min-width:0!important;text-align:center;justify-content:center}
+ html body #club-assistant-open{display:none!important}
+ html body #coach-agenda-new{display:none!important}
+ html body #coach-agenda-new~*{margin:0}
+ html body .reports-heading .report-actions{display:flex!important;gap:8px!important;flex-wrap:nowrap!important}
+ html body .reports-heading .report-actions>button{flex:1 1 0!important;min-width:0!important;font-size:13px!important;min-height:44px;padding:6px 8px!important}
+ html body .agenda-day-details p.hint,html body .agenda-overview-note,html body .agenda-overview-card small,html body #training-themes-help,html body #training-library-page .training-step-heading p{display:none!important}
+}
+/* Téléphone : Bilans — étape par étape */
+html body #report-tabs .mc-step-label{display:none}
+@media screen and (max-width:700px){
+ html body #report-tabs>button{display:none!important}
+ html body #report-tabs{display:block!important;margin:0 0 6px!important;padding:0!important;background:none!important;border:0!important;min-height:0!important}
+ html body #report-tabs .mc-step-label{display:block}
+ html body .report-actions-dock{bottom:var(--navigation-bottom-space,64px)!important;z-index:50!important;background:#f3f6fb}
+ html body #after-match .report-causerie-import p,html body #after-match .report-panel>p.hint:not([role]),html body #after-match .hint:not([role]){display:none!important}
+ html body #report-new,html body #report-delete{min-height:44px;font-size:13px!important}
+}
+@media screen and (max-width:700px){
+ html body .reports-heading .report-actions{display:grid!important;grid-template-columns:1fr 1fr!important;gap:8px!important;width:100%!important}
+ html body .reports-heading .report-actions>.report-header-library{grid-column:1/-1!important;width:100%!important;display:flex!important;align-items:center;gap:8px}
+ html body .reports-heading .report-actions>.report-header-library select{flex:1 1 0;min-width:0}
+ html body .reports-heading .report-actions>button{width:100%!important;min-width:0!important;padding:6px 8px!important}
+}
+@media screen and (max-width:700px){
+ html body.reports-mode #report-previous{display:inline-flex!important;align-items:center;justify-content:center;flex:0 0 38%!important;min-height:44px}
+ html body.reports-mode .report-actions-dock{justify-content:space-between!important;gap:8px!important}
+ html body.reports-mode #report-next{flex:1 1 0!important}
+}
+@media screen and (max-width:700px){html body.document-completed-report #report-tabs .mc-step-label{display:none!important}}
+@media screen and (max-width:700px){
+ html body>header .coach-profile-trigger{width:44px!important;height:44px!important;min-height:44px!important;padding:0!important;gap:0!important;justify-content:center!important;align-items:center!important}
+ html body>header .coach-profile-avatar{margin:0!important}
+ html body>header .coach-profile-name{display:none!important}
+}
+/* Écran de connexion du club : pas de menu du bas tant qu'on n'est pas connecté */
+@media screen and (max-width:700px){
+ html.club-private-request:not(.club-authenticated) body.task-navigation.responsive-navigation #workspace-navigation,
+ html.club-private-request:not(.club-authenticated) body .mc-extra{display:none!important}
+}
+/* Téléphone : en-tête sans chevauchement, même avec un long nom de club (équipe | logo + nom | profil) */
+@media screen and (max-width:700px){
+ html body>header{position:relative!important;z-index:120!important}
+ html body>header .header-actions{display:contents!important}
+ html body>header .team-space-picker{order:1!important;flex:0 1 36%!important;max-width:36%!important;margin:0!important}
+ html body>header .brand{order:2!important;position:static!important;transform:none!important;flex:1 1 0!important;min-width:0!important;justify-content:center!important;overflow:hidden}
+ html body>header .brand>span:not(.club-monogram){min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:13px!important;margin-left:6px!important}
+ html body>header #save{order:3!important}
+ html body>header .coach-profile-menu{order:4!important;margin-left:0!important}
+}
+@media screen and (max-width:700px){html body>header .brand>span:not(.club-monogram){font-size:12px!important;letter-spacing:0!important}}
+@media screen and (max-width:700px){html body>header .club-save-indicator,html body>header #club-save-indicator{display:none!important}}
+/* Téléphone : champs de saisie à 16 px, sinon l'iPhone zoome dans la page dès qu'on touche un champ */
+@media screen and (max-width:700px){
+ html body input:not([type=checkbox]):not([type=radio]):not([type=range]):not([type=color]):not([type=file]),html body select,html body textarea{font-size:16px!important}
+}
+/* Téléphone : logo Cruza × logo du club à gauche, équipe réduite, profil à droite */
+@media screen and (max-width:700px){
+ html body>header .cruza-lockup{order:0!important}
+ html body>header .brand-times{order:0!important}
+ html body>header .brand{order:1!important;justify-content:flex-start!important;flex:1 1 0!important}
+ html body>header .team-space-picker{order:2!important;flex:0 1 auto!important;max-width:30%!important}
+ html body>header .team-space-trigger{padding:4px 7px!important;min-height:34px!important}
+ html body>header .team-space-trigger strong{font-size:11px!important;max-width:64px}
+ html body>header .coach-profile-menu{order:3!important}
+}
+@media screen and (max-width:700px){
+ html body>header .brand>span:not(.club-monogram){display:none!important}
+ html body>header .brand{flex:0 0 auto!important}
+ html body>header .brand .club-logo{width:34px!important;height:34px!important}
+ html body>header .team-space-picker{flex:1 1 0!important;max-width:none!important;min-width:0!important;margin-left:6px!important}
+ html body>header .team-space-trigger{width:100%!important}
+ html body>header .team-space-trigger strong{max-width:none!important;font-size:12px!important}
+}
+/* Téléphone : équipe réduite à gauche, logos Cruza × club au centre de la barre, profil à droite */
+@media screen and (max-width:700px){
+ html body>header{display:grid!important;grid-template-columns:minmax(0,1fr) auto auto auto minmax(0,1fr)!important;align-items:center!important;column-gap:0!important}
+ html body>header .team-space-picker{grid-column:1!important;order:0!important;justify-self:start!important;max-width:100%!important;width:auto!important;flex:none!important;margin:0!important}
+ html body>header .team-space-trigger{width:auto!important;max-width:100%!important}
+ html body>header .team-space-trigger strong{font-size:11px!important;max-width:82px!important}
+ html body>header .cruza-lockup{grid-column:2!important;order:0!important}
+ html body>header .brand-times{grid-column:3!important;order:0!important;margin:0 8px!important}
+ html body>header .brand{grid-column:4!important;order:0!important;flex:none!important;justify-content:center!important}
+ html body>header .coach-profile-menu{grid-column:5!important;order:0!important;justify-self:end!important}
+ html body>header #save{display:none!important}
+}
+@media screen and (max-width:700px){
+ html body>header .team-space-picker,html body>header .cruza-lockup,html body>header .brand-times,html body>header .brand,html body>header .coach-profile-menu{grid-row:1!important}
+ html body.home-mode #home-page-0 #home-live-widgets{grid-template-rows:repeat(3,minmax(0,1fr))!important}
+ html body .home-photo-banner{margin-top:10px;flex:0 0 auto}
+}

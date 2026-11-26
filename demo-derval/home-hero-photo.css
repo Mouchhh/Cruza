@@ -1,0 +1,5 @@
+/* Bandeau d'accueil avec photo : texte blanc, bords nets, hauteur un peu plus généreuse pour laisser voir la photo. */
+html body.home-mode .home-hero.home-hero-has-photo{border:1px solid #ffffff22;border-radius:16px;min-height:200px;overflow:hidden;box-shadow:0 10px 30px #0a182e30}
+html body.home-mode .home-hero.home-hero-has-photo :is(h1,p,.eyebrow,.home-welcome-intro,.home-last-saved){color:#fff!important}
+html body.home-mode .home-hero.home-hero-has-photo .eyebrow{color:#cfe0f7!important}
+@media print{html body.home-mode .home-hero.home-hero-has-photo{background:#fff!important}}

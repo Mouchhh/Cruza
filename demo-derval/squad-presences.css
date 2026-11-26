@@ -1,0 +1,53 @@
+/* Effectif → Présences : tableau joueur × séances, boutons P / A. */
+.squad-presences[hidden]{display:none!important}
+.squad-presences-mode .squad-list,.squad-presences-mode .monthly-review,.squad-presences-mode .squad-category-filter,.squad-presences-mode .squad-tools,.squad-presences-mode .squad-position-filters,.squad-presences-mode #squad-followup,.squad-presences-mode .player-monthly-controls,.squad-presences-mode .player-stats-season-filter{display:none!important}
+.squad-presences{margin-top:14px;color:#17305a}
+.squad-presences-title{font-size:clamp(22px,3vw,30px);margin:6px 0 4px;color:#17305a}
+.squad-presences-head{display:flex;align-items:center;flex-wrap:wrap;gap:10px;margin:14px 0}
+.squad-presences-head strong{font-size:18px;min-width:240px;text-align:center}
+.squad-presences-head button{min-height:40px;min-width:40px}
+.squad-presences-table{background:#fff;border:1px solid #e3e8f0;border-radius:16px;overflow:hidden}
+.squad-presences-row{display:grid;grid-template-columns:minmax(150px,1.3fr) repeat(var(--cols,1),minmax(150px,1fr));align-items:center;gap:8px;padding:10px 18px;border-top:1px solid #edf0f5}
+.squad-presences-row:first-child{border-top:0}
+.squad-presences-header{background:#f6f8fb;padding-top:14px;padding-bottom:14px;font-size:11.5px;color:#6b7c92;text-transform:uppercase;letter-spacing:.05em}
+.squad-presences-col{display:flex;flex-direction:column;gap:3px;text-transform:none;letter-spacing:0}
+.squad-presences-col b{font-size:13px;color:#17305a;text-transform:capitalize}
+.squad-presences-col small{font-size:12px;color:#5d7089}
+.squad-presences-all{align-self:flex-start;border:0;background:transparent;color:#2855a2;font-size:12px;font-weight:700;cursor:pointer;padding:2px 0;text-decoration:underline;text-underline-offset:3px}
+.squad-presences-name{font-weight:650;font-size:14px;color:#17305a}
+.squad-presences-cell{display:flex;gap:6px}
+.squad-presences-toggle{width:40px;height:36px;border:1px solid #d8e0ea;border-radius:8px;background:#fff;color:#5d7089;font-weight:700;font-size:13px;cursor:pointer}
+.squad-presences-toggle.present[aria-pressed=true]{background:#e4f4ea;border-color:#58a679;color:#1f6b45}
+.squad-presences-toggle.absent[aria-pressed=true]{background:#fbe8e8;border-color:#d27a7a;color:#9b2c2c}
+@media(max-width:700px){
+ .squad-presences-row{grid-template-columns:minmax(110px,1.2fr) repeat(var(--cols,1),minmax(84px,1fr));padding:10px 10px;gap:6px}
+ .squad-presences-table{overflow-x:auto}
+ .squad-presences-row{min-width:calc(110px + var(--cols,1) * 90px)}
+ .squad-presences-toggle{width:36px;height:34px}
+ .squad-presences-head strong{min-width:0;flex:1 1 100%;order:-1;text-align:left}
+}
+
+/* Téléphone : une séance à la fois (pastilles en haut), puis les joueurs avec de gros boutons P / A. */
+.squad-presences-chips{display:flex;gap:8px;overflow-x:auto;padding:2px 0 10px;margin:0 -2px;scrollbar-width:none}
+.squad-presences-chips::-webkit-scrollbar{display:none}
+.squad-presences-chip{flex:0 0 auto;border:1px solid #d8e0ea;background:#fff;color:#4a5f78;border-radius:999px;padding:9px 16px;font-size:13.5px;font-weight:650;min-height:42px;cursor:pointer;white-space:nowrap;text-transform:capitalize}
+.squad-presences-chip[aria-pressed=true]{background:#17305a;border-color:#17305a;color:#fff}
+.squad-presences-card{background:#fff;border:1px solid #e3e8f0;border-radius:16px;overflow:hidden}
+.squad-presences-cardhead{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:14px 16px;background:#f6f8fb;border-bottom:1px solid #e9eef5}
+.squad-presences-cardtitle{display:flex;flex-direction:column;gap:2px;min-width:0}
+.squad-presences-cardtitle strong{font-size:15px;color:#17305a;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.squad-presences-cardtitle small{font-size:12.5px;color:#5d7089}
+.squad-presences-allbtn{flex:0 0 auto;border:1px solid #cdd7e4;background:#fff;color:#2855a2;border-radius:10px;padding:9px 12px;font-size:13px;font-weight:700;min-height:40px;cursor:pointer}
+.squad-presences-line{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:8px 14px;border-top:1px solid #edf0f5}
+.squad-presences-line:first-of-type{border-top:0}
+.squad-presences-line .squad-presences-name{font-size:15px;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+@media(max-width:700px){
+ .squad-presences-title{font-size:22px;margin:2px 0 2px}
+ .squad-presences>.hint{display:none}
+ .squad-presences-head{margin:8px 0}
+ .squad-presences-head strong{font-size:16px;order:0;flex:1 1 auto;text-align:center;min-width:0}
+ .squad-presences-head{flex-wrap:nowrap}
+ .squad-presences-head button{min-height:42px;min-width:42px;flex:0 0 auto}
+ .squad-presences-head button:last-child{display:none}
+ .squad-presences-line .squad-presences-toggle{width:50px;height:44px;font-size:15px}
+}

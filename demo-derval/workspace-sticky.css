@@ -1,0 +1,179 @@
+/* Shared page geometry: a reserved desktop rail and one aligned content column. */
+@media screen {
+  body.responsive-navigation {
+    --navigation-bottom-space: 0px;
+    --navigation-rail-width: 176px;
+    --workspace-content-width: 1600px;
+    --workspace-gutter: clamp(14px, 2vw, 32px);
+    box-sizing: border-box;
+  }
+  body.task-navigation.responsive-navigation > header,
+  body.task-navigation.responsive-navigation > main {
+    box-sizing: border-box;
+    width: 100%;
+    max-width: var(--workspace-content-width);
+    min-width: 0;
+    margin-inline: auto;
+    padding-inline: var(--workspace-gutter);
+  }
+  body.task-navigation.responsive-navigation > main {
+    padding-top: 12px;
+  }
+  body.task-navigation.responsive-navigation #workspace-navigation {
+    position: fixed;
+    z-index: 100;
+    box-sizing: border-box;
+    margin: 0;
+    background: var(--club-navy, #142d50);
+    border: 1px solid #345278;
+    box-shadow: 0 6px 24px #142d5029;
+    isolation: isolate;
+  }
+  body.responsive-navigation #workspace-navigation > button {
+    display: flex !important;
+    align-items: center;
+    gap: 10px;
+    min-width: 0;
+    margin: 0;
+    border-radius: 10px;
+  }
+  .navigation-icon {
+    width: 22px;
+    height: 22px;
+    flex: 0 0 22px;
+    pointer-events: none;
+  }
+  .navigation-label {
+    min-width: 0;
+  }
+  body.responsive-navigation #workspace-navigation > button:focus-visible {
+    outline: 3px solid #fff;
+    outline-offset: -3px;
+  }
+  body.responsive-navigation #task-section-navigation {
+    margin-top: 0;
+  }
+}
+/* A mouse-driven laptop gets the same spacious dock as a desktop. */
+@media screen and (min-width: 1100px) and (hover: hover) and (pointer: fine) {
+  /* Reserve the rail once on the page, rather than offsetting each view. */
+  body.responsive-navigation {
+    padding-left: var(--navigation-rail-width);
+  }
+  body.task-navigation.responsive-navigation #workspace-navigation {
+    top: 0;
+    bottom: 0;
+    left: 0;
+    width: var(--navigation-rail-width);
+    height: 100dvh;
+    max-height: 100dvh;
+    overflow-y: auto;
+    display: flex !important;
+    flex-direction: column;
+    flex-wrap: nowrap;
+    padding: 20px 12px;
+    gap: 6px;
+    border: 0;
+    border-right: 1px solid #345278;
+    border-radius: 0;
+    box-shadow: none;
+    scrollbar-width: thin;
+  }
+  body.task-navigation.responsive-navigation #workspace-navigation > button {
+    width: 100%;
+    justify-content: flex-start;
+    min-height: 54px;
+    padding: 10px 9px !important;
+    font-size: 13px !important;
+    text-align: left;
+    white-space: normal;
+  }
+}
+/* Tablets (including large touch tablets) and phones keep all seven destinations. */
+@media screen and (max-width: 1099px),
+  screen and (hover: none),
+  screen and (pointer: coarse) {
+  body.responsive-navigation {
+    --navigation-bottom-space: calc(82px + env(safe-area-inset-bottom, 0px));
+    padding-bottom: var(--navigation-bottom-space) !important;
+  }
+  html {
+    scroll-padding-bottom: calc(
+      var(--navigation-bottom-clearance, 82px) + 12px
+    );
+  }
+  body.task-navigation.responsive-navigation #workspace-navigation {
+    top: auto;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    width: 100%;
+    display: grid !important;
+    grid-template-columns: repeat(8, minmax(0, 1fr));
+    gap: 2px;
+    padding: 6px max(4px, env(safe-area-inset-right, 0px))
+      calc(6px + env(safe-area-inset-bottom, 0px))
+      max(4px, env(safe-area-inset-left, 0px));
+    border: 0;
+    border-top: 1px solid #345278;
+    border-radius: 0;
+    box-shadow: 0 -2px 8px #142d5014;
+  }
+  body.task-navigation.responsive-navigation #workspace-navigation > button {
+    flex-direction: column;
+    justify-content: center;
+    gap: 4px;
+    min-height: 64px;
+    padding: 6px 1px !important;
+    font-size: 10px !important;
+    line-height: 1.15;
+    text-align: center;
+    white-space: normal;
+  }
+  body.responsive-navigation .flow-footer {
+    bottom: var(--navigation-bottom-space);
+  }
+}
+@media print {
+  body.responsive-navigation #workspace-navigation {
+    display: none !important;
+  }
+}
+/* Existing desktop-height editors also run on large touch tablets. */
+@media screen and (min-width: 1000px) and (min-height: 650px) {
+  body.responsive-navigation .flow-root:not([hidden]),
+  body.responsive-navigation.reports-mode #after-match {
+    height: calc(
+      100dvh - var(--flow-top, 180px) - 8px - var(--navigation-bottom-space)
+    );
+  }
+  body.responsive-navigation.training-mode #training-space {
+    height: calc(
+      100dvh - var(--training-top, 160px) - 6px - var(--navigation-bottom-space)
+    );
+  }
+}
+/* Preserve the private-club login gate after moving the dock outside main. */
+html.club-private-request:not(.club-authenticated) body #workspace-navigation {
+  display: none !important;
+}
+@media screen and (max-width: 379px) {
+  body.task-navigation.responsive-navigation #workspace-navigation {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 2px;
+    padding-inline: 4px;
+  }
+}
+@media screen {
+  html.club-private-request:not(.club-authenticated)
+    body.responsive-navigation {
+    padding-left: 0;
+    padding-bottom: 0 !important;
+  }
+}
+
+@media screen and (min-width: 380px) and (max-width: 650px) {
+  body.task-navigation.responsive-navigation #workspace-navigation > button {
+    font-size: 9px !important;
+  }
+}

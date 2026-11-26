@@ -1,0 +1,10 @@
+CRUZA — Démo Seniors R2 · Derval
+
+Extrayez tout le dossier puis ouvrez index.html dans Chrome ou Edge.
+L’éditeur Cruza ouvre la causerie Derval. Les quatre boutons bleus ouvrent
+les situations dans le tableau tactique. « Retour à la causerie Derval »
+ramène à l’éditeur. Les modifications restent dans ce navigateur.
+
+Si votre navigateur bloque les fichiers locaux, ouvrez un terminal dans
+ce dossier, lancez python -m http.server 8736 puis ouvrez
+http://localhost:8736/index.html

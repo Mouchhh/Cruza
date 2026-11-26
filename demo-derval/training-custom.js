@@ -1,0 +1,56 @@
+// Création libre : les exercices du coach font partie du document de séance.
+const customTrainingLabels={title:'Nom de l’exercice',goal:'Objectif',organisation:'Organisation / répartition des joueurs',instructions:'Consignes',material:'Matériel',success:'Critère de réussite'};
+function trainingCustomAdaptationValid(a){return a&&a.version===1&&Number.isInteger(a.players)&&a.players>=2&&a.players<=80&&Number.isInteger(a.keepers)&&a.keepers>=0&&a.keepers<=12&&typeof a.source==='string'&&a.source.length<=200&&typeof a.rotations==='string'&&a.rotations.length<=4000&&Array.isArray(a.groups)&&a.groups.length>=1&&a.groups.length<=40&&a.groups.every(g=>g&&Number.isInteger(g.players)&&g.players>=2&&Number.isInteger(g.keepers)&&g.keepers>=0&&g.keepers<=g.players-2)&&a.groups.reduce((n,g)=>n+g.players,0)===a.players&&a.groups.reduce((n,g)=>n+g.keepers,0)===a.keepers;}
+function trainingCustomValid(ex){return ex&&(ex.importedExerciseView===undefined||Number.isInteger(ex.importedExerciseView)&&ex.importedExerciseView>=0&&ex.importedExerciseView<=20)&&(ex.importedExerciseId===undefined||typeof ex.importedExerciseId==='string'&&suppliedImportedExerciseIds.has(ex.importedExerciseId))&&(ex.adaptation===undefined||trainingCustomAdaptationValid(ex.adaptation))&&Object.keys(customTrainingLabels).every(k=>typeof ex[k]==='string'&&ex[k].length<=(k==='title'?100:3000))&&ex.title.trim().length>0&&['game','possession','circuit','duel'].includes(ex.kind)&&Number.isInteger(ex.width)&&ex.width>=6&&ex.width<=68&&Number.isInteger(ex.length)&&ex.length>=6&&ex.length<=105&&(!Object.hasOwn(ex,"board")||validExerciseBoard(ex.board))&&(ex.bibleOrigin===undefined||ex.bibleOrigin&&trainingExercises.some(e=>e.id===ex.bibleOrigin.exerciseId)&&Array.isArray(ex.bibleOrigin.sourceIds)&&ex.bibleOrigin.sourceIds.length<=10&&ex.bibleOrigin.sourceIds.every(id=>Object.hasOwn(bibleSources,id)));}
+function trainingExerciseForBlock(block){return block.exerciseId==='custom'?{id:'custom',title:block.custom.title,method:'Création du coach',theme:'Exercice personnalisé',custom:block.custom}:{...trainingExercises.find(e=>e.id===block.exerciseId),...(block.bibleVariant?{bibleVariant:block.bibleVariant,title:block.bibleVariant.title||trainingExercises.find(e=>e.id===block.exerciseId).title}:{})};}
+function trainingCustomDetail(custom,session){
+ const root=el('div','training-detail');
+ for(const key of ['goal','organisation','instructions','material','success'])if(custom[key].trim()){root.append(el('h4','',customTrainingLabels[key]),el('p','training-custom-text',custom[key]));}
+ const adaptation=custom.adaptation;if(adaptation){root.append(el('h4','','Groupes et rotations adaptés'),el('p','training-custom-text',adaptation.groups.map((g,i)=>'Groupe '+(i+1)+' : '+g.players+' joueurs dont '+g.keepers+' gardien(s)').join('\n')+'\n'+adaptation.rotations),el('p','hint','Source : '+adaptation.source));if(session.players!==adaptation.players||session.keepers!==adaptation.keepers)root.append(el('p','training-alert','L’effectif a changé depuis cette adaptation. Réadaptez les groupes et les dimensions avant utilisation.'));}
+ const diagramSession=adaptation?{...session,players:adaptation.groups[0].players,keepers:adaptation.groups[0].keepers}:session;
+ const exercise={id:'custom',title:custom.title,goal:'Placement indicatif selon le type d’exercice, à adapter à vos consignes.',kind:custom.kind,width:custom.width,length:custom.length,target:diagramSession.players};
+ if(custom.board){root.append(custom.board.viewer==="bible"?trainingBibleExercisePreview(custom):exerciseBoardPreview(custom.board,custom.title));if(adaptation)root.append(el('p','training-alert','Schéma personnalisé conservé : vérifiez que ses joueurs et déplacements correspondent aux groupes adaptés.'));}else root.append(el('p','hint','Schéma indicatif : répartition des '+diagramSession.players+' joueurs du groupe représenté. Il ne traduit pas automatiquement vos consignes libres.'),trainingDiagram(exercise,diagramSession));
+ const bounds=bibleAvailable(session),available=[bounds.width,bounds.length];root.append(el('p','hint','Zone demandée : '+custom.width+' × '+custom.length+' m · espace disponible : '+available[0]+' × '+available[1]+' m (repères à ajuster sur place).'));
+ if(custom.width>available[0]||custom.length>available[1])root.append(el('p','training-alert','La zone demandée dépasse l’espace disponible. Le schéma est limité à la surface disponible : adaptez les dimensions ou l’organisation.'));
+ if(custom.bibleOrigin){const original=trainingExercises.find(e=>e.id===custom.bibleOrigin.exerciseId);root.append(el('p','hint','Création libre du coach à partir de « '+original.title+' ». Les modifications et déplacements sont personnels.'),bibleSourceDetails(original));}
+ return root;
+}
+let trainingCustomEditing=null,trainingCustomOrigin=null;
+let trainingCustomFreshId=null;
+function openCustomTrainingExercise(block=null){
+ if(!applyTrainingForm())return notify('Vérifiez les paramètres de la séance.');
+ if(!block&&currentTraining.blocks.length>=20)return notify('20 blocs maximum.');
+ trainingCustomEditing=block?.id||null;trainingCustomOrigin=block?.custom?.bibleOrigin||null;const bounds=bibleAvailable(currentTraining),available=[Math.min(68,bounds.width),Math.min(105,bounds.length)];
+ const custom=block?.custom||{title:'',goal:'',organisation:'',instructions:'',material:'',success:'',kind:'game',width:available[0],length:available[1]};
+ for(const key of [...Object.keys(customTrainingLabels),'kind','width','length'])$('custom-training-'+key).value=custom[key];
+ $('custom-training-duration').value=block?.duration||Math.min(15,Math.max(1,currentTraining.duration-trainingTotal()||12));$('custom-training-dialog-title').textContent=block?'Modifier mon exercice':'Créer mon exercice';$('custom-training-dialog').showModal();
+}
+function renderManualTrainingMode(){
+ const manual=currentTraining.creationMode==='manual';$('training-manual').classList.toggle('active',manual);$('training-manual').setAttribute('aria-pressed',String(manual));$('training-assisted').classList.toggle('active',!manual);$('training-assisted').setAttribute('aria-pressed',String(!manual));document.body.classList.toggle('training-manual-mode',manual);
+ $('training-themes-help').textContent=manual?'Choisissez une intention de jeu et sa sous-partie. Vous construisez librement tout le contenu du déroulé.':'Choisissez une intention de jeu et sa sous-partie. Le générateur construit une proposition à valider par le coach.';
+ const left=currentTraining.duration-trainingTotal();$('training-remaining').textContent=left>0?left+' min à répartir':left===0?'Durée prévue atteinte':Math.abs(left)+' min au-delà de la durée prévue';
+}
+document.addEventListener('DOMContentLoaded',()=>{
+ const before=renderTrainingBlocks;renderTrainingBlocks=function(){before();renderManualTrainingMode();};
+ $('training-manual').onclick=()=>{
+  if(currentTraining.creationMode==='manual')return $('training-title').focus();
+  if(!applyTrainingForm())return;
+  if(currentTraining.blocks.length&&!confirm('Créer une nouvelle séance vide avec ces paramètres ? Enregistrez la séance actuelle avant de continuer si vous souhaitez la conserver.'))return;
+  const next=structuredClone(currentTraining);next.id=crypto.randomUUID();next.title='';next.updatedAt='';next.blocks=[];next.creationMode='manual';delete next.clubAdvice;delete next.coachingLoad;if(typeof workspaceReplaceDraft==='function'){if(!workspaceReplaceDraft('training',next))return;}else{const previous=currentTraining;currentTraining=next;if(!saveTrainingDraft()){currentTraining=previous;return;}syncTrainingForm();renderTrainingBlocks();renderTrainingLibrary();}$('training-title').focus();notify('Séance vierge créée : choisissez vos paramètres, puis ajoutez vos exercices.');
+ };
+ $('training-assisted').onclick=()=>{if(!applyTrainingForm())return;currentTraining.creationMode='assisted';saveTrainingDraft();renderManualTrainingMode();};
+ $('training-custom-add').onclick=()=>openCustomTrainingExercise();$('training-custom-catalogue').onclick=()=>$('training-search').focus();$('custom-training-close').onclick=()=>$('custom-training-dialog').close();
+ $('custom-training-form').onsubmit=event=>{
+  event.preventDefault();const custom=Object.fromEntries(Object.keys(customTrainingLabels).map(key=>[key,$('custom-training-'+key).value.trim()]));custom.kind=$('custom-training-kind').value;custom.width=Number($('custom-training-width').value);custom.length=Number($('custom-training-length').value);const duration=Number($('custom-training-duration').value);const board=serializeExerciseBoard();if(board)custom.board=board;if(trainingCustomOrigin)custom.bibleOrigin=structuredClone(trainingCustomOrigin);const savedCustom=currentTraining.blocks.find(b=>b.id===trainingCustomEditing)?.custom;if(savedCustom?.adaptation&&trainingCustomFreshId!==trainingCustomEditing)custom.adaptation=structuredClone(savedCustom.adaptation);
+  if(!trainingCustomValid(custom)||!Number.isInteger(duration)||duration<1||duration>120)return notify('Vérifiez le nom, la durée et les dimensions de l’exercice.');
+  const block=trainingCustomEditing?currentTraining.blocks.find(b=>b.id===trainingCustomEditing):null;
+  if(trainingCustomEditing&&!block)return notify('Cet exercice n’est plus présent dans la séance.');
+  if(block&&block.recoveryMinutes!==undefined&&block.recoveryMinutes>=duration)return notify('La récupération comprise dépasse la nouvelle durée. Ajustez-la dans le déroulé avant de raccourcir cet exercice.');
+  if(!block&&currentTraining.blocks.length>=20)return notify('20 blocs maximum.');
+  if(!trainingCommitBlocks(blocks=>{if(block){const target=blocks.find(b=>b.id===block.id);target.custom=custom;target.duration=duration;}else blocks.push({id:crypto.randomUUID(),exerciseId:'custom',custom,duration,notes:''});},!!block))return;
+  trainingCustomFreshId=null;$('custom-training-dialog').close();
+ };
+ // « Créer mon exercice ici » (assistant): a blank exercise replaces that block only.
+ $('custom-training-dialog').addEventListener('close',()=>{trainingCustomFreshId=null;});
+ renderManualTrainingMode();
+});
