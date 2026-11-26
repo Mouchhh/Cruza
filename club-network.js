@@ -429,8 +429,7 @@ async function clubNetworkSync(){
   try{
    if(!await clubNetworkLoadMember())return;
    clubNetworkRepairSaves();
-   if(clubNetworkClubId)clubNetworkRenderPresence();
-   else await clubNetworkUpdatePresence();
+   await clubNetworkUpdatePresence();
    await clubNetworkFlushPending();
    const all=[];for(let offset=0;;offset+=100){
     if(offset>=10000)throw Error('Trop de documents');
@@ -678,10 +677,9 @@ async function clubNetworkUpdatePresence(){
  clubNetworkRenderPresence();
 }
 async function clubNetworkLeavePresence(keepalive=false){
- if(clubNetworkClubId)return;
  if(!clubNetworkBound()||!clubNetworkSession)return;
  // Meilleur effort : une fermeture brutale expire aussi côté serveur après 90 secondes.
- try{await fetch(clubNetworkBase+'/rest/v1/rpc/club_presence_ping',{method:'POST',headers:{apikey:clubNetworkConfig.publishableKey,Authorization:'Bearer '+clubNetworkSession.access_token,'Content-Type':'application/json'},body:JSON.stringify({p_session_id:clubNetworkPresenceSession,p_online:false}),credentials:'omit',referrerPolicy:'no-referrer',cache:'no-store',keepalive,signal:AbortSignal.timeout(1500)});}catch{}
+ try{await fetch(clubNetworkBase+'/rest/v1/rpc/club_presence_ping',{method:'POST',headers:{apikey:clubNetworkConfig.publishableKey,Authorization:'Bearer '+clubNetworkSession.access_token,'Content-Type':'application/json',...(clubNetworkClubId?{'x-cruza-club':clubNetworkClubId}:{})},body:JSON.stringify({p_session_id:clubNetworkPresenceSession,p_online:false}),credentials:'omit',referrerPolicy:'no-referrer',cache:'no-store',keepalive,signal:AbortSignal.timeout(1500)});}catch{}
 }
 window.addEventListener('pagehide',()=>{void clubNetworkLeavePresence(true);});
 window.addEventListener('pageshow',event=>{if(event.persisted)clubNetworkResume();});
