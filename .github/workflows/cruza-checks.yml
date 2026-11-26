@@ -33,3 +33,4 @@ jobs:
         run: |
           node tests/club-management-access.mjs
           node tests/club-installation.mjs
+          node tests/multi-club-access.mjs
