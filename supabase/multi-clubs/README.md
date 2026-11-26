@@ -4,13 +4,13 @@ La migration [001-base-commune.sql](001-base-commune.sql) est destinée à un pr
 
 Les éducateurs ont le même compte pour leurs différents clubs. Le serveur tient compte des appartenances actives à chaque lecture et écriture. Un éducateur peut publier un document à son club. Ses paramètres et photos privés sont lisibles par lui seul. Les responsables voient les appartenances de leur club et les documents partagés, avec les mêmes limites que les autres membres sur les documents privés.
 
-Le test `tests/multi-club-access.mjs` vérifie les politiques PostgreSQL avec deux clubs fictifs et un compte commun aux deux. Il simule Auth et Storage. Les comportements en conditions Supabase réelles restent à valider.
+## Application éducateur
 
-## Raccordement restant avant la mise en service
+La migration [004-documents-educateurs.sql](004-documents-educateurs.sql), appliquée après la 001, raccorde la connexion des comptes préautorisés et le partage versionné des séances, bilans et compositions. Le serveur vérifie l’appartenance au club sélectionné. Un accès depuis un autre club est refusé et une modification sur une révision dépassée déclenche un conflit.
 
-1. Disposer d’un projet Supabase neuf et appliquer la migration sur ce seul projet.
-2. Adapter la sélection du club, les invitations, les RPC, les synchronisations et les brouillons au contexte de club. Le site actuel utilise toujours les tables et RPC de l’installation dédiée.
-3. Tester les parcours réels avec deux clubs, y compris le compte commun et la révocation. Préparer ensuite une reprise des données SMFC après sauvegarde et validation, avec retour possible vers le site actuel.
+Pour préparer une copie de préproduction, utiliser `scripts/configure-club-deployment.py` avec une origine dédiée, la clé publiable de `nzmkeylibdcqmgqopesu` et le champ `supabase.club_id` égal à l’UUID du club. Renseigner `cruza_memberships.display_name` avec le nom d’affichage du compte préautorisé. Les clés de session et de brouillon sont propres au club lorsqu’un éducateur appartient à plusieurs clubs.
+
+Il reste à raccorder les invitations, la synchronisation des données privées et l’espace Responsable, puis à tester ces parcours avant toute reprise de données et bascule du Stade Mayennais.
 
 ## Aperçu de test du nouveau projet
 

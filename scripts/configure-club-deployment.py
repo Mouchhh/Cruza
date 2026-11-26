@@ -3,10 +3,12 @@
 import argparse
 import json
 import re
+from uuid import UUID
 from pathlib import Path
 from urllib.parse import urlsplit
 
 ROOT = Path(__file__).resolve().parents[1]
+SHARED_URL = "https://nzmkeylibdcqmgqopesu.supabase.co"
 SMFC_URL = "https://uesbqljrcaugwcbzijcj.supabase.co"
 
 def origin(value):
@@ -31,6 +33,14 @@ def configure(profile, destination):
         raise ValueError("Renseignez exclusivement une clé Supabase publiable sb_publishable_.")
     if (slug == "stade-mayennais") != (url == SMFC_URL) or (slug != "stade-mayennais" and site == "https://mouchhh.github.io"):
         raise ValueError("La cible du Stade Mayennais est réservée à son propre profil.")
+    club_id = profile["supabase"].get("club_id")
+    cloud = {"url": url, "publishableKey": key}
+    if url == SHARED_URL:
+        if not isinstance(club_id, str) or str(UUID(club_id)) != club_id:
+            raise ValueError("Renseignez l’identifiant UUID du club dans la base commune.")
+        cloud["clubId"] = club_id
+    elif club_id is not None:
+        raise ValueError("Le club_id est réservé à la base commune Cruza.")
     services = profile["services"]
     if any(value is not None and not origin(value) for value in services.values()):
         raise ValueError("Les services optionnels attendent une origine HTTPS.")
@@ -42,7 +52,7 @@ def configure(profile, destination):
             raise ValueError(f"Copie de déploiement incomplète : {filename}.")
     (destination / "club-cloud-config.js").write_text(
         script("CRUZA_CLUB", {"slug": slug, "name": name}) +
-        script("CLUB_CLOUD_CONFIG", {"url": url, "publishableKey": key}) +
+        script("CLUB_CLOUD_CONFIG", cloud) +
         script("CRUZA_TERMS", {"url": "conditions-utilisation.html", "version": "v0.1-bêta"}))
     for file, name, field in [
         ("canva-config.js", "CLUB_CANVA_GATEWAY", "canva"),

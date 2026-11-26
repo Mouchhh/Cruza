@@ -9,9 +9,11 @@ try{const list=JSON.parse(localStorage.getItem('vestiaire-coach-profiles')||'nul
 let accountCoachBinding=null;
 try{if(new URLSearchParams(location.search).get('mode')!=='local'){
  const base=String(window.CLUB_CLOUD_CONFIG?.url||'').replace(/\/$/,'');
- const saved=JSON.parse(sessionStorage.getItem('vestiaire-private-session:'+base)||'null');
- const binding=JSON.parse(sessionStorage.getItem('vestiaire-account-binding:'+base)||'null');
- if(binding&&saved?.session?.user?.id===binding.userId&&validCoachProfile(binding.coach)&&binding.coach.id==='account-'+binding.userId)accountCoachBinding=binding;
+ const clubId=window.CLUB_CLOUD_CONFIG?.clubId;
+ const scope=base+(clubId?'/'+clubId:'');
+ const saved=JSON.parse(sessionStorage.getItem('vestiaire-private-session:'+scope)||'null');
+ const binding=JSON.parse(sessionStorage.getItem('vestiaire-account-binding:'+scope)||'null');
+ if(binding&&saved?.session?.user?.id===binding.userId&&validCoachProfile(binding.coach)&&binding.coach.id===(clubId?'mc-'+clubId+'-'+binding.userId:'account-'+binding.userId))accountCoachBinding=binding;
 }}catch{}
 const activeCoach=Object.freeze(accountCoachBinding?{...accountCoachBinding.coach}:{...coachProfiles.find(p=>p.id===selectedCoachId)});
 function coachStorageKey(key,id=activeCoach.id){return id==='legacy'?key:'vestiaire-coach:'+id+':'+key;}
