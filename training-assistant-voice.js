@@ -125,11 +125,12 @@ function trainingVoiceInput(form, apply, options = {}) {
   mic.type = fill.type = "button";
   const status = el("p", "hint");
   status.setAttribute("role", "status");
-  const Recognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+  const Recognition = window.cruzaDictationEnabled && (window.SpeechRecognition || window.webkitSpeechRecognition);
   const hint = el("p", "hint", Recognition
     ? "La dictée utilise le service vocal de votre navigateur. Vérifiez le texte avant de continuer."
     : "La dictée est indisponible dans ce navigateur. Vous pouvez écrire votre demande ou utiliser la dictée de votre clavier.");
   mic.hidden = !Recognition;
+  hint.hidden = !window.cruzaDictationEnabled;
   actions.append(mic, fill);
   box.append(title, label, actions, hint, status);
   form.prepend(box);
