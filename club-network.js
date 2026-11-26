@@ -558,7 +558,7 @@ $('club-network-login').onsubmit=e=>{e.preventDefault();clubNetworkRun(async()=>
  const session=await clubNetworkRequest('/auth/v1/token?grant_type=password',{method:'POST',auth:false,body:{email,password}});await clubNetworkAfterLogin(session);
 });};
 function clubAuthChoose(mode){
- const signup=mode==='signup';$('club-network-login').hidden=signup;$('club-network-signup').hidden=!signup;$('club-auth-show-signup').hidden=signup;
+ const signup=mode==='signup'&&!clubNetworkClubId;$('club-network-login').hidden=signup;$('club-network-signup').hidden=!signup;$('club-auth-show-signup').hidden=signup||!!clubNetworkClubId;
  const url=new URL(location.href);url.searchParams.set('auth',signup?'signup':'login');history.replaceState(null,'',url.href);
  if(signup)clubNetworkStatus('Renseignez votre prénom, votre nom et les accès autorisés par le club.');
 }
