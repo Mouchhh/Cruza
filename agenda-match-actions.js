@@ -39,7 +39,7 @@ document.addEventListener('DOMContentLoaded',()=>{
   const keys=agendaMatchKeys(event),rows=agendaEventEdits().filter(r=>!r.keys.some(k=>keys.includes(k)));
   rows.push({keys,title:event.title.slice(0,200),date,time:event.time||'',location:event.location||event.fff?.location||''});
   if(rows.length>1000){notify('Trop de modifications locales. Déplacez cet événement depuis sa fiche.');return false;}
-  try{coachStorageSet('vestiaire-agenda-event-edits',JSON.stringify(rows));$('coach-agenda-month').value=date.slice(0,7);$('coach-agenda-week').value='';renderCoachAgenda();root.querySelector('[data-agenda-day="'+date+'"]')?.onclick?.();notify('Événement déplacé au '+agendaCalendarDateLabel(date)+'. Horaire conservé.');return true;}catch{notify('Déplacement non enregistré. L’événement reste à sa date initiale.');return false;}
+  try{coachStorageSet('vestiaire-agenda-event-edits',JSON.stringify(rows));agendaCalendarGoToWeek(date);notify('Événement déplacé au '+agendaCalendarDateLabel(date)+'. Horaire conservé.');return true;}catch{notify('Déplacement non enregistré. L’événement reste à sa date initiale.');return false;}
  }
  // Desktop HTML drag-and-drop only accepts a drag started inside this calendar.
  let drag=null,touch=null,suppressClickUntil=0;

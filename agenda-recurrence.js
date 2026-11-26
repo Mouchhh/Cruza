@@ -861,11 +861,8 @@ function agendaRecurringEdit(id, remove = false, moveDate = null) {
       );
       dirty = false;
       dialog.close();
-      if (!remove) {
-        $("coach-agenda-month").value = date.value.slice(0, 7);
-        $("coach-agenda-week").value = "";
-      }
-      renderCoachAgenda();
+      if (remove) renderCoachAgenda();
+      else agendaCalendarGoToWeek(date.value);
       notify(
         remove
           ? "Récurrence supprimée pour la portée choisie."

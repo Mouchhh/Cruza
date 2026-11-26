@@ -141,7 +141,7 @@
     const controls=el('div','match-continuity-actions'),coach=activeCoach.id,team=activeCoachTeam.id;
     function button(label,run){const b=el('button','export',label);b.type='button';b.onclick=()=>{if(coach!==activeCoach.id||team!==activeCoachTeam.id)return;run();};controls.append(b);return b;}
     if(e){
-      button('Voir dans l’agenda',()=>workspaceNavigation.run('view-coach-agenda',()=>{$('coach-agenda-month').value=e.date.slice(0,7);$('coach-agenda-week').value='';workspaceFlows.agenda.go(1);renderCoachAgenda();}));
+      button('Voir dans l’agenda',()=>workspaceNavigation.run('view-coach-agenda',()=>{workspaceFlows.agenda.go(1);agendaCalendarGoToWeek(e.date);}));
       if(kind==='causerie')button('Bilan de ce match',()=>openEvent('report',eventKey(e)));
       else if(sourceFor(e))button('Revoir la causerie',()=>openEvent('causerie',eventKey(e)));
     }
