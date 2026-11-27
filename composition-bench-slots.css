@@ -5,3 +5,14 @@
 #players .player-empty-sub .token { background: var(--club-logo-red,#e41f28); border-color: white; }
 body.match-clean-mode .pitch-brand,
 body.match-clean-mode .board-footer { display: none !important; }
+/* Banc à droite du terrain (composition) : les remplaçants ne sont plus sur le terrain. */
+.pitch-with-bench{display:flex;align-items:stretch;gap:0;min-width:0}
+.pitch-with-bench>.pitch{flex:1 1 auto;min-width:0}
+.pitch-bench{display:none}
+.pitch-with-bench.has-bench>.pitch-bench{display:flex;flex-direction:column;align-items:center;gap:14px;flex:0 0 72px;margin-right:12px;padding:10px 4px;border-radius:0 8px 8px 0;background:#e9eef7;border:1px solid #d6dfec;border-left:0;overflow-y:auto}
+.pitch-with-bench.has-bench>.pitch{margin-right:0;border-radius:4px 0 0 4px}
+.pitch-bench-title{font-size:10px;font-weight:800;letter-spacing:1px;text-transform:uppercase;color:#425d7d}
+.pitch-bench .player{position:static!important;transform:none!important;pointer-events:auto;flex-shrink:0}
+.pitch-bench .player-name{max-width:64px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:8px}
+@media(max-width:700px){.pitch-with-bench.has-bench>.pitch-bench{flex-basis:54px;margin-right:8px;gap:10px}.pitch-bench .player-name{max-width:48px}}
+@media print{.pitch-bench{display:none!important}}
