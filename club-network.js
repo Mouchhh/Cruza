@@ -510,10 +510,16 @@ async function clubNetworkOpen(metadata,previewOnly=false){
  let content;if(row.kind==='training'){const original=currentTraining;try{currentTraining=structuredClone(row.payload);content=trainingDocument();}finally{currentTraining=original;}}
  else if(row.kind==='report'){const original=currentReport;try{currentReport=structuredClone(row.payload);content=buildReportDocument();}finally{currentReport=original;}}
  else content=clubNetworkComposition(row.payload);
+ $('club-network-copy').textContent=row.payload.squadDirectory?'Ajouter à mon effectif':'Copier dans mon espace';
  $('club-network-preview-title').textContent=row.title;$('club-network-preview-author').textContent=clubNetworkAuthor(row.owner_id)+' · version '+row.revision+' · lecture seule';$('club-network-preview-content').replaceChildren(content);$('club-network-preview').showModal();
 }
 function clubNetworkImport(openOwn=false,forceCopy=false){
- const row=clubNetworkPreview;if(!row||!clubNetworkBound())return;if(row.payload.squadDirectory)return notify('Cet effectif est consultable ici. Gérez vos joueurs depuis « Mes joueurs enregistrés ».');
+ const row=clubNetworkPreview;if(!row||!clubNetworkBound())return;if(row.payload.squadDirectory){
+  if(!squadImportShared(row.payload.squadDirectory))return;
+  $('club-network-preview-close').click();
+  openCoachSquad();
+  return;
+ }
  if(row.owner_id===clubNetworkSession.user.id&&!forceCopy&&!coachTeamOwns(row.payload))return notify('Sélectionnez l’équipe de ce document avant de l’ouvrir.');
  if(row.payload.pionExplanation)return simpleExplanationImport(row,forceCopy);
  const kind=row.kind,own=row.owner_id===clubNetworkSession.user.id&&!forceCopy,payload=structuredClone(row.payload),opened=kind==='training'?currentTraining:kind==='report'?currentReport:(typeof getTerrainDraftFor==='function'?getTerrainDraftFor(row.payload):state);

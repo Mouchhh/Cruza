@@ -22,6 +22,24 @@ function squadSave(players){
  if(!valid(snapshot))return notify('L’effectif ne peut pas être enregistré : vérifiez votre profil équipe.'),false;
  try{coachStorageSet('vestiaire-saves',JSON.stringify(next));saves=next;renderSaves();return true;}catch{return notify('Stockage indisponible : vos joueurs précédemment enregistrés sont conservés.'),false;}
 }
+function squadImportShared(directory){
+ if(!squadDirectoryValid(directory))return false;
+ const current=squadPlayers(),ids=new Set(current.map(player=>player.id));
+ const licenseKey=player=>(player.license||'').replace(/[ -]/g,'').toUpperCase();
+ const licenses=new Set(current.map(licenseKey).filter(Boolean));
+ const additions=[];
+ for(const player of directory.players){
+  const license=licenseKey(player);
+  if(ids.has(player.id)||license&&licenses.has(license))continue;
+  additions.push(player);ids.add(player.id);if(license)licenses.add(license);
+ }
+ if(!additions.length){notify('Ces joueurs figurent déjà dans votre effectif.');return true;}
+ if(current.length+additions.length>100){notify('L’import dépasserait la limite de 100 joueurs.');return false;}
+ if(!confirm('Ajouter '+additions.length+' joueur(s) à « '+activeCoachTeam.label+' » ? Les fiches déjà présentes seront conservées.'))return false;
+ if(!squadSave([...current,...additions]))return false;
+ notify(additions.length+' joueur(s) ajouté(s) à Votre effectif.');
+ return true;
+}
 const squadDialog=el('section','squad-page');squadDialog.hidden=true;squadDialog.id='coach-squad-dialog';squadDialog.setAttribute('aria-labelledby','coach-squad-title');
 const squadHeading=el('div','section-heading'),squadTitle=el('h2','','Mes joueurs');squadTitle.id='coach-squad-title';squadHeading.append(squadTitle);
 const squadInfo=el('p','hint'),squadTools=el('div','squad-tools'),squadSearch=el('input'),squadPosition=el('select'),squadNew=el('button','primary','+ Nouveau joueur');squadSearch.type='search';squadSearch.placeholder='Rechercher un joueur…';squadSearch.setAttribute('aria-label','Rechercher dans mes joueurs');squadPosition.setAttribute('aria-label','Filtrer mes joueurs par poste');const squadPositions=['Gardien','Défenseur','Milieu','Attaquant'];squadPosition.append(new Option('Tous les postes',''));squadPositions.forEach(p=>squadPosition.append(new Option(p,p)));squadPosition.append(new Option('Poste à préciser','__unassigned'));squadPosition.hidden=true;squadTools.append(squadSearch,squadPosition);squadHeading.append(squadNew);
