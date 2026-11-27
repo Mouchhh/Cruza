@@ -306,20 +306,24 @@ document.addEventListener("DOMContentLoaded", () => {
           },
           isCaptain ? "Capitaine retiré." : slot.name + " est capitaine.",
         );
-      const remove = el("button", "squad-remove", slot.role === "sub" ? "Retirer du banc" : "Retirer de la compo");
-      remove.type = "button";
-      remove.onclick = () =>
-        commitBoard(
-          (next) => {
-            const count = benchCount(next);
-            next.players = next.players.filter((p) => p.id !== id);
-            if (next.captainId === id) delete next.captainId;
-            // Sur le banc, la place disparaît avec le joueur (sinon une place vide reste).
-            if (slot.role === "sub") next.benchSlotCount = Math.max(0, count - 1);
-          },
-          slot.role === "sub" ? "Joueur retiré du banc." : "Joueur retiré de la composition.",
-        );
-      slotActions.append(captain, remove);
+      slotActions.append(captain);
+      // Seuls les remplaçants se retirent : un titulaire se remplace en choisissant un autre joueur ci-dessous.
+      if (slot.role === "sub") {
+        const remove = el("button", "squad-remove", "Retirer du banc");
+        remove.type = "button";
+        remove.onclick = () =>
+          commitBoard(
+            (next) => {
+              const count = benchCount(next);
+              next.players = next.players.filter((p) => p.id !== id);
+              if (next.captainId === id) delete next.captainId;
+              // La place disparaît avec le joueur (sinon une place vide reste sur le banc).
+              next.benchSlotCount = Math.max(0, count - 1);
+            },
+            "Joueur retiré du banc.",
+          );
+        slotActions.append(remove);
+      }
     } else if (slot.role === "sub" && !extra) {
       const drop = el("button", "squad-remove", "Supprimer cette place du banc");
       drop.type = "button";
