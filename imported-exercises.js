@@ -73,8 +73,10 @@ function ensureSuppliedLibraries() {
     mycoach: "Références du club",
   };
   select.append(new Option("Toutes les bibliothèques", ""));
+  // « Séances du coach » et « Références du club » ne se choisissent plus seules : leurs exercices restent dans « Toutes ».
   for (const source of suppliedExerciseEngine.libraries)
-    select.append(new Option(names[source.key] || source.source, source.key));
+    if (!["coach", "mycoach"].includes(source.key))
+      select.append(new Option(names[source.key] || source.source, source.key));
   original.href = "assets/exercises/mycoach-original.html";
   original.download = "Exercices - Stade Mayennais.html";
   original.hidden = true;
