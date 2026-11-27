@@ -43,9 +43,10 @@ document.addEventListener('DOMContentLoaded', () => {
   // In a composition the button creates/chooses a profile; the bench toggle keeps the count bar.
   $('add-sub').onclick=()=>{if(window.compositionPlayerPicker?.openNew('sub'))return;bar.hidden=false;toggle.setAttribute('aria-expanded','true');bar.scrollIntoView({block:'nearest'});};
   // Banc à droite du terrain : dans une composition, remplaçants et places libres sortent du terrain.
-  const pitch=$('pitch'),benchColumn=el('div','pitch-bench');
+  // Le banc est collé au bord droit du terrain, à l'extérieur : il ne peut jamais cacher un joueur.
+  const pitch=$('pitch'),row=el('div','pitch-with-bench'),benchColumn=el('div','pitch-bench');
   benchColumn.id='pitch-bench';benchColumn.setAttribute('aria-label','Banc : impacteurs / finisseurs');
-  pitch.append(benchColumn);
+  pitch.before(row);row.append(pitch,benchColumn);
   // Le banc est posé sur le terrain : il ne doit pas déclencher le déplacement des pions.
   benchColumn.addEventListener('pointerdown',e=>e.stopPropagation());
   benchColumn.onclick=e=>{const token=e.target.closest('.player');if(token&&window.compositionPlayerPicker)compositionPlayerPicker.open(token.dataset.id);};
@@ -55,7 +56,7 @@ document.addEventListener('DOMContentLoaded', () => {
     benchColumn.replaceChildren();
     const onBench=terrainBoardKind==='composition'&&state.benchVisible!==false;
     const tokens=onBench?[...$('pitch-subs').querySelectorAll('.pitch-sub'),...$('players').querySelectorAll('[data-id^="empty-sub-slot-"]')]:[];
-    pitch.classList.toggle('has-bench',tokens.length>0);
+    row.classList.toggle('has-bench',tokens.length>0);
     if(tokens.length){
       if(tokens.length){const subs=state.players.filter(p=>p.role==='sub').length,title=el('span','pitch-bench-title','Banc');title.append(el('small','',subs+'/'+tokens.length));benchColumn.append(title);}
       for(const token of tokens){token.style.left=token.style.top='';token.removeAttribute('draggable');const name=token.querySelector('.player-name');if(name)name.textContent=name.textContent.replace(/^I\/F · /,'');benchColumn.append(token);}
