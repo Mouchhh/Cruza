@@ -4,12 +4,6 @@ L’onglet principal `Ressources` est intégré à l’historique, au recentrage
 
 Catégories : Fiches d’exercices, Documents du club, Guides tactiques, Protocoles de séance, Vidéos et animations. Les catégories vides ne contiennent aucun faux document.
 
-## Document fourni
-
-`assets/resources/progression-crm-foot.pdf` contient **uniquement la deuxième page** du fichier reçu « Progression CRM foot.pdf ». La première page n’est pas publiée. Le PDF contient une seule page, dont l’image est identique à celle de la deuxième page source. Le contenu pédagogique n’a pas été retranscrit ni réécrit.
-
-`assets/resources/progression-crm-foot.webp` sert de vignette et d’aperçu. Le document est classé dans Protocoles de séance. Le bouton Consulter ouvre une fenêtre avec agrandissement et défilement du tableau, ouverture du PDF et téléchargement. Le PDF téléchargeable reste le document de référence.
-
 ## Structure
 
 ```html

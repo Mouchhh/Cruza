@@ -63,22 +63,6 @@
       tags: ["Vidéo", "Analyse", "Adversaire"],
       url: "assets/resources/analyse-video.html",
     },
-
-    {
-      id: "progression-crm-foot",
-      title: "Progression CRM foot",
-      category: "protocols",
-      description:
-        "Repères sur les durées, les séquences, la récupération, les espaces et les intérêts des jeux à effectif réduit.",
-      kind: "pdf",
-      format: "PDF",
-      pages: 1,
-      tags: ["CRM", "Jeux réduits", "Entraînement"],
-      url: "assets/resources/progression-crm-foot.pdf",
-      preview: "assets/resources/progression-crm-foot.webp",
-      previewAlt:
-        "Tableau de progression des jeux, de 1 contre 1 à 8 contre 8 et plus.",
-    },
   ];
   const nav = document.querySelector(".app-navigation");
   const button = el("button", "", "Ressources");
