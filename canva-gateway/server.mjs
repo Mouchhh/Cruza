@@ -18,7 +18,8 @@ export async function authorize(token,config,fetcher=fetch){
  const user=await fetcher(config.supabaseUrl+'/auth/v1/user',{headers,signal:AbortSignal.timeout(10000)});
  if(!user.ok)throw error('Connexion au club expirée.',401);
  const {id}=await user.json();if(!uuid.test(id||''))throw error('Compte invalide.',401);
- const response=await fetcher(config.supabaseUrl+'/rest/v1/club_members?select=user_id&user_id=eq.'+id+'&active=eq.true',{headers,signal:AbortSignal.timeout(10000)});
+ const membershipHeaders=config.clubId?{...headers,'x-cruza-club':config.clubId}:headers;
+ const response=await fetcher(config.supabaseUrl+'/rest/v1/club_members?select=user_id&user_id=eq.'+id+'&active=eq.true',{headers:membershipHeaders,signal:AbortSignal.timeout(10000)});
  if(!response.ok)throw error('Accès éducateur refusé.',403);
  const members=await response.json();
  if(!Array.isArray(members)||!members.some(member=>member.user_id===id))throw error('Compte non autorisé.',403);
@@ -206,7 +207,9 @@ export function runtimeConfig(environment=process.env){
  const settings={...environment,PUBLIC_URL:environment.PUBLIC_URL||environment.RENDER_EXTERNAL_URL};
  const required=['PUBLIC_URL','CANVA_CLIENT_ID','CANVA_CLIENT_SECRET','TOKEN_ENCRYPTION_KEY','SUPABASE_URL','SUPABASE_PUBLISHABLE_KEY','ALLOWED_ORIGINS'];
  if(required.some(name=>!settings[name]))throw Error('Configuration manquante : '+required.filter(name=>!settings[name]).join(', '));
- return {coachAIKey:settings.OPENAI_API_KEY,coachAIModel:settings.OPENAI_COACH_MODEL,publicURL:settings.PUBLIC_URL,clientId:settings.CANVA_CLIENT_ID,clientSecret:settings.CANVA_CLIENT_SECRET,encryptionKey:settings.TOKEN_ENCRYPTION_KEY,supabaseUrl:settings.SUPABASE_URL,publishableKey:settings.SUPABASE_PUBLISHABLE_KEY,origins:settings.ALLOWED_ORIGINS.split(',').map(s=>s.trim()).filter(Boolean),directory:settings.DATA_DIR||(settings.RENDER_EXTERNAL_URL?'/tmp/vestiaire-canva':'/data')};
+ const clubId=settings.SUPABASE_CLUB_ID?.trim();
+ if(clubId&&!uuid.test(clubId))throw Error('SUPABASE_CLUB_ID doit être un UUID.');
+ return {clubId,coachAIKey:settings.OPENAI_API_KEY,coachAIModel:settings.OPENAI_COACH_MODEL,publicURL:settings.PUBLIC_URL,clientId:settings.CANVA_CLIENT_ID,clientSecret:settings.CANVA_CLIENT_SECRET,encryptionKey:settings.TOKEN_ENCRYPTION_KEY,supabaseUrl:settings.SUPABASE_URL,publishableKey:settings.SUPABASE_PUBLISHABLE_KEY,origins:settings.ALLOWED_ORIGINS.split(',').map(s=>s.trim()).filter(Boolean),directory:settings.DATA_DIR||(settings.RENDER_EXTERNAL_URL?'/tmp/vestiaire-canva':'/data')};
 }
 if(process.argv[1]&&fileURLToPath(import.meta.url)===path.resolve(process.argv[1])){
  createCanvaGateway(runtimeConfig()).server.listen(Number(process.env.PORT)||3001,'0.0.0.0',()=>console.log('Service Canva démarré.'));

@@ -46,6 +46,7 @@ Renseigner les variables dans Render, jamais dans le chat ou le dépôt :
 | `CANVA_CLIENT_SECRET` | Secret de cette application, dans Render uniquement |
 | `TOKEN_ENCRYPTION_KEY` | 64 caractères hexadécimaux aléatoires, voir ci-dessous |
 | `SUPABASE_URL` | URL publique déjà utilisée par le club |
+| `SUPABASE_CLUB_ID` | UUID du club dans Cruza Multi-clubs, champ `supabase.club_id` du profil de déploiement |
 | `SUPABASE_PUBLISHABLE_KEY` | Clé publique déjà utilisée par le site, jamais une clé service_role |
 | `ALLOWED_ORIGINS` | `https://mouchhh.github.io` |
 

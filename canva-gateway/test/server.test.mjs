@@ -31,6 +31,18 @@ test('club authentication checks actual user and active membership',async()=>{
  await assert.rejects(authorize('',config,valid),e=>e.status===401);
  calls=0;await assert.rejects(authorize('revoked',config,async()=>Response.json(++calls===1?{id:A}:[])),e=>e.status===403);
 });
+test('multi-club authorization sends a server-configured club only to the membership lookup',async()=>{
+ const calls=[];
+ const config={supabaseUrl:'https://club.supabase.co',publishableKey:'public',clubId:B};
+ const fetcher=async(url,{headers})=>{
+  calls.push({url,headers});
+  return Response.json(url.includes('/auth/')?{id:A}:[{user_id:A}]);
+ };
+ assert.equal(await authorize('club-token',config,fetcher),A);
+ assert.equal(calls[0].headers['x-cruza-club'],undefined);
+ assert.equal(calls[1].headers['x-cruza-club'],B);
+ await assert.rejects(authorize('club-token',config,async url=>Response.json(url.includes('/auth/')?{id:A}:[])),e=>e.status===403);
+});
 test('OAuth PKCE, browser binding, consent refusal, persistence, refresh rotation, isolated imports and revocation',async()=>{
  const directory=fs.mkdtempSync(path.join(os.tmpdir(),'canva-api-'));let time=Date.now(),refreshes=0,imports=0,blocked=false;
  const requests=[],auth=async token=>{if(blocked||!['a','b'].includes(token))throw Object.assign(Error('Accès refusé.'),{status:403});return token==='a'?A:B;};

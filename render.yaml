@@ -17,7 +17,9 @@ services:
       - key: ALLOWED_ORIGINS
         value: https://mouchhh.github.io
       - key: SUPABASE_URL
-        value: https://uesbqljrcaugwcbzijcj.supabase.co
+        value: https://nzmkeylibdcqmgqopesu.supabase.co
+      - key: SUPABASE_CLUB_ID
+        value: 85d0f696-1b33-4333-a27f-ae642dd32b13
       - key: SUPABASE_PUBLISHABLE_KEY
         sync: false
       - key: CANVA_CLIENT_ID
