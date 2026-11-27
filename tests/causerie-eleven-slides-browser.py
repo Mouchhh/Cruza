@@ -30,16 +30,16 @@ with sync_playwright() as p:
   with zipfile.ZipFile(path) as z:
    assert z.testzip() is None
    slides=sorted([n for n in z.namelist() if re.fullmatch(r'ppt/slides/slide\d+\.xml',n)],key=lambda n:int(re.search(r'(\d+)\.xml',n)[1]));assert len(slides)==11
-   titles=['CHAMPIONNAT','Informations adversaire','Le contexte du match','Nos idées fortes','Animation Défensive','Transition OFF / DEF','Animation Offensive','Transition DEF / OFF','La composition','CPA','ENSEMBLE']
+   titles=['CHAMPIONNAT','La composition','Contexte','Informations adversaire','Nos idées fortes','Animation Défensive','Transition OFF / DEF','Animation Offensive','Transition DEF / OFF','CPA','ENSEMBLE']
    for n,(name,title) in enumerate(zip(slides,titles),1):
-    if n not in (5,6,7,8):assert title in ''.join(ET.fromstring(z.read(name)).itertext()),(name,title)
-   for n in [5,6,7,8]:
+    if n not in (6,7,8,9):assert title in ''.join(ET.fromstring(z.read(name)).itertext()),(name,title)
+   for n in [6,7,8,9]:
     root=ET.fromstring(z.read('ppt/slides/slide'+str(n)+'.xml'))
     assert len(root.findall('p:timing',ns))==(1 if mode=='native' else 0)
     ids=[node.attrib['id'] for node in root.findall('.//p:cTn',ns)];assert len(ids)==len(set(ids))
     shapes={node.attrib['id'] for node in root.findall('.//p:cNvPr',ns)}
     for motion in root.findall('.//p:animMotion',ns):assert motion.find('.//p:spTgt',ns).attrib['spid'] in shapes
-   if mode=='native':assert len(ET.fromstring(z.read('ppt/slides/slide5.xml')).findall('.//p:animMotion',ns))==4
+   if mode=='native':assert len(ET.fromstring(z.read('ppt/slides/slide6.xml')).findall('.//p:animMotion',ns))==4
    else:assert len([n for n in z.namelist() if n.endswith('.gif')])>=2
    assert len([n for n in z.namelist() if re.fullmatch(r'ppt/notesSlides/notesSlide\d+\.xml',n)])==11
  # Selecting a new match must clear optional phase selections and content.
@@ -47,4 +47,4 @@ with sync_playwright() as p:
  for width in [390,320]:
   page.set_viewport_size({'width':width,'height':1000});assert page.evaluate('document.documentElement.scrollWidth<=innerWidth+1')
  assert not errors,errors;b.close()
-print('Exactly eleven ordered slides, two native animations on slide 5, per-phase choices, unique timing ids, notes, Canva GIF variant and mobile passed')
+print('Exactly eleven ordered slides, two native animations on slide 6, per-phase choices, unique timing ids, notes, Canva GIF variant and mobile passed')

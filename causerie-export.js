@@ -79,11 +79,15 @@
  }
  function capture(){
   const board=structuredClone(getCompositionBoard()),candidate=getGamePlanBoard();
+  for(const player of board.players){
+   const profile=typeof pionProfile==='function'?pionProfile(player):null;
+   if(profile){player.photo=profile.photo||player.photo;player.displayName=squadDisplayName(profile);}
+  }
   const linked=board.boardKind!=='plan'&&board.documentId&&candidate?.sourceCompositionId===board.documentId?structuredClone(candidate):null;
   return {board,linked,demonstrations:window.causerieAnimations?.capture(),photos:window.causerieExportPhotos?.capture(),landscape:document.body.classList.contains('landscape-mode')};
  }
- async function pitchImage(board,landscape,{nameScale=1,nameWeight='bold'}={}){
-  const options={nameScale,nameWeight,bench:board.benchVisible!==false,opponents:!!board.opponents?.visible,arrows:true,lanes:!!board.lanes};
+ async function pitchImage(board,landscape,{nameScale=1,nameWeight='bold',portraits=false}={}){
+  const options={nameScale,nameWeight,portraits,bench:board.benchVisible!==false,opponents:!!board.opponents?.visible,arrows:true,lanes:!!board.lanes};
   const images=await compositionImages(board,options),canvas=document.createElement('canvas');
   canvas.width=1920;canvas.height=1080;
   compositionPitch(canvas.getContext('2d'),{x:0,y:0,w:canvas.width,h:canvas.height},landscape,board,images,options);

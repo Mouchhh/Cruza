@@ -5,10 +5,13 @@
     RED = "E31B23",
     WHITE = "FFFFFF",
     MUTED = "526780";
-  // Presented order, by content number (1 match info, 2 line-up, 3 context,
-  // 4 opponent, 5 objectives, 6 defensive, 7 OFF/DEF, 8 offensive, 9 DEF/OFF,
-  // 10 set pieces, 11 closing): intro, opponent, context, objectives, line-up…
-  const deckOrder = [1, 4, 3, 5, 6, 7, 8, 9, 2, 10, 11];
+  const deckOrder = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11];
+  const phaseStyle = {
+    defensive: { color: "E31B23", kicker: "SANS LE BALLON" },
+    offDef: { color: "B45309", kicker: "À LA PERTE DU BALLON" },
+    offensive: { color: "0055A5", kicker: "AVEC LE BALLON" },
+    defOff: { color: "247342", kicker: "À LA RÉCUPÉRATION DU BALLON" },
+  };
   const phases = {
     defensive: { slide: 6, title: "Animation Défensive", field: "defensive" },
     offDef: {
@@ -249,7 +252,7 @@
         fontFace: "Montserrat", bold: true, italic: true, charSpacing: 1.1, color: accent,
       });
       line(slide, x, y + 0.45, w, accent);
-      flowText(slide,value,x,y+.7,w,h-.7,{size:21,label});
+      flowText(slide,value,x,y+.7,w,h-.7,{size:21,label,color:accent});
     }
     function bodyFrame(n, photo = !!photos[n]) {
       return photo ? { x: 3.35, w: 9.33 } : { x: 0.65, w: 12.03 };
@@ -312,7 +315,7 @@
     const pitch = await pitchImage(
       { ...board, benchVisible: false, lanes: false },
       true,
-      { nameScale: 1.65, nameWeight: "normal" },
+      { nameScale: 1.18, nameWeight: "bold", portraits: true },
     );
     slide.addImage({
       data: pitch.data,
@@ -322,45 +325,27 @@
       h: 5.09,
       objectName: "match-composition",
     });
-    const sidebarY = photos[2] ? 3.3 : 1.9;
-    if (photos[2])
-      slide.addImage({
-        data: photos[2].landscape,
-        x: 10.12,
-        y: 1.7,
-        w: 2.4,
-        h: 1.3,
+    const sidebarY = photos[2] ? 3.15 : 1.9;
+    if (photos[2]) slide.addImage({data:photos[2].landscape,x:10.05,y:1.75,w:2.62,h:1.24});
+    const system = board.formation || "";
+    text(slide,"SYSTÈME DE JEU",10.05,sidebarY,2.62,.25,10,{fontFace:"Montserrat",bold:true,color:MUTED,charSpacing:1});
+    heading(slide,system,10.05,sidebarY+.32,2.62,.57,32,{color:BLUE});
+    line(slide,10.05,sidebarY+1.02,2.62,BLUE);
+    text(slide,"IMPACTEURS / FINISSEURS",10.05,sidebarY+1.18,2.62,.24,10,{fontFace:"Montserrat",bold:true,color:BLUE});
+    const bench = board.players.filter(player=>player.role==="sub");
+    const benchY = sidebarY + 1.56;
+    if (bench.length <= Math.floor((6.95-benchY)/.4)) {
+      bench.forEach((player,i)=>{
+        const y=benchY+i*.4;
+        rect(slide,10.05,y,.34,.27,"E7F0FA");
+        text(slide,player.number,10.05,y+.025,.34,.22,10,{fontFace:"Montserrat",bold:true,color:BLUE,align:"center"});
+        text(slide,player.displayName||player.name,10.53,y,2.14,.29,15,{color:NAVY});
+        if(i<bench.length-1)line(slide,10.05,y+.33,2.62);
       });
-    heading(slide, board.formation, 10.08, sidebarY, 2.5, 0.5, 28, {
-      color: BLUE,
-    });
-    text(
-      slide,
-      "IMPACTEURS / FINISSEURS",
-      10.08,
-      sidebarY + 0.77,
-      2.5,
-      0.55,
-      11,
-      { bold: true, color: MUTED },
-    );
-    const bench = board.players.filter((player) => player.role === "sub");
-    text(
-      slide,
-      bench
-        .map((player) =>
-          [player.number, player.name]
-            .filter((v) => v !== "" && v !== undefined)
-            .join(" · "),
-        )
-        .join("\n"),
-      10.08,
-      sidebarY + 1.45,
-      2.5,
-      Math.max(0.5, 5.15 - sidebarY),
-      bench.length > 8 ? 13 : 17,
-      { breakLine: false },
-    );
+    } else {
+      flowText(slide,bench.map(player=>[player.number,player.displayName||player.name].filter(Boolean).join(" · ")).join("\n"),
+        10.05,benchY,2.62,Math.max(.5,6.95-benchY),{size:17,minSize:13,label:"Impacteurs / finisseurs",color:NAVY});
+    }
     notes(
       slide,
       board.players.map(
@@ -395,13 +380,30 @@
       notes(page, sections.map(section => section.value));
       return page;
     }
-    slide = informationPage("Le contexte du match", 3, "LES REPÈRES À PARTAGER AU GROUPE", [
-      { label: "Contexte du match", value: p.context, primary: true },
-      { label: "Dynamique du groupe", value: p.contextDynamics },
-      { label: "Objectifs du contexte", value: p.contextObjective },
-    ]);
+    const contextLines = String(p.context || "").split(/\n/).map(line=>line.trim()).filter(Boolean);
+    if (contextLines.length && contextLines.length<=5 && contextLines.every(line=>line.length<=90)) {
+      slide = base("Contexte",3,{kicker:"CONTEXTE POUR CE MATCH",photo:true});
+      const frame = bodyFrame(3);
+      const secondary = [["Dynamique du groupe",p.contextDynamics],["Objectifs du contexte",p.contextObjective]].filter(([,value])=>String(value||"").trim());
+      const slot=(secondary.length?3.65:4.95)/contextLines.length;
+      contextLines.forEach((value,i)=>{
+        const y=1.95+i*slot;
+        text(slide,String(i+1).padStart(2,"0"),frame.x,y,.65,.42,19,{color:BLUE});
+        flowText(slide,value,frame.x+.88,y,frame.w-.92,slot-.16,{size:23,label:"Contexte",color:BLUE});
+        if(i<contextLines.length-1)line(slide,frame.x,y+slot-.14,frame.w);
+      });
+      const extraWidth=(frame.w-.3*(secondary.length-1))/Math.max(1,secondary.length);
+      secondary.forEach(([label,value],i)=>block(slide,label,value,frame.x+i*(extraWidth+.3),5.72,extraWidth,1.4));
+      notes(slide,[p.context,p.contextDynamics,p.contextObjective]);
+    } else {
+      slide = informationPage("Contexte",3,"CONTEXTE POUR CE MATCH",[
+        {label:"Contexte du match",value:p.context,primary:true},
+        {label:"Dynamique du groupe",value:p.contextDynamics},
+        {label:"Objectifs du contexte",value:p.contextObjective},
+      ]);
+    }
     slide = informationPage("Informations adversaire", 4, "LES INFORMATIONS DU COACH", [
-      { label: "Informations", value: p.opponent, primary: true },
+      { label: "Informations", value: p.opponent, primary: true, accent: "B92635" },
       { label: "Forces", value: p.opponentStrengths },
       { label: "Points à exploiter", value: p.opponentWeaknesses },
       { label: "Organisation", value: p.opponentAnimation, accent: NAVY },
@@ -444,18 +446,22 @@
       }).filter(Boolean);
       const body = [p[phase.field] || "",...instructions].filter(Boolean).join("\n\n");
       const hasText=!!body.trim(),drawings=choices.filter(c=>!c.exercise||c.exercise.custom?.board);
-      slide = base(phase.title, phase.slide, { bare: !hasText });
-      const stage = hasText
-        ? { x: drawings.length ? 4.2 : .65, y: 1.85, w: drawings.length ? 8.48 : 12.03, h: 5.1 }
-        : { x: .1, y: .1, w: 13.133333, h: 7.3 };
-      if(hasText)flowText(slide,body,.65,1.85,drawings.length?3.2:12.03,5.05,{size:22,minSize:17,label:phase.title});
+      const {color,kicker}=phaseStyle[key];
+      slide = base(phase.title, phase.slide, {accent:color,kicker});
+      const stage = {x:.65,y:1.8,w:hasText?6.25:12.03,h:5.2};
+      if(hasText){
+        const x=drawings.length?7.26:.65, w=drawings.length?5.42:12.03;
+        text(slide,"NOS PRINCIPES",x,1.86,w,.24,11,{fontFace:"Montserrat",bold:true,italic:true,color});
+        line(slide,x,2.18,w,color);
+        flowText(slide,body,x,2.36,w,4.62,{size:20,minSize:16,label:phase.title,color});
+      }
       const cols = drawings.length <= 1 ? 1 : 2, rows = Math.max(1, Math.ceil(drawings.length / cols));
       const gap = 0.12, tileW = (stage.w - gap * (cols - 1)) / cols, tileH = (stage.h - gap * (rows - 1)) / rows;
       drawings.forEach((choice, i) => {
         const custom=choice.exercise?.custom, ratio=choice.exercise?1.6:840/680;
         const w=Math.min(tileW,tileH*ratio),h=w/ratio;
         const box={x:stage.x+(i%cols)*(tileW+gap)+(tileW-w)/2,y:stage.y+Math.floor(i/cols)*(tileH+gap)+(tileH-h)/2,w,h};
-        if (!choice.exercise || custom.board) (choice.exercise?exerciseHosts:hosts).push({...choice,slide,box,palette:{navy:NAVY,red:RED,blue:BLUE,accent:clubGamePhaseColors[{defensive:"off",offDef:"loss",offensive:"ball",defOff:"win"}[key]]}});
+        if (!choice.exercise || custom.board) (choice.exercise?exerciseHosts:hosts).push({...choice,slide,box,palette:{navy:NAVY,red:RED,blue:BLUE,accent:color}});
         // No invented pitch or on-screen instructions when no drawing is saved.
       });
       notes(slide, [
@@ -470,7 +476,7 @@
           ),
       ]);
     }
-    slide = base("Spécificités & CPA", 10, {
+    slide = base("CPA · Coups de pied arrêtés", 10, {
       kicker: "ÊTRE PRÊTS DANS LES DEUX SURFACES",
       photo: true,
     });

@@ -272,3 +272,7 @@ body.match-clean-mode #terrain-flow[data-step="1"] > .flow-footer,
 .causerie-visibility input:checked+.causerie-visibility-track::before{transform:translateX(18px)}
 .causerie-visibility input:focus-visible+.causerie-visibility-track{outline:2px solid #0b2e8a;outline-offset:3px}
 .causerie-visibility small{grid-column:1/-1;font-weight:500}
+
+.causerie-clean-objectives{min-width:0;border:1px solid #dbe6f3;border-left:4px solid #0055a5;border-radius:12px;padding:14px 16px}
+.causerie-clean-objectives legend{color:#0055a5;font-weight:800;padding:0 6px}
+@media(max-width:640px){.causerie-clean-objectives{grid-template-columns:minmax(0,1fr)}}

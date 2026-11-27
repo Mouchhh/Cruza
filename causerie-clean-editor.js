@@ -145,7 +145,6 @@ document.addEventListener("DOMContentLoaded", () => {
   for (const selector of [
     ".match-plan-top",
     ".match-plan-context-grid",
-    ".match-plan-objectives",
     ".match-plan-animations",
   ]) {
     const node = form.querySelector(selector);
@@ -160,7 +159,10 @@ document.addEventListener("DOMContentLoaded", () => {
   const exportOptions = el("details", "causerie-export-options");
   exportOptions.append(el("summary", "", "Options d’export"), format);
   header.append(exportOptions);
-  body.append(info, context, opponent, grid, actions);
+  const objectives = form.querySelector(".match-plan-objectives");
+  objectives.classList.add("causerie-clean-objectives");
+  objectives.querySelector("legend").textContent = "Nos idées fortes";
+  body.append(info, context, opponent, objectives, grid, actions);
   header.after(body);
   form.append(legacy);
   const status = $("causerie-ppt-status");
