@@ -332,7 +332,9 @@
     const foot = el("div", "squad-pick-foot"), count = el("span"), save = el("button", "primary", "Ajouter à mon effectif");
     save.type = "button";
     foot.hidden = true;
-    foot.append(count, save);
+    const saveError = el("p", "hint");
+    saveError.setAttribute("role", "alert");
+    foot.append(count, save, saveError);
 
     dialog.append(head, el("div", "squad-pick-body"), foot);
     dialog.querySelector(".squad-pick-body").append(fileStep, pickStep);
@@ -487,7 +489,11 @@
     };
 
     save.onclick = () => {
-      if (teamId !== coachTeamSquadId()) return dialog.close();
+      saveError.textContent = "";
+      if (teamId !== coachTeamSquadId()) {
+        saveError.textContent = "L’équipe active a changé. Rouvrez l’import pour choisir les joueurs.";
+        return;
+      }
       const existing = squadPlayers(), known = I.createMatcher(existing);
       const additions = players.filter(p => chosen.has(p.key) && !known.find(p)).map(p => ({
         id: crypto.randomUUID(),
@@ -507,10 +513,14 @@
       }
       if ((!additions.length && !photoFor.size) || existing.length + additions.length > MAX_PLAYERS) {
         rebuild();
-        return notify("Votre effectif a changé : vérifiez la sélection.");
+        saveError.textContent = "Votre effectif a changé : vérifiez la sélection.";
+        return;
       }
       const updated = existing.map(p => (photoFor.has(p) ? { ...p, photo: photoFor.get(p) } : p));
-      if (!squadSave([...updated, ...additions])) return;
+      if (!squadSave([...updated, ...additions])) {
+        saveError.textContent = $("toast").textContent || "L’effectif n’a pas pu être enregistré. La sélection est conservée.";
+        return;
+      }
       dialog.close();
       squadRender();
       notify([

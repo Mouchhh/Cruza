@@ -1,4 +1,9 @@
-function coachTeamSquadId(){return activeCoachTeam.id==='unassigned'?'effectif-'+activeCoach.id:'effectif-'+activeCoachTeam.id+'-'+activeCoach.id;}
+function coachTeamSquadId(){
+ const team=activeCoachTeam.id;
+ const legacy=team==='unassigned'?'effectif-'+activeCoach.id:'effectif-'+team+'-'+activeCoach.id;
+ // Document keys are already scoped to their owner. Keep previously valid IDs.
+ return legacy.length<=100?legacy:'effectif-'+team;
+}
 // The directory is a typed composition-library document, so existing authenticated
 // versioning, offline queue and owner isolation apply without a new database table.
 // A profile has no shirt number: legacy numbers stay readable but each match chooses its own.
