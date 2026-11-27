@@ -43,18 +43,20 @@ document.addEventListener('DOMContentLoaded', () => {
   // In a composition the button creates/chooses a profile; the bench toggle keeps the count bar.
   $('add-sub').onclick=()=>{if(window.compositionPlayerPicker?.openNew('sub'))return;bar.hidden=false;toggle.setAttribute('aria-expanded','true');bar.scrollIntoView({block:'nearest'});};
   // Banc à droite du terrain : dans une composition, remplaçants et places libres sortent du terrain.
-  const pitch=$('pitch'),row=el('div','pitch-with-bench'),benchColumn=el('div','pitch-bench');
+  const pitch=$('pitch'),benchColumn=el('div','pitch-bench');
   benchColumn.id='pitch-bench';benchColumn.setAttribute('aria-label','Banc : impacteurs / finisseurs');
-  pitch.before(row);row.append(pitch,benchColumn);
+  pitch.append(benchColumn);
+  // Le banc est posé sur le terrain : il ne doit pas déclencher le déplacement des pions.
+  benchColumn.addEventListener('pointerdown',e=>e.stopPropagation());
   benchColumn.onclick=e=>{const token=e.target.closest('.player');if(token&&window.compositionPlayerPicker)compositionPlayerPicker.open(token.dataset.id);};
   const renderBefore=render;
   render=function(...args){const value=renderBefore.apply(this,args);
     for(const node of $('players').querySelectorAll('[data-id^="empty-sub-slot-"]')){node.classList.add('player-empty-sub');node.setAttribute('aria-label','Impacteur / Finisseur libre : choisir un joueur');}
     benchColumn.replaceChildren();
     const onBench=terrainBoardKind==='composition'&&state.benchVisible!==false;
-    row.classList.toggle('has-bench',onBench);
-    if(onBench){
-      const tokens=[...$('pitch-subs').querySelectorAll('.pitch-sub'),...$('players').querySelectorAll('[data-id^="empty-sub-slot-"]')];
+    const tokens=onBench?[...$('pitch-subs').querySelectorAll('.pitch-sub'),...$('players').querySelectorAll('[data-id^="empty-sub-slot-"]')]:[];
+    pitch.classList.toggle('has-bench',tokens.length>0);
+    if(tokens.length){
       if(tokens.length){const subs=state.players.filter(p=>p.role==='sub').length,title=el('span','pitch-bench-title','Banc');title.append(el('small','',subs+'/'+tokens.length));benchColumn.append(title);}
       for(const token of tokens){token.style.left=token.style.top='';token.removeAttribute('draggable');const name=token.querySelector('.player-name');if(name)name.textContent=name.textContent.replace(/^I\/F · /,'');benchColumn.append(token);}
     }

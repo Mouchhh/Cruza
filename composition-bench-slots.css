@@ -5,21 +5,17 @@
 #players .player-empty-sub .token { background: var(--club-logo-red,#e41f28); border-color: white; }
 body.match-clean-mode .pitch-brand,
 body.match-clean-mode .board-footer { display: none !important; }
-/* Banc à droite du terrain (composition) : un « bord du terrain » vert foncé, séparé de la pelouse. */
-.pitch-with-bench{display:flex;align-items:stretch;min-width:0}
-.pitch-with-bench>.pitch{flex:1 1 auto;min-width:0}
+/* Banc intégré au terrain (composition) : petite zone sombre sur le bord droit, à la hauteur des joueurs. */
 .pitch-bench{display:none}
-.pitch-with-bench.has-bench{gap:8px}
-.pitch-with-bench.has-bench>.pitch{margin-right:0}
-.pitch-with-bench.has-bench>.pitch-bench{display:flex;flex-direction:column;align-items:center;gap:16px;flex:0 0 78px;margin-right:12px;padding:12px 6px 14px;border-radius:10px;background:#1f3a2a;box-shadow:inset 0 0 0 1px rgba(255,255,255,.12);overflow-y:auto}
-.pitch-bench-title{display:flex;flex-direction:column;align-items:center;gap:2px;padding-bottom:10px;margin-bottom:2px;width:100%;border-bottom:1px dashed rgba(255,255,255,.35);color:rgba(255,255,255,.85);font-size:9px;font-weight:800;letter-spacing:2px;text-transform:uppercase}
-.pitch-bench-title small{font-size:9px;font-weight:600;letter-spacing:0;color:rgba(255,255,255,.6);text-transform:none}
-.pitch-bench .player{position:static!important;transform:none!important;pointer-events:auto;flex-shrink:0;cursor:pointer;gap:5px}
-.pitch-bench .player .token{width:38px;height:38px;font-size:14px;border:2px solid #fff;outline:0;box-shadow:0 3px 8px rgba(0,0,0,.35)}
-.pitch-bench .player-name{max-width:70px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:9px;padding:3px 7px;border-radius:20px;background:rgba(255,255,255,.14);border:0;color:#fff}
-.pitch-bench .player-empty-sub .token{background:transparent!important;border:2px dashed rgba(255,255,255,.6);box-shadow:none;color:rgba(255,255,255,.8);font-size:20px;font-weight:400}
+.pitch.has-bench>.pitch-bench{position:absolute;right:6px;top:50%;transform:translateY(-50%);z-index:6;display:flex;flex-direction:column;align-items:center;gap:12px;width:64px;max-height:calc(100% - 16px);overflow-y:auto;padding:8px 4px 10px;border-radius:12px;background:rgba(10,30,18,.68);box-shadow:0 0 0 1px rgba(255,255,255,.2),0 6px 16px rgba(0,0,0,.25)}
+.pitch-bench-title{display:flex;flex-direction:column;align-items:center;gap:1px;padding-bottom:7px;width:100%;border-bottom:1px dashed rgba(255,255,255,.35);color:rgba(255,255,255,.9);font-size:9px;font-weight:800;letter-spacing:2px;text-transform:uppercase}
+.pitch-bench-title small{font-size:9px;font-weight:600;letter-spacing:0;color:rgba(255,255,255,.65);text-transform:none}
+.pitch-bench .player{position:static!important;transform:none!important;pointer-events:auto;flex-shrink:0;cursor:pointer;gap:4px}
+.pitch-bench .player .token{width:34px;height:34px;font-size:13px;border:2px solid #fff;outline:0;box-shadow:0 3px 8px rgba(0,0,0,.35)}
+.pitch-bench .player-name{max-width:58px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:8px;padding:2px 6px;border-radius:20px;background:rgba(255,255,255,.16);border:0;color:#fff}
+.pitch-bench .player-empty-sub .token{background:transparent!important;border:2px dashed rgba(255,255,255,.65);box-shadow:none;color:rgba(255,255,255,.85);font-size:18px;font-weight:400}
 .pitch-bench .player-empty-sub .token::after{content:"+"}
 .pitch-bench .player-empty-sub:hover .token,.pitch-bench .player-empty-sub:focus-visible .token{border-color:#fff;color:#fff}
 .pitch-bench .player:focus-visible{outline:2px solid #fff;outline-offset:3px;border-radius:12px}
-@media(max-width:700px){.pitch-with-bench.has-bench{gap:6px}.pitch-with-bench.has-bench>.pitch-bench{flex-basis:58px;margin-right:8px;gap:12px;padding:10px 4px}.pitch-bench .player .token{width:30px;height:30px;font-size:12px}.pitch-bench .player-empty-sub .token{font-size:16px}.pitch-bench .player-name{max-width:52px;font-size:8px;padding:2px 5px}}
+@media(max-width:700px){.pitch.has-bench>.pitch-bench{width:48px;right:4px;gap:8px;padding:6px 3px 8px}.pitch-bench .player .token{width:26px;height:26px;font-size:11px}.pitch-bench .player-empty-sub .token{font-size:14px}.pitch-bench .player-name{max-width:44px;font-size:7px;padding:1px 4px}}
 @media print{.pitch-bench{display:none!important}}
