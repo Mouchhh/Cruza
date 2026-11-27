@@ -5,14 +5,21 @@
 #players .player-empty-sub .token { background: var(--club-logo-red,#e41f28); border-color: white; }
 body.match-clean-mode .pitch-brand,
 body.match-clean-mode .board-footer { display: none !important; }
-/* Banc à droite du terrain (composition) : les remplaçants ne sont plus sur le terrain. */
-.pitch-with-bench{display:flex;align-items:stretch;gap:0;min-width:0}
+/* Banc à droite du terrain (composition) : un « bord du terrain » vert foncé, séparé de la pelouse. */
+.pitch-with-bench{display:flex;align-items:stretch;min-width:0}
 .pitch-with-bench>.pitch{flex:1 1 auto;min-width:0}
 .pitch-bench{display:none}
-.pitch-with-bench.has-bench>.pitch-bench{display:flex;flex-direction:column;align-items:center;gap:14px;flex:0 0 72px;margin-right:12px;padding:10px 4px;border-radius:0 8px 8px 0;background:#e9eef7;border:1px solid #d6dfec;border-left:0;overflow-y:auto}
-.pitch-with-bench.has-bench>.pitch{margin-right:0;border-radius:4px 0 0 4px}
-.pitch-bench-title{font-size:10px;font-weight:800;letter-spacing:1px;text-transform:uppercase;color:#425d7d}
-.pitch-bench .player{position:static!important;transform:none!important;pointer-events:auto;flex-shrink:0}
-.pitch-bench .player-name{max-width:64px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:8px}
-@media(max-width:700px){.pitch-with-bench.has-bench>.pitch-bench{flex-basis:54px;margin-right:8px;gap:10px}.pitch-bench .player-name{max-width:48px}}
+.pitch-with-bench.has-bench{gap:8px}
+.pitch-with-bench.has-bench>.pitch{margin-right:0}
+.pitch-with-bench.has-bench>.pitch-bench{display:flex;flex-direction:column;align-items:center;gap:16px;flex:0 0 78px;margin-right:12px;padding:12px 6px 14px;border-radius:10px;background:#1f3a2a;box-shadow:inset 0 0 0 1px rgba(255,255,255,.12);overflow-y:auto}
+.pitch-bench-title{display:flex;flex-direction:column;align-items:center;gap:2px;padding-bottom:10px;margin-bottom:2px;width:100%;border-bottom:1px dashed rgba(255,255,255,.35);color:rgba(255,255,255,.85);font-size:9px;font-weight:800;letter-spacing:2px;text-transform:uppercase}
+.pitch-bench-title small{font-size:9px;font-weight:600;letter-spacing:0;color:rgba(255,255,255,.6);text-transform:none}
+.pitch-bench .player{position:static!important;transform:none!important;pointer-events:auto;flex-shrink:0;cursor:pointer;gap:5px}
+.pitch-bench .player .token{width:38px;height:38px;font-size:14px;border:2px solid #fff;outline:0;box-shadow:0 3px 8px rgba(0,0,0,.35)}
+.pitch-bench .player-name{max-width:70px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:9px;padding:3px 7px;border-radius:20px;background:rgba(255,255,255,.14);border:0;color:#fff}
+.pitch-bench .player-empty-sub .token{background:transparent!important;border:2px dashed rgba(255,255,255,.6);box-shadow:none;color:rgba(255,255,255,.8);font-size:20px;font-weight:400}
+.pitch-bench .player-empty-sub .token::after{content:"+"}
+.pitch-bench .player-empty-sub:hover .token,.pitch-bench .player-empty-sub:focus-visible .token{border-color:#fff;color:#fff}
+.pitch-bench .player:focus-visible{outline:2px solid #fff;outline-offset:3px;border-radius:12px}
+@media(max-width:700px){.pitch-with-bench.has-bench{gap:6px}.pitch-with-bench.has-bench>.pitch-bench{flex-basis:58px;margin-right:8px;gap:12px;padding:10px 4px}.pitch-bench .player .token{width:30px;height:30px;font-size:12px}.pitch-bench .player-empty-sub .token{font-size:16px}.pitch-bench .player-name{max-width:52px;font-size:8px;padding:2px 5px}}
 @media print{.pitch-bench{display:none!important}}

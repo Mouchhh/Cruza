@@ -55,8 +55,8 @@ document.addEventListener('DOMContentLoaded', () => {
     row.classList.toggle('has-bench',onBench);
     if(onBench){
       const tokens=[...$('pitch-subs').querySelectorAll('.pitch-sub'),...$('players').querySelectorAll('[data-id^="empty-sub-slot-"]')];
-      if(tokens.length)benchColumn.append(el('span','pitch-bench-title','Banc'));
-      for(const token of tokens){token.style.left=token.style.top='';token.removeAttribute('draggable');benchColumn.append(token);}
+      if(tokens.length){const subs=state.players.filter(p=>p.role==='sub').length,title=el('span','pitch-bench-title','Banc');title.append(el('small','',subs+'/'+tokens.length));benchColumn.append(title);}
+      for(const token of tokens){token.style.left=token.style.top='';token.removeAttribute('draggable');const name=token.querySelector('.player-name');if(name)name.textContent=name.textContent.replace(/^I\/F · /,'');benchColumn.append(token);}
     }
     return value;};
   render();
