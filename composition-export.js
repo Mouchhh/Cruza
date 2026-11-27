@@ -33,7 +33,7 @@ function compositionPitch(ctx,rect,landscape,snapshot,images,options){
  if(options.opponents&&snapshot.opponents)snapshot.opponents.players.forEach(p=>{const [px,py]=xy(p.x,p.y);compositionPortrait(ctx,p,px,py,radius*.7,images,snapshot.opponents.color);});
  const players=snapshot.players.filter(p=>p.role!=='sub');
  if(options.bench)snapshot.players.filter(p=>p.role==='sub').forEach((p,i)=>players.push({...p,x:p.benchX??92-Math.floor(i/7)*11,y:p.benchY??20+(i%7)*10,name:'I/F · '+p.name}));
- players.forEach(p=>{const [px,py]=xy(p.x,p.y),r=p.role==='sub'?radius*.75:radius;compositionPortrait(ctx,{...p,photo:''},px,py,r,images,snapshot.color);
+ players.forEach(p=>{const [px,py]=xy(p.x,p.y),r=p.role==='sub'?radius*.75:radius;compositionPortrait(ctx,{...p,photo:''},px,py,r,images,snapshot.color);if(p.id===snapshot.captainId){/* brassard : un C jaune en haut à droite du pion */const cr=r*.42,cx=px+r*.78,cy=py-r*.78;ctx.save();ctx.beginPath();ctx.arc(cx,cy,cr,0,Math.PI*2);ctx.fillStyle='#ffd23f';ctx.fill();ctx.strokeStyle='#142d50';ctx.lineWidth=Math.max(2,cr*.14);ctx.stroke();ctx.fillStyle='#142d50';ctx.font='800 '+Math.round(cr*1.25)+'px Arial,sans-serif';ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillText('C',cx,cy+cr*.05);ctx.restore();}
  if(minimal)return;
  ctx.font=(options.nameWeight==='normal'?'normal ':'bold ')+Math.round(r*.45*(options.nameScale||1))+'px Arial';ctx.textAlign='center';ctx.textBaseline='middle';const name=compositionFit(ctx,p.name,w*.22),tw=ctx.measureText(name).width,height=r*.67*(options.nameScale||1);
  const left=Math.max(x+6,Math.min(x+w-tw-34,px-tw/2-14)),top=Math.min(y+h-height-6,py+r+10);

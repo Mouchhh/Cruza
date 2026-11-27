@@ -262,6 +262,74 @@ document.addEventListener("DOMContentLoaded", () => {
       };
       matchNumberBox.append(updateNumber);
     }
+    // Capitaine et retrait : bien visibles dans la fenêtre du joueur, pas cachés dans un menu.
+    function commitBoard(change, message) {
+      if (!alive())
+        return (status.textContent = "La composition a changé. Rouvrez cet emplacement.");
+      const next = structuredClone(getCompositionBoard());
+      change(next);
+      if (!valid(next))
+        return (status.textContent = "Modification impossible sur cette composition.");
+      try {
+        coachStorageSet("vestiaire-draft", JSON.stringify(next));
+      } catch {
+        return (status.textContent = "Modification non enregistrée : stockage indisponible.");
+      }
+      state = next;
+      compositionBoard = next;
+      terrainKnownState = next;
+      render();
+      if (typeof terrainHistoryRecord === "function")
+        terrainHistoryRecord(terrainHistoryContext(false));
+      dialog.close();
+      notify(message);
+    }
+    // Places du banc affichées = max(joueurs sur le banc, nombre de places choisi).
+    const benchCount = (b) =>
+      Math.max(b.players.filter((p) => p.role === "sub").length, Number(b.benchSlotCount) || 0);
+    const slotActions = el("div", "composition-picker-actions");
+    if (!virtual) {
+      const isCaptain = board.captainId === id;
+      const captain = el(
+        "button",
+        "composition-captain-toggle" + (isCaptain ? " is-captain" : ""),
+        isCaptain ? "Capitaine · retirer le C" : "Nommer capitaine",
+      );
+      captain.type = "button";
+      captain.setAttribute("aria-pressed", String(isCaptain));
+      captain.prepend(el("span", "composition-captain-badge", "C"));
+      captain.onclick = () =>
+        commitBoard(
+          (next) => {
+            if (isCaptain) delete next.captainId;
+            else next.captainId = id;
+          },
+          isCaptain ? "Capitaine retiré." : slot.name + " est capitaine.",
+        );
+      const remove = el("button", "squad-remove", slot.role === "sub" ? "Retirer du banc" : "Retirer de la compo");
+      remove.type = "button";
+      remove.onclick = () =>
+        commitBoard(
+          (next) => {
+            const count = benchCount(next);
+            next.players = next.players.filter((p) => p.id !== id);
+            if (next.captainId === id) delete next.captainId;
+            // Sur le banc, la place disparaît avec le joueur (sinon une place vide reste).
+            if (slot.role === "sub") next.benchSlotCount = Math.max(0, count - 1);
+          },
+          slot.role === "sub" ? "Joueur retiré du banc." : "Joueur retiré de la composition.",
+        );
+      slotActions.append(captain, remove);
+    } else if (slot.role === "sub" && !extra) {
+      const drop = el("button", "squad-remove", "Supprimer cette place du banc");
+      drop.type = "button";
+      drop.onclick = () =>
+        commitBoard(
+          (next) => (next.benchSlotCount = Math.max(0, benchCount(next) - 1)),
+          "Place supprimée du banc.",
+        );
+      slotActions.append(drop);
+    }
     const normal = (s) =>
       String(s)
         .normalize("NFD")
@@ -448,6 +516,7 @@ document.addEventListener("DOMContentLoaded", () => {
     dialog.append(
       heading,
       context,
+      slotActions,
       matchNumberBox,
       tabs,
       existing,
@@ -508,6 +577,21 @@ document.addEventListener("DOMContentLoaded", () => {
     });
     return true;
   }
+  // Brassard : un « C » bien visible sur le pion du capitaine (terrain et banc).
+  const renderBeforeCaptain = render;
+  render = function (...args) {
+    const result = renderBeforeCaptain.apply(this, args);
+    for (const mark of document.querySelectorAll(".composition-captain-mark")) mark.remove();
+    const captainId = state.boardKind !== "plan" && state.players.some((p) => p.id === state.captainId) && state.captainId;
+    if (captainId)
+      for (const token of document.querySelectorAll('[data-id="' + CSS.escape(captainId) + '"] .token')) {
+        const mark = el("span", "composition-captain-mark", "C");
+        mark.title = "Capitaine";
+        mark.setAttribute("aria-label", "Capitaine");
+        token.append(mark);
+      }
+    return result;
+  };
   const legacyEditor = openEditor;
   openEditor = function (id, role = "starter") {
     if (id === null && openNew(role)) return;

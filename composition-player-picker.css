@@ -157,3 +157,13 @@ body.composition-slot-editing .roster-folded #terrain-roster-drawer {
 .composition-picker-number > .report-field {
   flex: 1 1 160px;
 }
+/* Capitaine : brassard « C » sur le pion ; boutons Capitaine / Retirer en haut de la fenêtre du joueur */
+.token{position:relative}
+.composition-captain-mark{position:absolute;top:-6px;right:-8px;width:20px;height:20px;border-radius:50%;background:#ffd23f;color:#142d50;border:2px solid #142d50;display:grid;place-items:center;font:800 11px/1 Arial,sans-serif;z-index:2;pointer-events:none}
+.composition-picker-actions{display:flex;flex-wrap:wrap;gap:8px;margin:4px 0 12px}
+.composition-picker-actions:empty{display:none}
+.composition-captain-toggle{display:inline-flex;align-items:center;gap:8px;min-height:44px;padding:8px 14px;border:1px solid #cbd8eb;border-radius:10px;background:#fff;color:#142d50;font-weight:700;cursor:pointer}
+.composition-captain-toggle.is-captain{background:#fff7d6;border-color:#e0b400}
+.composition-captain-badge{width:22px;height:22px;border-radius:50%;background:#ffd23f;color:#142d50;border:2px solid #142d50;display:grid;place-items:center;font:800 11px/1 Arial,sans-serif}
+.composition-picker-actions .squad-remove{min-height:44px;padding:8px 12px;font-weight:600}
+@media print{.composition-captain-mark{-webkit-print-color-adjust:exact;print-color-adjust:exact}}
