@@ -263,3 +263,12 @@ body.match-clean-mode #terrain-flow[data-step="1"] > .flow-footer,
 #task-causerie.causerie-clean-editor #match-plan-form [data-phase="closingMessage"] textarea { height:90px; min-height:90px; }
 
 .causerie-clean-context{padding:22px;border:1px solid #dbe4f1;border-left:4px solid #0055a5;border-radius:12px;background:#f5f8fd;min-width:0}.causerie-clean-context h3{margin:0 0 15px;font-size:18px;color:#0b192c}.causerie-clean-editor .causerie-clean-context textarea{min-height:145px;background:white}
+
+.causerie-visibility{position:relative;display:grid!important;grid-template-columns:40px auto;gap:5px 8px;align-items:center;max-width:100%}
+.task-causerie #match-plan-form .causerie-visibility input{position:absolute;opacity:0;width:40px;height:24px;margin:0;cursor:pointer}
+.causerie-visibility-track{display:block;width:40px;height:22px;background:#2455a1;border-radius:20px;padding:3px;pointer-events:none}
+.causerie-visibility-track::before{content:"";display:block;width:16px;height:16px;border-radius:50%;background:white;transition:transform .15s}
+.causerie-visibility input:checked+.causerie-visibility-track{background:#465469}
+.causerie-visibility input:checked+.causerie-visibility-track::before{transform:translateX(18px)}
+.causerie-visibility input:focus-visible+.causerie-visibility-track{outline:2px solid #0b2e8a;outline-offset:3px}
+.causerie-visibility small{grid-column:1/-1;font-weight:500}

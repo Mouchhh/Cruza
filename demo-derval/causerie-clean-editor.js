@@ -10,6 +10,41 @@ document.addEventListener("DOMContentLoaded", () => {
   legacy.hidden = true;
   const header = form.querySelector(".section-heading"),
     actions = el("div", "causerie-clean-actions");
+  if (window.CLUB_CLOUD_CONFIG?.clubId || window.CRUZA_DERVAL_DEMO) {
+    const control = el("label", "causerie-visibility");
+    const toggle = el("input");
+    toggle.type = "checkbox";
+    toggle.setAttribute("role", "switch");
+    toggle.setAttribute("aria-label", "Rendre la causerie privée");
+    toggle.setAttribute("aria-describedby", "causerie-visibility-help");
+    const mark = el("span", "causerie-visibility-track");
+    mark.setAttribute("aria-hidden", "true");
+    const stateLabel = el("strong");
+    const hint = el("small", "", "Validez puis attendez la synchronisation. La composition associée suit le même réglage.");
+    hint.id = "causerie-visibility-help";
+    control.append(toggle, mark, stateLabel, hint);
+    header.append(control);
+    function paintVisibility() {
+      toggle.checked = getCompositionBoard().causerieVisibility === "private";
+      stateLabel.textContent = toggle.checked ? "Privé · moi uniquement" : "Partagé au club";
+    }
+    toggle.onchange = () => {
+      const board = getCompositionBoard(), old = board.causerieVisibility;
+      board.causerieVisibility = toggle.checked ? "private" : "club";
+      if (persist() === false) {
+        if (old === undefined) delete board.causerieVisibility;
+        else board.causerieVisibility = old;
+      }
+      paintVisibility();
+    };
+    const renderPreparation = renderMatchPreparation;
+    renderMatchPreparation = function (...args) {
+      const result = renderPreparation.apply(this, args);
+      paintVisibility();
+      return result;
+    };
+    paintVisibility();
+  }
   const submit = form.querySelector("[type=submit]"),
     close = $("match-plan-close"),
     ppt = $("causerie-download"),

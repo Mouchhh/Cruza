@@ -18,3 +18,5 @@ if(location.pathname.endsWith('/')||location.pathname.endsWith('/index.html')){
  demoUrl.searchParams.set('mode','local');
  try{history.replaceState(history.state,'',demoUrl)}catch{}
 }
+
+window.CRUZA_DERVAL_DEMO=true;
