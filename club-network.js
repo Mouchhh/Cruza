@@ -33,7 +33,7 @@ function clubSaveRender(){
   panel.append(el('strong','','Documents enregistrés'),detail,el('p','hint','Les brouillons restent sur cet appareil jusqu’au clic sur « Enregistrer ». Le partage est réservé aux éducateurs autorisés.'),retry,resolve);root.append(summary,panel);document.querySelector('.header-actions').prepend(root);
  }
  root.hidden=!clubNetworkBound();root.dataset.state=clubSaveState.state;
- const label={saved:'Enregistré et partagé',pending:'En attente',error:'Échec'}[clubSaveState.state];
+ const label={saved:clubNetworkClubId?'Synchronisé':'Enregistré et partagé',pending:'En attente',error:'Échec'}[clubSaveState.state];
  if($('club-save-label').textContent!==label)$('club-save-label').textContent=label;
  $('club-save-detail').textContent=clubSaveState.detail;
  $('club-save-retry').hidden=clubSaveState.state==='saved'||clubSaveState.conflict||[...clubSaveLocalErrors].some(key=>!key.startsWith('queue:'));
@@ -464,7 +464,7 @@ async function clubNetworkSync(){
    clubNetworkRenderSources();clubNetworkRenderRows();
    clubNetworkFailures=0;clubNetworkRetryAfter=0;
    const pending=clubNetworkPendingJobs(),conflicts=pending.filter(j=>j.conflict).length;
-   clubSaveStatus(conflicts?'error':pending.length?'pending':'saved',conflicts?'Conflit de version : votre copie locale est conservée. Ouvrez le document partagé avant de reporter vos changements.':pending.length?pending.length+' document(s) conservé(s) sur cet appareil, en attente de partage.':'Confirmation du serveur à '+new Date().toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit',timeZone:'Europe/Paris'})+'. Les documents enregistrés sont partagés avec le club.',conflicts>0);
+   clubSaveStatus(conflicts?'error':pending.length?'pending':'saved',conflicts?'Conflit de version : votre copie locale est conservée. Ouvrez le document partagé avant de reporter vos changements.':pending.length?pending.length+' document(s) conservé(s) sur cet appareil, en attente de partage.':'Confirmation du serveur à '+new Date().toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit',timeZone:'Europe/Paris'})+'. Les documents sont synchronisés selon leur visibilité.',conflicts>0);
    clubNetworkStatus(conflicts?conflicts+' conflit(s) à résoudre dans « Travail du club ». Vos versions locales sont conservées.':pending.length?pending.length+' enregistrement(s) en attente de synchronisation.':'Synchronisé avec le club · '+new Date().toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit',timeZone:'Europe/Paris'}));
   }catch(error){clubNetworkFailures++;clubNetworkRetryAfter=Date.now()+Math.min(300000,30000*2**Math.min(clubNetworkFailures-1,4));clubSaveStatus(!navigator.onLine||error instanceof TypeError||error.name==='TimeoutError'?'pending':'error',!navigator.onLine||error instanceof TypeError||error.name==='TimeoutError'?'Connexion indisponible : les enregistrements locaux restent en attente. Nouvelle tentative au retour de la connexion.':clubNetworkMessage(error));clubNetworkPresenceState='unavailable';clubNetworkConnected=[];clubNetworkActivity=[];clubNetworkActivityState='unavailable';clubNetworkRenderPresence();if(error.status===401||error.status===403||error.code==='42501')clubNetworkClear();clubNetworkStatus(clubNetworkMessage(error));}
   finally{clubNetworkSyncPromise=null;}
